@@ -444,6 +444,49 @@ document.addEventListener("DOMContentLoaded", () => {
     renderPublic();
   }, 5000); // 5 seconds
 });
+/**********************
+  ADMIN AUTH (Firebase)
+**********************/
+function setAdminStatus(text) {
+  const el = document.getElementById("adminStatus");
+  if (el) el.textContent = text;
+}
+
+function adminLogin() {
+  if (!window.auth) return alert("Auth not ready");
+
+  const email = document.getElementById("adminEmail")?.value?.trim();
+  const pass = document.getElementById("adminPassword")?.value;
+
+  if (!email || !pass) return alert("Enter email + password");
+
+  window.auth
+    .signInWithEmailAndPassword(email, pass)
+    .then(() => {
+      setAdminStatus("Signed in");
+      alert("Logged in!");
+    })
+    .catch((err) => {
+      alert(err.message);
+    });
+}
+
+function adminLogout() {
+  if (!window.auth) return;
+  window.auth.signOut().then(() => {
+    setAdminStatus("Not signed in");
+    alert("Logged out");
+  });
+}
+
+// Update status automatically when auth changes
+document.addEventListener("DOMContentLoaded", () => {
+  if (!window.auth) return;
+  window.auth.onAuthStateChanged((user) => {
+    if (user) setAdminStatus("Signed in as " + user.email);
+    else setAdminStatus("Not signed in");
+  });
+});
 
 
 /**********************
@@ -462,4 +505,6 @@ window.renderPublicGroup = renderPublic;
 window.renameTeam = renameTeam;
 window.addTeam = addTeam;
 window.removeTeam = removeTeam;
+window.adminLogin = adminLogin;
+window.adminLogout = adminLogout;
 
