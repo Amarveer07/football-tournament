@@ -281,6 +281,7 @@ function renameTeam() {
 
   renameInput.value = "";
   renderAdmin();
+  renderPublic();
 }
 
 function addTeam() {
@@ -293,10 +294,37 @@ function addTeam() {
   saveStateForUndo();
 
   if (!groups[currentGroup]) groups[currentGroup] = [];
-  groups[currentGroup].push({ name, p: 0, w: 0, d: 0, l: 0, points: 0, gd: 0 });
+  groups[currentGroup].push({
+    name,
+    p: 0, w: 0, d: 0, l: 0,
+    points: 0, gd: 0
+  });
 
   newTeamInput.value = "";
   renderAdmin();
+  renderPublic();
+}
+
+function removeTeam() {
+  const removeSelect = byId("removeSelect");
+  if (!removeSelect) return;
+
+  const i = Number(removeSelect.value);
+  const team = groups[currentGroup]?.[i];
+  if (!team) return;
+
+  // Safety: keep at least 2 teams in a group (you can remove this if you want)
+  if ((groups[currentGroup] || []).length <= 2) {
+    return alert("You must have at least 2 teams in a group.");
+  }
+
+  if (!confirm(`Remove ${team.name} from Group ${currentGroup}?`)) return;
+
+  saveStateForUndo();
+  groups[currentGroup].splice(i, 1);
+
+  renderAdmin();
+  renderPublic();
 }
 
 /**********************
@@ -401,3 +429,5 @@ window.resetTournament = resetTournament;
 window.renderPublicGroup = renderPublic;
 window.renameTeam = renameTeam;
 window.addTeam = addTeam;
+window.removeTeam = removeTeam;
+
