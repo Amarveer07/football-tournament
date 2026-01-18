@@ -37,9 +37,40 @@ let groups = loadGroups();
 let currentGroup = "A";
 let undoStack = [];
 
-function saveGroups() {
-  localStorage.setItem("groups", JSON.stringify(groups));
+/**********************
+  FIREBASE SYNC (Realtime Database)
+**********************/
+function dbReady() {
+  return typeof window.db !== "undefined" && window.db && window.db.ref;
 }
+
+function writeGroupsToFirebase() {
+  if (!dbReady()) return;
+  return window.db.ref("tournament/groups").set(groups);
+}
+
+function listenToGroupsFromFirebase() {
+  if (!dbReady()) return;
+
+  // Whenever the database changes, update local "groups" and re-render
+  window.db.ref("tournament/groups").on("value", (snapshot) => {
+    const data = snapshot.val();
+    if (data && typeof data === "object") {
+      groups = data;
+      renderAdmin();
+      renderPublic();
+    }
+  });
+}
+
+
+function saveGroups() {
+  // still keep a local backup (optional, helps offline)
+  localStorage.setItem("groups", JSON.stringify(groups));
+  // write to shared online database
+  writeGroupsToFirebase();
+}
+
 
 function sortGroup(group) {
   group.sort((a, b) => {
@@ -404,13 +435,14 @@ function renderPublic() {
   START
 **********************/
 document.addEventListener("DOMContentLoaded", () => {
-  renderAdmin();
+ listenToGroupsFromFirebase();
+ renderAdmin();
   renderPublic();
 
   // Public page auto-refresh (does nothing on admin page)
   setInterval(() => {
     renderPublic();
-  }, 10000); // 5 seconds
+  }, 5000); // 5 seconds
 });
 
 
