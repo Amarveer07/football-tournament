@@ -392,7 +392,7 @@ function renderPublic() {
   if (!select || !table) return; // not on this page
 
   // refresh groups in case admin updated elsewhere
-  groups = loadGroups();
+ 
 
   publicCurrentGroup = select.value;
   const group = groups[publicCurrentGroup] || [];
