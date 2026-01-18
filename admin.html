@@ -1,28 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
-  <head>
-    <meta charset="UTF-8">
-    <title>admin table</title>
-    <link rel="stylesheet" href="./style.css">
-
-  </head>
-    
-  <body>
-  <!DOCTYPE html>
-<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Football Tournament – Admin</title>
 
-  <!-- Admin styles -->
-  <link rel="stylesheet" href="admin.css" />
-
-  <!-- Admin logic -->
+  <link rel="stylesheet" href="admin.css?v=2" />
   <script src="app.js?v=3" defer></script>
 
-  <!-- Simple password gate -->
   <script>
     const PASSWORD = "a"; // change later
     const entered = prompt("Enter admin password:");
@@ -36,76 +21,86 @@
 
   <div class="card">
 
-    <!-- Group Tabs -->
+    <!-- Tabs -->
     <div class="tabs">
       <button onclick="showGroup('A')">Group A</button>
       <button onclick="showGroup('B')">Group B</button>
       <button onclick="showGroup('C')">Group C</button>
       <button onclick="showGroup('D')">Group D</button>
     </div>
-<h3>Manage Teams</h3>
 
+    <!-- Standings -->
+    <div class="section">
+      <h3>Standings</h3>
+      <div class="table-wrap">
+        <table id="groupTable"></table>
+      </div>
+    </div>
 
-<!-- Rename team -->
-<div>
-  <label>Rename a team:</label><br>
-  <select id="renameSelect"></select><br>
-  <input type="text" id="renameInput" placeholder="New team name">
-  <button onclick="renameTeam()">Rename Team</button>
-</div>
+    <!-- Manage Teams -->
+    <div class="section">
+      <h3>Manage Teams</h3>
 
-<br>
+      <div class="row">
+        <div>
+          <label>Rename a team</label><br>
+          <select id="renameSelect"></select><br>
+          <input type="text" id="renameInput" placeholder="New team name">
+          <button onclick="renameTeam()">Rename Team</button>
+        </div>
 
-<!-- Add new team -->
-<div>
-  <label>Add a team to this group:</label><br>
-  <input type="text" id="newTeamInput" placeholder="New team name">
-  <button onclick="addTeam()">Add Team</button>
-</div>
+        <div>
+          <label>Add a team</label><br>
+          <input type="text" id="newTeamInput" placeholder="New team name">
+          <button onclick="addTeam()">Add Team</button>
+        </div>
+      </div>
 
-<br>
+      <div style="margin-top:12px;">
+        <label>Remove a team</label><br>
+        <select id="removeSelect"></select><br>
+        <button onclick="removeTeam()">Remove Team</button>
+      </div>
+    </div>
 
-<!-- Remove team -->
-<div>
-  <label>Remove a team:</label><br>
-  <select id="removeSelect"></select><br>
-  <button onclick="removeTeam()">Remove Team</button>
-</div>
+    <!-- Update Team + Match -->
+    <div class="section">
+      <h3>Update Team</h3>
 
-    <!-- Standings Table -->
-   <div class="table-wrap">
-  <table id="groupTable"></table>
-</div>
+      <select id="teamSelect"></select><br>
+      <button onclick="addWin()">+3 Win</button>
+      <button onclick="addDraw()">+1 Draw</button>
+      <button onclick="addLoss()">Loss</button>
+      <button onclick="addGoal()">+ Goal</button>
+      <button onclick="removeGoal()">- Goal</button>
 
+      <h3 style="margin-top:16px;">Add Match Result</h3>
 
-    <!-- Manual Team Update -->
-    <h3>Update Team</h3>
-    <select id="teamSelect"></select><br>
-    <button onclick="addWin()">+3 Win</button>
-    <button onclick="addDraw()">+1 Draw</button>
-    <button onclick="addLoss()">Loss</button>
-    <button onclick="addGoal()">+ Goal</button>
-    <button onclick="removeGoal()">- Goal</button>
+      <div class="row">
+        <div>
+          <label>Team A</label><br>
+          <select id="teamA"></select><br>
+          <input type="number" id="scoreA" placeholder="Team A goals">
+        </div>
 
-    <!-- Match Entry -->
-    <h3>Add Match Result</h3>
-    <select id="teamA"></select>
-    <select id="teamB"></select><br>
-    <input type="number" id="scoreA" placeholder="Team A goals">
-    <input type="number" id="scoreB" placeholder="Team B goals">
-    <button onclick="submitMatch()">Submit Match</button>
+        <div>
+          <label>Team B</label><br>
+          <select id="teamB"></select><br>
+          <input type="number" id="scoreB" placeholder="Team B goals">
+        </div>
+      </div>
+
+      <button onclick="submitMatch()" style="margin-top:10px;">Submit Match</button>
+    </div>
 
     <!-- Undo / Reset -->
-    <br><br>
-    <button onclick="undoLastAction()">Undo Last Action</button>
-    <button onclick="resetTournament()">Reset Tournament</button>
+    <div class="section">
+      <h3>Admin Actions</h3>
+      <button onclick="undoLastAction()">Undo Last Action</button>
+      <button onclick="resetTournament()">Reset Tournament</button>
+    </div>
 
   </div>
 
 </body>
-</html>
-    <script  src="./app,js?v=3"></script>
-
-  </body>
-  
 </html>
