@@ -51,26 +51,23 @@ function writeGroupsToFirebase() {
 
 function listenToGroupsFromFirebase() {
   if (!dbReady()) return;
-
-  // Whenever the database changes, update local "groups" and re-render
   window.db.ref("tournament/groups").on("value", (snapshot) => {
     const data = snapshot.val();
     if (data && typeof data === "object") {
       groups = data;
       renderAdmin();
-      renderPublic();
+      renderPublicGroup();      // IMPORTANT: renders table + matches
+      fillMatchTeamDropdowns(); // keeps match dropdowns synced with team names
     }
   });
 }
 
-
 function saveGroups() {
-  // still keep a local backup (optional, helps offline)
+  // keep a local backup
   localStorage.setItem("groups", JSON.stringify(groups));
   // write to shared online database
   writeGroupsToFirebase();
 }
-
 
 function sortGroup(group) {
   group.sort((a, b) => {
@@ -89,11 +86,97 @@ function byId(id) {
 }
 
 /**********************
+  MATCHES (Firebase)
+  Data path: tournament/matches/{A|B|C|D}/{matchId}
+**********************/
+let matches = { A: {}, B: {}, C: {}, D: {} };
+
+function listenToMatchesFromFirebase() {
+  if (!dbReady()) return;
+
+  window.db.ref("tournament/matches").on("value", (snapshot) => {
+    const data = snapshot.val();
+    matches = data && typeof data === "object" ? data : { A: {}, B: {}, C: {}, D: {} };
+
+    renderPublicMatches();
+    renderAdminMatches();
+  });
+}
+
+function isAdminAuthed() {
+  return !!(window.auth && window.auth.currentUser);
+}
+
+function matchObjToArray(groupLetter) {
+  const obj = matches?.[groupLetter] || {};
+  return Object.entries(obj).map(([id, m]) => ({ id, ...m }));
+}
+
+function formatMatchTime(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleString([], {
+    year: "numeric", month: "short", day: "2-digit",
+    hour: "2-digit", minute: "2-digit"
+  });
+}
+
+function matchIsResult(m) {
+  return m && m.scoreA !== null && m.scoreA !== undefined && m.scoreB !== null && m.scoreB !== undefined;
+}
+
+/**********************
+  PUBLIC MATCH RENDER
+**********************/
+function renderPublicMatches() {
+  const upcomingEl = byId("publicUpcoming");
+  const resultsEl = byId("publicResults");
+  if (!upcomingEl || !resultsEl) return;
+
+  const groupLetter = (byId("publicGroupSelect")?.value) || "A";
+  const list = matchObjToArray(groupLetter);
+
+  list.sort((m1, m2) => {
+    const t1 = new Date(m1.time || "9999-12-31T00:00:00Z").getTime();
+    const t2 = new Date(m2.time || "9999-12-31T00:00:00Z").getTime();
+    return t1 - t2;
+  });
+
+  const upcoming = list.filter(m => !matchIsResult(m));
+  const results = list.filter(m => matchIsResult(m));
+
+  upcomingEl.innerHTML = upcoming.length
+    ? upcoming.map(m => `
+        <div style="padding:10px 12px; border:1px solid rgba(255,255,255,0.10); border-radius:12px; margin-bottom:10px;">
+          <div style="font-weight:700;">${m.teamA} vs ${m.teamB}</div>
+          <div style="opacity:0.75; font-size:13px; margin-top:4px;">
+            ${formatMatchTime(m.time)} • ${m.pitch ? `Pitch: ${m.pitch}` : "Pitch: TBC"}
+          </div>
+        </div>
+      `).join("")
+    : `<div style="opacity:0.7; font-size:13px;">No upcoming matches yet.</div>`;
+
+  resultsEl.innerHTML = results.length
+    ? results.map(m => `
+        <div style="padding:10px 12px; border:1px solid rgba(255,255,255,0.10); border-radius:12px; margin-bottom:10px;">
+          <div style="font-weight:700;">
+            ${m.teamA} ${m.scoreA}–${m.scoreB} ${m.teamB}
+          </div>
+          <div style="opacity:0.75; font-size:13px; margin-top:4px;">
+            ${formatMatchTime(m.time)} • ${m.pitch ? `Pitch: ${m.pitch}` : "Pitch: TBC"}
+          </div>
+        </div>
+      `).join("")
+    : `<div style="opacity:0.7; font-size:13px;">No results yet.</div>`;
+}
+
+/**********************
   ADMIN RENDER
 **********************/
 function renderAdmin() {
   const table = byId("groupTable");
-  if (!table) return; // not on this page
+  if (!table) return;
 
   const group = groups[currentGroup] || [];
   if (group.length === 0) {
@@ -135,6 +218,7 @@ function renderAdmin() {
   updateAdminDropdowns();
   saveGroups();
 }
+
 function updateAdminDropdowns() {
   const select = byId("teamSelect");
   const a = byId("teamA");
@@ -142,7 +226,6 @@ function updateAdminDropdowns() {
   const renameSelect = byId("renameSelect");
   const removeSelect = byId("removeSelect");
 
-  // if these don't exist, we're not on admin page
   if (!select || !a || !b) return;
 
   select.innerHTML = "";
@@ -152,7 +235,6 @@ function updateAdminDropdowns() {
   if (removeSelect) removeSelect.innerHTML = "";
 
   (groups[currentGroup] || []).forEach((team, index) => {
-    // teamSelect, teamA, teamB
     [select, a, b].forEach(el => {
       const opt = document.createElement("option");
       opt.value = index;
@@ -160,7 +242,6 @@ function updateAdminDropdowns() {
       el.appendChild(opt);
     });
 
-    // renameSelect
     if (renameSelect) {
       const opt = document.createElement("option");
       opt.value = index;
@@ -168,7 +249,6 @@ function updateAdminDropdowns() {
       renameSelect.appendChild(opt);
     }
 
-    // removeSelect
     if (removeSelect) {
       const opt = document.createElement("option");
       opt.value = index;
@@ -177,7 +257,6 @@ function updateAdminDropdowns() {
     }
   });
 }
-
 
 /**********************
   ADMIN ACTIONS
@@ -191,13 +270,9 @@ function addWin() {
   const sel = byId("teamSelect");
   if (!sel) return;
   saveStateForUndo();
-
   const g = groups[currentGroup];
   const i = Number(sel.value);
-  g[i].p++;
-  g[i].w++;
-  g[i].points += 3;
-
+  g[i].p++; g[i].w++; g[i].points += 3;
   renderAdmin();
 }
 
@@ -205,13 +280,9 @@ function addDraw() {
   const sel = byId("teamSelect");
   if (!sel) return;
   saveStateForUndo();
-
   const g = groups[currentGroup];
   const i = Number(sel.value);
-  g[i].p++;
-  g[i].d++;
-  g[i].points += 1;
-
+  g[i].p++; g[i].d++; g[i].points += 1;
   renderAdmin();
 }
 
@@ -219,12 +290,9 @@ function addLoss() {
   const sel = byId("teamSelect");
   if (!sel) return;
   saveStateForUndo();
-
   const g = groups[currentGroup];
   const i = Number(sel.value);
-  g[i].p++;
-  g[i].l++;
-
+  g[i].p++; g[i].l++;
   renderAdmin();
 }
 
@@ -232,11 +300,9 @@ function addGoal() {
   const sel = byId("teamSelect");
   if (!sel) return;
   saveStateForUndo();
-
   const g = groups[currentGroup];
   const i = Number(sel.value);
   g[i].gd++;
-
   renderAdmin();
 }
 
@@ -244,11 +310,9 @@ function removeGoal() {
   const sel = byId("teamSelect");
   if (!sel) return;
   saveStateForUndo();
-
   const g = groups[currentGroup];
   const i = Number(sel.value);
   g[i].gd--;
-
   renderAdmin();
 }
 
@@ -277,16 +341,9 @@ function submitMatch() {
   A.gd += (sA - sB);
   B.gd += (sB - sA);
 
-  if (sA > sB) {
-    A.w++; A.points += 3;
-    B.l++;
-  } else if (sB > sA) {
-    B.w++; B.points += 3;
-    A.l++;
-  } else {
-    A.d++; B.d++;
-    A.points += 1; B.points += 1;
-  }
+  if (sA > sB) { A.w++; A.points += 3; B.l++; }
+  else if (sB > sA) { B.w++; B.points += 3; A.l++; }
+  else { A.d++; B.d++; A.points += 1; B.points += 1; }
 
   scoreA.value = "";
   scoreB.value = "";
@@ -295,7 +352,117 @@ function submitMatch() {
 }
 
 /**********************
-  TEAM MANAGEMENT (NEW)
+  ADMIN MATCH UI + ACTIONS
+**********************/
+function fillMatchTeamDropdowns() {
+  const grpSel = byId("matchGroup");
+  const aSel = byId("matchTeamA");
+  const bSel = byId("matchTeamB");
+  if (!grpSel || !aSel || !bSel) return;
+
+  const g = grpSel.value || "A";
+  const teams = (groups[g] || []).map(t => t.name);
+
+  aSel.innerHTML = "";
+  bSel.innerHTML = "";
+
+  teams.forEach((name) => {
+    const o1 = document.createElement("option");
+    o1.value = name;
+    o1.textContent = name;
+    aSel.appendChild(o1);
+
+    const o2 = document.createElement("option");
+    o2.value = name;
+    o2.textContent = name;
+    bSel.appendChild(o2);
+  });
+}
+
+function renderAdminMatches() {
+  const listEl = byId("adminMatchesList");
+  const grpSel = byId("matchGroup");
+  if (!listEl || !grpSel) return;
+
+  const g = grpSel.value || "A";
+  const list = matchObjToArray(g);
+
+  list.sort((m1, m2) => {
+    const t1 = new Date(m1.time || "9999-12-31T00:00:00Z").getTime();
+    const t2 = new Date(m2.time || "9999-12-31T00:00:00Z").getTime();
+    return t1 - t2;
+  });
+
+  if (list.length === 0) {
+    listEl.innerHTML = `<div style="opacity:0.7; font-size:13px;">No matches in Group ${g} yet.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = list.map(m => `
+    <div style="padding:10px 12px; border:1px solid rgba(255,255,255,0.10); border-radius:12px; margin-bottom:10px;">
+      <div style="font-weight:700;">${m.teamA} vs ${m.teamB}</div>
+      <div style="opacity:0.75; font-size:13px; margin-top:4px;">
+        ${formatMatchTime(m.time)} • ${m.pitch ? `Pitch: ${m.pitch}` : "Pitch: TBC"}
+      </div>
+
+      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        <input type="number" placeholder="A" style="width:90px;" id="scoreA_${m.id}" value="${matchIsResult(m) ? m.scoreA : ""}">
+        <input type="number" placeholder="B" style="width:90px;" id="scoreB_${m.id}" value="${matchIsResult(m) ? m.scoreB : ""}">
+        <button onclick="saveMatchScore('${g}','${m.id}')">Save Score</button>
+        <button onclick="deleteMatch('${g}','${m.id}')">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function addMatch() {
+  if (!dbReady()) return alert("Database not ready yet.");
+  if (!isAdminAuthed()) return alert("Please log in as admin first.");
+
+  const grp = byId("matchGroup")?.value || "A";
+  const teamA = byId("matchTeamA")?.value;
+  const teamB = byId("matchTeamB")?.value;
+  const timeLocal = byId("matchTime")?.value;
+  const pitch = (byId("matchPitch")?.value || "").trim();
+
+  if (!teamA || !teamB) return alert("Pick both teams.");
+  if (teamA === teamB) return alert("A team cannot play itself.");
+
+  const timeISO = timeLocal ? new Date(timeLocal).toISOString() : "";
+
+  const newRef = window.db.ref(`tournament/matches/${grp}`).push();
+  newRef.set({ teamA, teamB, time: timeISO, pitch: pitch || "", scoreA: null, scoreB: null });
+
+  if (byId("matchTime")) byId("matchTime").value = "";
+  if (byId("matchPitch")) byId("matchPitch").value = "";
+}
+
+function saveMatchScore(groupLetter, matchId) {
+  if (!dbReady()) return alert("Database not ready yet.");
+  if (!isAdminAuthed()) return alert("Please log in as admin first.");
+
+  const aVal = byId(`scoreA_${matchId}`)?.value;
+  const bVal = byId(`scoreB_${matchId}`)?.value;
+
+  const scoreA = Number(aVal);
+  const scoreB = Number(bVal);
+
+  if (Number.isNaN(scoreA) || Number.isNaN(scoreB)) {
+    return alert("Enter both scores (numbers).");
+  }
+
+  window.db.ref(`tournament/matches/${groupLetter}/${matchId}`).update({ scoreA, scoreB });
+}
+
+function deleteMatch(groupLetter, matchId) {
+  if (!dbReady()) return alert("Database not ready yet.");
+  if (!isAdminAuthed()) return alert("Please log in as admin first.");
+  if (!confirm("Delete this match?")) return;
+  window.db.ref(`tournament/matches/${groupLetter}/${matchId}`).remove();
+}
+
+/**********************
+  TEAM MANAGEMENT
 **********************/
 function renameTeam() {
   const renameSelect = byId("renameSelect");
@@ -306,13 +473,13 @@ function renameTeam() {
   if (!newName) return alert("Type a new team name first.");
 
   saveStateForUndo();
-
   const i = Number(renameSelect.value);
   groups[currentGroup][i].name = newName;
 
   renameInput.value = "";
   renderAdmin();
-  renderPublic();
+  renderPublicGroup();
+  fillMatchTeamDropdowns();
 }
 
 function addTeam() {
@@ -325,15 +492,12 @@ function addTeam() {
   saveStateForUndo();
 
   if (!groups[currentGroup]) groups[currentGroup] = [];
-  groups[currentGroup].push({
-    name,
-    p: 0, w: 0, d: 0, l: 0,
-    points: 0, gd: 0
-  });
+  groups[currentGroup].push({ name, p: 0, w: 0, d: 0, l: 0, points: 0, gd: 0 });
 
   newTeamInput.value = "";
   renderAdmin();
-  renderPublic();
+  renderPublicGroup();
+  fillMatchTeamDropdowns();
 }
 
 function removeTeam() {
@@ -344,7 +508,6 @@ function removeTeam() {
   const team = groups[currentGroup]?.[i];
   if (!team) return;
 
-  // Safety: keep at least 2 teams in a group (you can remove this if you want)
   if ((groups[currentGroup] || []).length <= 2) {
     return alert("You must have at least 2 teams in a group.");
   }
@@ -355,7 +518,8 @@ function removeTeam() {
   groups[currentGroup].splice(i, 1);
 
   renderAdmin();
-  renderPublic();
+  renderPublicGroup();
+  fillMatchTeamDropdowns();
 }
 
 /**********************
@@ -365,7 +529,8 @@ function undoLastAction() {
   if (undoStack.length === 0) return alert("No actions to undo!");
   groups = undoStack.pop();
   renderAdmin();
-  renderPublic(); // safe if on public page too
+  renderPublicGroup();
+  fillMatchTeamDropdowns();
 }
 
 function resetTournament() {
@@ -377,27 +542,27 @@ function resetTournament() {
   saveGroups();
 
   renderAdmin();
-  renderPublic();
+  renderPublicGroup();
+  fillMatchTeamDropdowns();
   alert("Tournament has been reset!");
 }
 
 /**********************
-  PUBLIC RENDER
+  PUBLIC RENDER (Table + Matches)
 **********************/
 let publicCurrentGroup = "A";
 
-function renderPublic() {
+function renderPublicGroup() {
   const select = byId("publicGroupSelect");
   const table = byId("publicTable");
-  if (!select || !table) return; // not on this page
-
-  // refresh groups in case admin updated elsewhere
- 
+  if (!select || !table) return;
 
   publicCurrentGroup = select.value;
   const group = groups[publicCurrentGroup] || [];
+
   if (group.length === 0) {
     table.innerHTML = `<tr><th>No teams in Group ${publicCurrentGroup}</th></tr>`;
+    renderPublicMatches();
     return;
   }
 
@@ -429,65 +594,81 @@ function renderPublic() {
       </tr>
     `;
   });
+
+  // IMPORTANT: keep matches in sync with group selection
+  renderPublicMatches();
 }
 
-/**********************
-  START
-**********************/
-document.addEventListener("DOMContentLoaded", () => {
- listenToGroupsFromFirebase();
- renderAdmin();
-  renderPublic();
-
-  // Public page auto-refresh (does nothing on admin page)
-  setInterval(() => {
-    renderPublic();
-  }, 5000); // 5 seconds
-});
 /**********************
   ADMIN AUTH (Firebase)
 **********************/
 function setAdminStatus(text) {
-  const el = document.getElementById("adminStatus");
+  const el = byId("adminStatus");
   if (el) el.textContent = text;
 }
 
 function adminLogin() {
   if (!window.auth) return alert("Auth not ready");
 
-  const email = document.getElementById("adminEmail")?.value?.trim();
-  const pass = document.getElementById("adminPassword")?.value;
+  const email = byId("adminEmail")?.value?.trim();
+  const pass = byId("adminPassword")?.value;
 
   if (!email || !pass) return alert("Enter email + password");
 
   window.auth
     .signInWithEmailAndPassword(email, pass)
-    .then(() => {
-      setAdminStatus("Signed in");
-      alert("Logged in!");
-    })
-    .catch((err) => {
-      alert(err.message);
-    });
+    .then(() => alert("Logged in!"))
+    .catch((err) => alert(err.message));
 }
 
 function adminLogout() {
   if (!window.auth) return;
-  window.auth.signOut().then(() => {
-    setAdminStatus("Not signed in");
-    alert("Logged out");
-  });
+  window.auth.signOut().then(() => alert("Logged out"));
 }
 
-// Update status automatically when auth changes
+/**********************
+  START (single predictable boot)
+**********************/
 document.addEventListener("DOMContentLoaded", () => {
-  if (!window.auth) return;
-  window.auth.onAuthStateChanged((user) => {
-    if (user) setAdminStatus("Signed in as " + user.email);
-    else setAdminStatus("Not signed in");
-  });
-});
+  // Auth status
+  if (window.auth) {
+    window.auth.onAuthStateChanged((user) => {
+      if (user) setAdminStatus("Signed in as " + user.email);
+      else setAdminStatus("Not signed in");
+    });
+  }
 
+  // Firebase listeners
+  listenToGroupsFromFirebase();
+  listenToMatchesFromFirebase();
+
+  // Initial renders
+  renderAdmin();
+  renderPublicGroup();
+  renderPublicMatches();
+  renderAdminMatches();
+
+  // Admin match dropdowns
+  const grpSel = byId("matchGroup");
+  if (grpSel) {
+    fillMatchTeamDropdowns();
+    grpSel.addEventListener("change", () => {
+      fillMatchTeamDropdowns();
+      renderAdminMatches();
+    });
+  }
+
+  // Public group selector should update matches too
+  const pubSel = byId("publicGroupSelect");
+  if (pubSel) {
+    pubSel.addEventListener("change", renderPublicGroup);
+  }
+
+  // Optional safety refresh (Firebase already pushes updates)
+  setInterval(() => {
+    renderPublicGroup();
+  }, 5000);
+});
 
 /**********************
   Make onclick="" work
@@ -501,10 +682,17 @@ window.removeGoal = removeGoal;
 window.submitMatch = submitMatch;
 window.undoLastAction = undoLastAction;
 window.resetTournament = resetTournament;
-window.renderPublicGroup = renderPublic;
+
 window.renameTeam = renameTeam;
 window.addTeam = addTeam;
 window.removeTeam = removeTeam;
+
 window.adminLogin = adminLogin;
 window.adminLogout = adminLogout;
 
+window.addMatch = addMatch;
+window.saveMatchScore = saveMatchScore;
+window.deleteMatch = deleteMatch;
+
+// Keep your old inline onchange="renderPublicGroup()" working
+window.renderPublicGroup = renderPublicGroup;
