@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>admin table</title>
+    <link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Football Tournament – Admin</title>
+
+  <!-- Admin styles -->
+  <link rel="stylesheet" href="admin.css" />
+
+  <!-- Admin logic -->
+  <script src="app.js" defer></script>
+
+  <!-- Simple password gate -->
+  <script>
+    const PASSWORD = "a"; // change later
+    const entered = prompt("Enter admin password:");
+    if (entered !== PASSWORD) {
+      alert("Access denied");
+      window.location.href = "index.html";
+    }
+  </script>
+</head>
+<body>
+
+  <div class="card">
+
+    <!-- Group Tabs -->
+    <div class="tabs">
+      <button onclick="showGroup('A')">Group A</button>
+      <button onclick="showGroup('B')">Group B</button>
+      <button onclick="showGroup('C')">Group C</button>
+      <button onclick="showGroup('D')">Group D</button>
+    </div>
+
+    <!-- Standings Table -->
+    <table id="groupTable"></table>
+
+    <!-- Manual Team Update -->
+    <h3>Update Team</h3>
+    <select id="teamSelect"></select><br>
+    <button onclick="addWin()">+3 Win</button>
+    <button onclick="addDraw()">+1 Draw</button>
+    <button onclick="addLoss()">Loss</button>
+    <button onclick="addGoal()">+ Goal</button>
+    <button onclick="removeGoal()">- Goal</button>
+
+    <!-- Match Entry -->
+    <h3>Add Match Result</h3>
+    <select id="teamA"></select>
+    <select id="teamB"></select><br>
+    <input type="number" id="scoreA" placeholder="Team A goals">
+    <input type="number" id="scoreB" placeholder="Team B goals">
+    <button onclick="submitMatch()">Submit Match</button>
+
+    <!-- Undo / Reset -->
+    <br><br>
+    <button onclick="undoLastAction()">Undo Last Action</button>
+    <button onclick="resetTournament()">Reset Tournament</button>
+
+  </div>
+
+</body>
+</html>
+    <script  src="./script.js"></script>
+
+  </body>
+  
+</html>

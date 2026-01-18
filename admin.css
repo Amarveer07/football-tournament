@@ -1,0 +1,124 @@
+/* BODY STYLING */
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+/* CARD CONTAINER */
+.card {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  max-width: 800px;
+  width: 100%;
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  border-radius: 6px;
+  background: #1976d2;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.tabs button:hover {
+  background: #125aa0;
+}
+
+/* TABLE STYLING */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+th, td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background: #222;
+  color: white;
+}
+
+tr:hover {
+  background: #f0f0f0;
+}
+
+/* Highlight the top team */
+.top-team {
+  background-color: #c8e6c9 !important; /* light green */
+  font-weight: bold;
+}
+
+/* Highlight the bottom team */
+.bottom-team {
+  background-color: #ffcdd2 !important; /* light red */
+  font-weight: bold;
+}
+
+/* HEADINGS */
+h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+/* BUTTONS AND INPUTS */
+button {
+  padding: 8px 12px;
+  margin: 5px 3px;
+  border: none;
+  border-radius: 6px;
+  background: #1976d2;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #125aa0;
+}
+
+input, select {
+  padding: 6px 10px;
+  margin: 5px 3px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .tabs {
+    flex-direction: column;
+  }
+
+  button, input, select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+#publicView .card {
+  background: #f9f9f9;
+}
+
+#publicView h2 {
+  margin-bottom: 15px;
+}
