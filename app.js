@@ -98,8 +98,14 @@ function listenToMatchesFromFirebase() {
     const data = snapshot.val();
     matches = data && typeof data === "object" ? data : { A: {}, B: {}, C: {}, D: {} };
 
-    renderPublicMatches();
-    renderAdminMatches();
+   //  rebuild standings from match results
+recalcStandingsFromMatches();
+
+//  now re-render tables + matches
+renderAdmin();
+renderPublicGroup();
+renderPublicMatches();
+renderAdminMatches();
   });
 }
 
