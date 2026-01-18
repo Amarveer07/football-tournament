@@ -54,6 +54,34 @@
         <table id="groupTable"></table>
       </div>
     </div>
+<div class="section">
+  <h3>Match Schedule</h3>
+
+  <label>Group</label><br>
+  <select id="matchGroup">
+    <option value="A">Group A</option>
+    <option value="B">Group B</option>
+    <option value="C">Group C</option>
+    <option value="D">Group D</option>
+  </select><br>
+
+  <label>Team A</label><br>
+  <select id="matchTeamA"></select><br>
+
+  <label>Team B</label><br>
+  <select id="matchTeamB"></select><br>
+
+  <label>Date & Time</label><br>
+  <input type="datetime-local" id="matchTime"><br>
+
+  <label>Pitch</label><br>
+  <input type="text" id="matchPitch" placeholder="e.g. Pitch 1"><br>
+
+  <button onclick="addMatch()">Add Match</button>
+
+  <h4 style="margin:14px 0 8px; font-size:14px; color:rgba(255,255,255,0.75);">Matches in this group</h4>
+  <div id="adminMatchesList"></div>
+</div>
 
     <!-- Manage Teams -->
     <div class="section">
