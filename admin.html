@@ -8,7 +8,8 @@
   <link rel="stylesheet" href="admin.css?v=2" />
  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-database-compat.js"></script>
-<script src="firebase-init.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-auth-compat.js"></script>
+ <script src="firebase-init.js" defer></script>
 
   <script src="app.js?v=3" defer></script>
 
@@ -22,6 +23,19 @@
   </script>
 </head>
 <body>
+<div class="card" style="margin-bottom:14px;">
+  <h2 style="margin:0 0 10px;">Admin Login</h2>
+
+  <input type="text" id="adminEmail" placeholder="Email">
+  <input type="password" id="adminPassword" placeholder="Password">
+
+  <button onclick="adminLogin()">Login</button>
+  <button onclick="adminLogout()">Logout</button>
+
+  <p id="adminStatus" style="margin:10px 0 0; color: rgba(255,255,255,0.7); font-size: 13px;">
+    Not signed in
+  </p>
+</div>
 
   <div class="card">
 
