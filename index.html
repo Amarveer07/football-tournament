@@ -1,30 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-
-  <head>
-    <meta charset="UTF-8">
-    <title>public view</title>
-    <link rel="stylesheet" href="./style.css">
-
-  </head>
-    
-  <body>
-  <!DOCTYPE html>
-<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Football Tournament - Public Standings</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Football Tournament – Standings</title>
+
+  <link rel="stylesheet" href="style.css?v=2" />
   <script src="app.js?v=3" defer></script>
 </head>
 <body>
 
   <div class="card" id="publicView">
-    <h2>Public Standings</h2>
+    <h2>Standings</h2>
 
-    <!-- Dropdown to select group -->
-    <label for="publicGroupSelect">Select Group: </label>
+    <label for="publicGroupSelect">Select group</label><br>
     <select id="publicGroupSelect" onchange="renderPublicGroup()">
       <option value="A">Group A</option>
       <option value="B">Group B</option>
@@ -32,22 +21,15 @@
       <option value="D">Group D</option>
     </select>
 
-    <!-- Table for public -->
     <div class="table-wrap">
-  <table id="publicTable"></table>
-</div>
+      <table id="publicTable"></table>
+    </div>
 
-
-    <!-- Optional: link to admin login -->
-    <p style="margin-top: 15px;">
-      <a href="admin.html">Admin Login</a>
+    <p style="margin-top: 14px; color: rgba(255,255,255,0.65); font-size: 13px;">
+      Admin?
+      <a href="admin.html">Login</a>
     </p>
   </div>
 
 </body>
-</html>
-    <script  src="./app.js?v=3"></script>
-
-  </body>
-  
 </html>
