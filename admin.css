@@ -1,124 +1,190 @@
-/* BODY STYLING */
-body {
-  font-family: Arial, sans-serif;
-  background: #f4f6f8;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
+/* =========
+   Base (same theme as public)
+========= */
+:root{
+  --bg: #0b1220;
+  --card: rgba(255,255,255,0.06);
+  --text: rgba(255,255,255,0.92);
+  --muted: rgba(255,255,255,0.65);
+  --line: rgba(255,255,255,0.10);
+  --accent: #60a5fa;
+  --good: #22c55e;
+  --bad: #ef4444;
+  --warn: #f59e0b;
+  --shadow: 0 18px 60px rgba(0,0,0,0.45);
+  --radius: 18px;
 }
 
-/* CARD CONTAINER */
-.card {
-  background: white;
-  padding: 20px 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  max-width: 800px;
-  width: 100%;
+*{ box-sizing: border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background:
+    radial-gradient(900px 600px at 15% 10%, rgba(96,165,250,0.18), transparent 60%),
+    radial-gradient(900px 600px at 85% 30%, rgba(34,197,94,0.12), transparent 60%),
+    radial-gradient(900px 600px at 60% 90%, rgba(239,68,68,0.10), transparent 55%),
+    var(--bg);
+  color: var(--text);
+  padding: 18px;
 }
 
-/* TABS */
-.tabs {
-  display: flex;
+/* =========
+   Card / headings
+========= */
+.card{
+  max-width: 980px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  backdrop-filter: blur(12px);
+}
+
+h2, h3{
+  margin: 14px 0 10px;
+  letter-spacing: 0.2px;
+}
+h3{
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.70);
+}
+
+/* =========
+   Tabs (segmented control)
+========= */
+.tabs{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
-
-.tabs button {
-  flex: 1;
-  padding: 10px 0;
-  border: none;
-  border-radius: 6px;
-  background: #1976d2;
-  color: white;
+.tabs button{
+  appearance: none;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-weight: 650;
   cursor: pointer;
-  font-weight: bold;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+.tabs button:hover{
+  background: rgba(255,255,255,0.10);
+  transform: translateY(-1px);
+}
+.tabs button:active{
+  transform: translateY(0);
 }
 
-.tabs button:hover {
-  background: #125aa0;
+/* =========
+   Controls / buttons
+========= */
+select, input[type="number"], input[type="text"]{
+  width: 100%;
+  max-width: 360px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  outline: none;
+  margin: 6px 0;
+}
+select:focus, input:focus{
+  border-color: rgba(96,165,250,0.55);
+  box-shadow: 0 0 0 4px rgba(96,165,250,0.12);
 }
 
-/* TABLE STYLING */
-table {
+button{
+  appearance: none;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  margin: 6px 6px 6px 0;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+button:hover{
+  background: rgba(255,255,255,0.12);
+  transform: translateY(-1px);
+}
+button:active{ transform: translateY(0); }
+
+/* Optional “semantic” button classes if you want to add them later */
+.btn-good{ border-color: rgba(34,197,94,0.35); }
+.btn-bad{ border-color: rgba(239,68,68,0.35); }
+.btn-warn{ border-color: rgba(245,158,11,0.35); }
+
+/* =========
+   Sections layout
+========= */
+.section{
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,0.14);
+  border-radius: 16px;
+  padding: 14px;
+  margin-top: 14px;
+}
+
+.row{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+@media (max-width: 760px){
+  .tabs{ grid-template-columns: repeat(2, 1fr); }
+  .row{ grid-template-columns: 1fr; }
+}
+
+/* =========
+   Table
+========= */
+.table-wrap{
+  margin-top: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,0.18);
+}
+table{
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 30px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  min-width: 720px;
 }
-
-th, td {
-  padding: 10px;
+th, td{
+  padding: 12px 10px;
   text-align: center;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
 }
-
-th {
-  background: #222;
-  color: white;
+th{
+  position: sticky;
+  top: 0;
+  background: rgba(17,26,46,0.92);
+  backdrop-filter: blur(10px);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.72);
 }
-
-tr:hover {
-  background: #f0f0f0;
+td:first-child, th:first-child{
+  text-align: left;
+  padding-left: 14px;
+  font-weight: 700;
 }
+tr:hover td{ background: rgba(255,255,255,0.04); }
 
-/* Highlight the top team */
-.top-team {
-  background-color: #c8e6c9 !important; /* light green */
-  font-weight: bold;
-}
-
-/* Highlight the bottom team */
-.bottom-team {
-  background-color: #ffcdd2 !important; /* light red */
-  font-weight: bold;
-}
-
-/* HEADINGS */
-h3 {
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-
-/* BUTTONS AND INPUTS */
-button {
-  padding: 8px 12px;
-  margin: 5px 3px;
-  border: none;
-  border-radius: 6px;
-  background: #1976d2;
-  color: white;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #125aa0;
-}
-
-input, select {
-  padding: 6px 10px;
-  margin: 5px 3px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-/* RESPONSIVE */
-@media (max-width: 600px) {
-  .tabs {
-    flex-direction: column;
-  }
-
-  button, input, select {
-    width: 100%;
-    box-sizing: border-box;
-  }
-}
-
-#publicView .card {
-  background: #f9f9f9;
-}
-
-#publicView h2 {
-  margin-bottom: 15px;
-}
+.top-team td{ background: rgba(34,197,94,0.14); }
+.bottom-team td{ background: rgba(239,68,68,0.14); }
