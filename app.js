@@ -372,7 +372,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Public page auto-refresh (does nothing on admin page)
   setInterval(() => {
     renderPublic();
-  }, 10000); // 10 seconds
+  }, 10000); // 5 seconds
 });
 
 
