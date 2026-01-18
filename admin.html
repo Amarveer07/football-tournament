@@ -43,6 +43,26 @@
       <button onclick="showGroup('C')">Group C</button>
       <button onclick="showGroup('D')">Group D</button>
     </div>
+<h3>Manage Teams</h3>
+
+
+<!-- Rename team -->
+<div>
+  <label>Rename a team:</label><br>
+  <select id="renameSelect"></select><br>
+  <input type="text" id="renameInput" placeholder="New team name">
+  <button onclick="renameTeam()">Rename Team</button>
+</div>
+
+<br>
+
+<!-- Add new team -->
+<div>
+  <label>Add a team to this group:</label><br>
+  <input type="text" id="newTeamInput" placeholder="New team name">
+  <button onclick="addTeam()">Add Team</button>
+</div>
+
 
     <!-- Standings Table -->
     <table id="groupTable"></table>

@@ -1,11 +1,7 @@
 /**********************
   SHARED DATA
 **********************/
-function loadGroups() {
-  const saved = localStorage.getItem("groups");
-  if (saved) {
-    try { return JSON.parse(saved); } catch(e) {}
-  }
+function defaultGroups() {
   return {
     A: [
       { name: "Lions", p: 0, w: 0, d: 0, l: 0, points: 0, gd: 0 },
@@ -24,6 +20,17 @@ function loadGroups() {
       { name: "Fishes", p: 0, w: 0, d: 0, l: 0, points: 0, gd: 0 }
     ]
   };
+}
+
+function loadGroups() {
+  const saved = localStorage.getItem("groups");
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (parsed && typeof parsed === "object") return parsed;
+    } catch (e) {}
+  }
+  return defaultGroups();
 }
 
 let groups = loadGroups();
@@ -55,7 +62,7 @@ function byId(id) {
 **********************/
 function renderAdmin() {
   const table = byId("groupTable");
-  if (!table) return;
+  if (!table) return; // not on this page
 
   const group = groups[currentGroup] || [];
   if (group.length === 0) {
@@ -102,19 +109,32 @@ function updateAdminDropdowns() {
   const select = byId("teamSelect");
   const a = byId("teamA");
   const b = byId("teamB");
+  const renameSelect = byId("renameSelect");
+
+  // if these don't exist, we're not on admin page
   if (!select || !a || !b) return;
 
   select.innerHTML = "";
   a.innerHTML = "";
   b.innerHTML = "";
+  if (renameSelect) renameSelect.innerHTML = "";
 
   (groups[currentGroup] || []).forEach((team, index) => {
+    // teamSelect, teamA, teamB
     [select, a, b].forEach(el => {
       const opt = document.createElement("option");
       opt.value = index;
       opt.textContent = team.name;
       el.appendChild(opt);
     });
+
+    // renameSelect
+    if (renameSelect) {
+      const opt = document.createElement("option");
+      opt.value = index;
+      opt.textContent = team.name;
+      renameSelect.appendChild(opt);
+    }
   });
 }
 
@@ -130,9 +150,13 @@ function addWin() {
   const sel = byId("teamSelect");
   if (!sel) return;
   saveStateForUndo();
+
   const g = groups[currentGroup];
   const i = Number(sel.value);
-  g[i].p++; g[i].w++; g[i].points += 3;
+  g[i].p++;
+  g[i].w++;
+  g[i].points += 3;
+
   renderAdmin();
 }
 
@@ -140,9 +164,13 @@ function addDraw() {
   const sel = byId("teamSelect");
   if (!sel) return;
   saveStateForUndo();
+
   const g = groups[currentGroup];
   const i = Number(sel.value);
-  g[i].p++; g[i].d++; g[i].points += 1;
+  g[i].p++;
+  g[i].d++;
+  g[i].points += 1;
+
   renderAdmin();
 }
 
@@ -150,9 +178,12 @@ function addLoss() {
   const sel = byId("teamSelect");
   if (!sel) return;
   saveStateForUndo();
+
   const g = groups[currentGroup];
   const i = Number(sel.value);
-  g[i].p++; g[i].l++;
+  g[i].p++;
+  g[i].l++;
+
   renderAdmin();
 }
 
@@ -160,9 +191,11 @@ function addGoal() {
   const sel = byId("teamSelect");
   if (!sel) return;
   saveStateForUndo();
+
   const g = groups[currentGroup];
   const i = Number(sel.value);
   g[i].gd++;
+
   renderAdmin();
 }
 
@@ -170,9 +203,11 @@ function removeGoal() {
   const sel = byId("teamSelect");
   if (!sel) return;
   saveStateForUndo();
+
   const g = groups[currentGroup];
   const i = Number(sel.value);
   g[i].gd--;
+
   renderAdmin();
 }
 
@@ -201,28 +236,77 @@ function submitMatch() {
   A.gd += (sA - sB);
   B.gd += (sB - sA);
 
-  if (sA > sB) { A.w++; A.points += 3; B.l++; }
-  else if (sB > sA) { B.w++; B.points += 3; A.l++; }
-  else { A.d++; B.d++; A.points += 1; B.points += 1; }
+  if (sA > sB) {
+    A.w++; A.points += 3;
+    B.l++;
+  } else if (sB > sA) {
+    B.w++; B.points += 3;
+    A.l++;
+  } else {
+    A.d++; B.d++;
+    A.points += 1; B.points += 1;
+  }
 
   scoreA.value = "";
   scoreB.value = "";
+
   renderAdmin();
 }
 
+/**********************
+  TEAM MANAGEMENT (NEW)
+**********************/
+function renameTeam() {
+  const renameSelect = byId("renameSelect");
+  const renameInput = byId("renameInput");
+  if (!renameSelect || !renameInput) return;
+
+  const newName = renameInput.value.trim();
+  if (!newName) return alert("Type a new team name first.");
+
+  saveStateForUndo();
+
+  const i = Number(renameSelect.value);
+  groups[currentGroup][i].name = newName;
+
+  renameInput.value = "";
+  renderAdmin();
+}
+
+function addTeam() {
+  const newTeamInput = byId("newTeamInput");
+  if (!newTeamInput) return;
+
+  const name = newTeamInput.value.trim();
+  if (!name) return alert("Type a team name first.");
+
+  saveStateForUndo();
+
+  if (!groups[currentGroup]) groups[currentGroup] = [];
+  groups[currentGroup].push({ name, p: 0, w: 0, d: 0, l: 0, points: 0, gd: 0 });
+
+  newTeamInput.value = "";
+  renderAdmin();
+}
+
+/**********************
+  UNDO & RESET
+**********************/
 function undoLastAction() {
   if (undoStack.length === 0) return alert("No actions to undo!");
   groups = undoStack.pop();
   renderAdmin();
-  renderPublic(); // if public exists on same page, safe anyway
+  renderPublic(); // safe if on public page too
 }
 
 function resetTournament() {
   if (!confirm("Reset all data?")) return;
+
   localStorage.removeItem("groups");
   undoStack = [];
-  groups = loadGroups();
+  groups = defaultGroups();
   saveGroups();
+
   renderAdmin();
   renderPublic();
   alert("Tournament has been reset!");
@@ -236,13 +320,17 @@ let publicCurrentGroup = "A";
 function renderPublic() {
   const select = byId("publicGroupSelect");
   const table = byId("publicTable");
-  if (!select || !table) return;
+  if (!select || !table) return; // not on this page
 
-  // reload groups in case admin updated in another tab
+  // refresh groups in case admin updated elsewhere
   groups = loadGroups();
 
   publicCurrentGroup = select.value;
   const group = groups[publicCurrentGroup] || [];
+  if (group.length === 0) {
+    table.innerHTML = `<tr><th>No teams in Group ${publicCurrentGroup}</th></tr>`;
+    return;
+  }
 
   sortGroup(group);
 
@@ -251,8 +339,6 @@ function renderPublic() {
       <th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>Pts</th><th>GD</th>
     </tr>
   `;
-
-  if (group.length === 0) return;
 
   const topPoints = group[0].points;
   const bottomPoints = group[group.length - 1].points;
@@ -284,7 +370,9 @@ document.addEventListener("DOMContentLoaded", () => {
   renderPublic();
 });
 
-// make onclick="" work
+/**********************
+  Make onclick="" work
+**********************/
 window.showGroup = showGroup;
 window.addWin = addWin;
 window.addDraw = addDraw;
@@ -295,3 +383,5 @@ window.submitMatch = submitMatch;
 window.undoLastAction = undoLastAction;
 window.resetTournament = resetTournament;
 window.renderPublicGroup = renderPublic;
+window.renameTeam = renameTeam;
+window.addTeam = addTeam;
