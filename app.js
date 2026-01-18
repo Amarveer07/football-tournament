@@ -110,7 +110,7 @@ function updateAdminDropdowns() {
   const a = byId("teamA");
   const b = byId("teamB");
   const renameSelect = byId("renameSelect");
-
+  const removeSelect = byId("removeSelect");
   // if these don't exist, we're not on admin page
   if (!select || !a || !b) return;
 
@@ -118,25 +118,33 @@ function updateAdminDropdowns() {
   a.innerHTML = "";
   b.innerHTML = "";
   if (renameSelect) renameSelect.innerHTML = "";
-
+  if (removeSelect) removeSelect.innerHTML = "";
+  
   (groups[currentGroup] || []).forEach((team, index) => {
-    // teamSelect, teamA, teamB
-    [select, a, b].forEach(el => {
-      const opt = document.createElement("option");
-      opt.value = index;
-      opt.textContent = team.name;
-      el.appendChild(opt);
-    });
-
-    // renameSelect
-    if (renameSelect) {
-      const opt = document.createElement("option");
-      opt.value = index;
-      opt.textContent = team.name;
-      renameSelect.appendChild(opt);
-    }
+  // teamSelect, teamA, teamB
+  [select, a, b].forEach(el => {
+    const opt = document.createElement("option");
+    opt.value = index;
+    opt.textContent = team.name;
+    el.appendChild(opt);
   });
-}
+
+  // renameSelect
+  if (renameSelect) {
+    const opt = document.createElement("option");
+    opt.value = index;
+    opt.textContent = team.name;
+    renameSelect.appendChild(opt);
+  }
+
+  // removeSelect ✅ MUST BE INSIDE
+  if (removeSelect) {
+    const opt = document.createElement("option");
+    opt.value = index;
+    opt.textContent = team.name;
+    removeSelect.appendChild(opt);
+  }
+});
 
 /**********************
   ADMIN ACTIONS
