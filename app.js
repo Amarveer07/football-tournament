@@ -625,6 +625,48 @@ function adminLogout() {
   if (!window.auth) return;
   window.auth.signOut().then(() => alert("Logged out"));
 }
+function recalcStandingsFromMatches() {
+  // Reset all stats back to 0
+  ["A","B","C","D"].forEach(letter => {
+    (groups[letter] || []).forEach(t => {
+      t.p = 0; t.w = 0; t.d = 0; t.l = 0;
+      t.points = 0; t.gd = 0;
+    });
+  });
+
+  // Apply all finished match results onto the table
+  ["A","B","C","D"].forEach(letter => {
+    const list = matchObjToArray(letter);
+
+    list.forEach(m => {
+      if (!matchIsResult(m)) return;
+
+      const sA = Number(m.scoreA);
+      const sB = Number(m.scoreB);
+      if (Number.isNaN(sA) || Number.isNaN(sB)) return;
+
+      const teamA = (groups[letter] || []).find(t => t.name === m.teamA);
+      const teamB = (groups[letter] || []).find(t => t.name === m.teamB);
+      if (!teamA || !teamB) return;
+
+      teamA.p++; teamB.p++;
+      teamA.gd += (sA - sB);
+      teamB.gd += (sB - sA);
+
+      if (sA > sB) {
+        teamA.w++; teamA.points += 3;
+        teamB.l++;
+      } else if (sB > sA) {
+        teamB.w++; teamB.points += 3;
+        teamA.l++;
+      } else {
+        teamA.d++; teamB.d++;
+        teamA.points += 1;
+        teamB.points += 1;
+      }
+    });
+  });
+}
 
 /**********************
   START (single predictable boot)
