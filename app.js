@@ -226,43 +226,42 @@ function renderAdmin() {
 }
 
 function updateAdminDropdowns() {
-  const select = byId("teamSelect");
-  const a = byId("teamA");
-  const b = byId("teamB");
+  const select = byId("teamSelect");        // Update Team dropdown (still used)
   const renameSelect = byId("renameSelect");
   const removeSelect = byId("removeSelect");
 
-  if (!select || !a || !b) return;
+  // If teamSelect isn't on the page, we're not on admin
+  if (!select) return;
 
   select.innerHTML = "";
-  a.innerHTML = "";
-  b.innerHTML = "";
   if (renameSelect) renameSelect.innerHTML = "";
   if (removeSelect) removeSelect.innerHTML = "";
 
   (groups[currentGroup] || []).forEach((team, index) => {
-    [select, a, b].forEach(el => {
-      const opt = document.createElement("option");
-      opt.value = index;
-      opt.textContent = team.name;
-      el.appendChild(opt);
-    });
+    // teamSelect
+    const opt = document.createElement("option");
+    opt.value = index;
+    opt.textContent = team.name;
+    select.appendChild(opt);
 
+    // renameSelect
     if (renameSelect) {
-      const opt = document.createElement("option");
-      opt.value = index;
-      opt.textContent = team.name;
-      renameSelect.appendChild(opt);
+      const opt2 = document.createElement("option");
+      opt2.value = index;
+      opt2.textContent = team.name;
+      renameSelect.appendChild(opt2);
     }
 
+    // removeSelect
     if (removeSelect) {
-      const opt = document.createElement("option");
-      opt.value = index;
-      opt.textContent = team.name;
-      removeSelect.appendChild(opt);
+      const opt3 = document.createElement("option");
+      opt3.value = index;
+      opt3.textContent = team.name;
+      removeSelect.appendChild(opt3);
     }
   });
 }
+
 
 /**********************
   ADMIN ACTIONS
