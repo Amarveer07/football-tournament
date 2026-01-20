@@ -21,6 +21,8 @@ function defaultGroups() {
     ]
   };
 }
+
+
 function toArray(maybeArrayOrObject) {
   if (Array.isArray(maybeArrayOrObject)) return maybeArrayOrObject;
   if (maybeArrayOrObject && typeof maybeArrayOrObject === "object") {
@@ -35,6 +37,12 @@ function setLastUpdatedNow() {
   const el = document.getElementById("lastUpdated");
   if (!el) return; // not on public page
   el.textContent = new Date().toLocaleString([], { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "short" });
+}
+function setLiveStatus(isLive) {
+  const dot = document.getElementById("liveDot");
+  if (!dot) return;
+
+  dot.style.background = isLive ? "#22c55e" : "#ef4444";
 }
 
 function normalizeGroups(raw) {
@@ -705,6 +713,14 @@ function recalcStandingsFromMatches() {
 /**********************
   START (single predictable boot)
 **********************/
+function listenToConnectionStatus() {
+  if (!dbReady()) return;
+
+  const connectedRef = window.db.ref(".info/connected");
+  connectedRef.on("value", (snap) => {
+    setLiveStatus(!!snap.val());
+  });
+}
 document.addEventListener("DOMContentLoaded", () => {
   // Auth status
   if (window.auth) {
@@ -717,6 +733,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Firebase listeners
   listenToGroupsFromFirebase();
   listenToMatchesFromFirebase();
+listenToConnectionStatus();
 
   // Initial renders
   renderAdmin();
