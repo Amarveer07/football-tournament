@@ -120,6 +120,18 @@ function saveStateForUndo() {
 function byId(id) {
   return document.getElementById(id);
 }
+/**********************
+  GROUP HELPERS (dynamic groups)
+**********************/
+function getGroupKeys() {
+  return Object.keys(groups || {}).sort((a, b) => a.localeCompare(b));
+}
+
+function ensureGroupExists(letter) {
+  if (!groups[letter]) groups[letter] = [];
+  if (!matches) matches = {};
+  if (!matches[letter]) matches[letter] = {};
+}
 
 /**********************
   MATCHES (Firebase)
@@ -391,6 +403,116 @@ function submitMatch() {
   scoreB.value = "";
 
   renderAdmin();
+}
+function refreshGroupUI() {
+  const keys = getGroupKeys();
+
+  // ---- Admin tabs (buttons) ----
+  const tabsEl = document.querySelector(".tabs");
+  if (tabsEl) {
+    tabsEl.innerHTML = keys.map(k =>
+      `<button onclick="showGroup('${k}')">Group ${k}</button>`
+    ).join("");
+  }
+
+  // ---- Public group dropdown ----
+  const pubSel = byId("publicGroupSelect");
+  if (pubSel) {
+    const current = pubSel.value || keys[0] || "A";
+    pubSel.innerHTML = keys.map(k =>
+      `<option value="${k}">Group ${k}</option>`
+    ).join("");
+    if (keys.includes(current)) pubSel.value = current;
+  }
+
+  // ---- Admin remove-group dropdown ----
+  const removeGroupSelect = byId("removeGroupSelect");
+  if (removeGroupSelect) {
+    removeGroupSelect.innerHTML = keys.map(k =>
+      `<option value="${k}">Group ${k}</option>`
+    ).join("");
+  }
+
+  // ---- Admin match group dropdown (if present) ----
+  const matchGroup = byId("matchGroup");
+  if (matchGroup) {
+    const current = matchGroup.value || keys[0] || "A";
+    matchGroup.innerHTML = keys.map(k =>
+      `<option value="${k}">Group ${k}</option>`
+    ).join("");
+    if (keys.includes(current)) matchGroup.value = current;
+  }
+}
+function addGroup() {
+  const input = byId("newGroupName");
+  if (!input) return;
+
+  let name = input.value.trim();
+  if (!name) return alert("Enter a group name first.");
+
+  // Simple cleanup: allow "Group E" -> "E"
+  name = name.replace(/^group\s+/i, "").trim();
+  // Keep short + neat (optional)
+  if (name.length > 8) return alert("Keep group name short (max 8 chars).");
+
+  // Normalize: use uppercase for consistency
+  const key = name.toUpperCase();
+
+  if (groups[key]) return alert("That group already exists.");
+
+  groups[key] = [];
+  if (!matches) matches = {};
+  matches[key] = {};
+
+  // If this is the first group ever, switch to it
+  if (!currentGroup) currentGroup = key;
+
+  input.value = "";
+
+  saveGroups();
+  if (dbReady()) window.db.ref(`tournament/matches/${key}`).set({});
+
+  refreshGroupUI();
+  renderAdmin();
+  renderPublicGroup();
+  renderPublicMatches();
+  renderAdminMatches();
+}
+
+function removeGroup() {
+  const sel = byId("removeGroupSelect");
+  if (!sel) return;
+
+  const key = sel.value;
+  if (!key || !groups[key]) return;
+
+  const teamCount = (groups[key] || []).length;
+  const matchCount = Object.keys(matches?.[key] || {}).length;
+
+  if (teamCount > 0) {
+    return alert("You can’t remove a group that still has teams. Remove the teams first.");
+  }
+  if (matchCount > 0) {
+    return alert("You can’t remove a group that still has matches. Delete the matches first.");
+  }
+
+  if (!confirm(`Remove Group ${key}?`)) return;
+
+  delete groups[key];
+  if (matches && matches[key]) delete matches[key];
+
+  // If we deleted the current group, switch to another
+  const keysLeft = getGroupKeys();
+  if (currentGroup === key) currentGroup = keysLeft[0] || "";
+
+  saveGroups();
+  if (dbReady()) window.db.ref(`tournament/matches/${key}`).remove();
+
+  refreshGroupUI();
+  renderAdmin();
+  renderPublicGroup();
+  renderPublicMatches();
+  renderAdminMatches();
 }
 
 /**********************
@@ -669,7 +791,7 @@ function adminLogout() {
 }
 function recalcStandingsFromMatches() {
   // Reset all stats back to 0
-  ["A","B","C","D"].forEach(letter => {
+  getGroupKeys().forEach(letter => {
     (groups[letter] || []).forEach(t => {
       t.p = 0; t.w = 0; t.d = 0; t.l = 0;
       t.points = 0; t.gd = 0;
@@ -677,7 +799,7 @@ function recalcStandingsFromMatches() {
   });
 
   // Apply all finished match results onto the table
-  ["A","B","C","D"].forEach(letter => {
+  getGroupKeys().forEach(letter => {
     const list = matchObjToArray(letter);
 
     list.forEach(m => {
@@ -727,6 +849,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.auth.onAuthStateChanged((user) => {
       if (user) setAdminStatus("Signed in as " + user.email);
       else setAdminStatus("Not signed in");
+   getGroupKeys()
     });
   }
 
@@ -734,6 +857,7 @@ document.addEventListener("DOMContentLoaded", () => {
   listenToGroupsFromFirebase();
   listenToMatchesFromFirebase();
 listenToConnectionStatus();
+
 
   // Initial renders
   renderAdmin();
@@ -789,3 +913,5 @@ window.deleteMatch = deleteMatch;
 
 // Keep your old inline onchange="renderPublicGroup()" working
 window.renderPublicGroup = renderPublicGroup;
+window.addGroup = addGroup;
+window.removeGroup = removeGroup;
