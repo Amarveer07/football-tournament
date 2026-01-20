@@ -88,6 +88,7 @@ function listenToGroupsFromFirebase() {
 
     if (data && typeof data === "object") {
       groups = normalizeGroups(data);
+     refreshGroupUI();
       renderAdmin();
       renderPublicGroup();
       fillMatchTeamDropdowns();
