@@ -69,16 +69,19 @@ function writeGroupsToFirebase() {
 
 function listenToGroupsFromFirebase() {
   if (!dbReady()) return;
+
   window.db.ref("tournament/groups").on("value", (snapshot) => {
     const data = snapshot.val();
+
     if (data && typeof data === "object") {
-      groups = data;
+      groups = normalizeGroups(data);
       renderAdmin();
-      renderPublicGroup();      // IMPORTANT: renders table + matches
-      fillMatchTeamDropdowns(); // keeps match dropdowns synced with team names
+      renderPublicGroup();
+      fillMatchTeamDropdowns();
     }
   });
 }
+
 
 function saveGroups() {
   // keep a local backup
