@@ -31,6 +31,11 @@ function toArray(maybeArrayOrObject) {
   }
   return [];
 }
+function setLastUpdatedNow() {
+  const el = document.getElementById("lastUpdated");
+  if (!el) return; // not on public page
+  el.textContent = new Date().toLocaleString([], { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "short" });
+}
 
 function normalizeGroups(raw) {
   const out = { A: [], B: [], C: [], D: [] };
@@ -78,6 +83,8 @@ function listenToGroupsFromFirebase() {
       renderAdmin();
       renderPublicGroup();
       fillMatchTeamDropdowns();
+      setLastUpdatedNow();
+
     }
   });
 }
@@ -118,6 +125,7 @@ function listenToMatchesFromFirebase() {
   window.db.ref("tournament/matches").on("value", (snapshot) => {
     const data = snapshot.val();
     matches = data && typeof data === "object" ? data : { A: {}, B: {}, C: {}, D: {} };
+setLastUpdatedNow();
 
    //  rebuild standings from match results
 recalcStandingsFromMatches();
