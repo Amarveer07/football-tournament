@@ -16,6 +16,10 @@
 
   <div class="card" id="publicView">
     <h2>Standings</h2>
+<p id="liveStatus" style="margin:6px 0 14px; font-size:13px; color: rgba(255,255,255,0.75);">
+  <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;margin-right:8px;"></span>
+  Live • Last updated: <span id="lastUpdated">—</span>
+</p>
 
     <label for="publicGroupSelect">Select group</label><br>
     <select id="publicGroupSelect" onchange="renderPublicGroup()">
