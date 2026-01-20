@@ -5,14 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Football Tournament – Admin</title>
 
+  <!-- Styles -->
   <link rel="stylesheet" href="admin.css?v=2" />
- <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-auth-compat.js"></script>
- <script src="firebase-init.js" defer></script>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-auth-compat.js"></script>
+  <script src="firebase-init.js" defer></script>
+
+  <!-- App logic -->
   <script src="app.js?v=14" defer></script>
 
+  <!-- Simple password gate (extra safety) -->
   <script>
     const PASSWORD = "a"; // change later
     const entered = prompt("Enter admin password:");
@@ -22,82 +27,85 @@
     }
   </script>
 </head>
+
 <body>
-<div class="card" style="margin-bottom:14px;">
-  <h2 style="margin:0 0 10px;">Admin Login</h2>
 
-  <input type="text" id="adminEmail" placeholder="Email">
-  <input type="password" id="adminPassword" placeholder="Password">
+  <!-- Admin login card -->
+  <div class="card" style="margin-bottom:16px;">
+    <h2 style="margin:0 0 10px;">Admin Login</h2>
 
-  <button onclick="adminLogin()">Login</button>
-  <button onclick="adminLogout()">Logout</button>
+    <input type="text" id="adminEmail" placeholder="Email">
+    <input type="password" id="adminPassword" placeholder="Password">
 
-  <p id="adminStatus" style="margin:10px 0 0; color: rgba(255,255,255,0.7); font-size: 13px;">
-    Not signed in
-  </p>
-</div>
-
-  <div class="card">
-
-    <!-- Tabs -->
-    <div class="tabs">
-      <button onclick="showGroup('A')">Group A</button>
-      <button onclick="showGroup('B')">Group B</button>
-      <button onclick="showGroup('C')">Group C</button>
-      <button onclick="showGroup('D')">Group D</button>
+    <div style="margin-top:8px;">
+      <button onclick="adminLogin()">Login</button>
+      <button onclick="adminLogout()">Logout</button>
     </div>
 
-</div>
+    <p id="adminStatus" style="margin:10px 0 0; font-size:13px; opacity:0.75;">
+      Not signed in
+    </p>
+  </div>
+
+  <!-- Main admin panel -->
+  <div class="card">
+
+    <!-- Group tabs -->
+    <div class="tabs"></div>
+
     <!-- Standings -->
     <div class="section">
       <h3>Standings</h3>
       <div class="table-wrap">
         <table id="groupTable"></table>
       </div>
-<div class="section">
-  <h3>Manage Groups</h3>
-
-  <label>Add a group</label><br>
-  <input type="text" id="newGroupName" placeholder="e.g. E or Group 5">
-  <button onclick="addGroup()">Add Group</button>
-
-  <div style="margin-top:12px;">
-    <label>Remove a group</label><br>
-    <select id="removeGroupSelect"></select><br>
-    <button onclick="removeGroup()">Remove Group</button>
-    <p style="margin:8px 0 0; font-size:13px; opacity:0.7;">
-      Tip: You can’t remove a group if it still has teams (we’ll enforce this).
-    </p>
-  </div>
     </div>
-<div class="section">
-  <h3>Match Schedule</h3>
 
-  <label>Group</label><br>
-  <select id="matchGroup">
-    <option value="A">Group A</option>
-    <option value="B">Group B</option>
-    <option value="C">Group C</option>
-    <option value="D">Group D</option>
-  </select><br>
+    <!-- Manage Groups -->
+    <div class="section">
+      <h3>Manage Groups</h3>
 
-  <label>Team A</label><br>
-  <select id="matchTeamA"></select><br>
+      <label>Add a group</label><br>
+      <input type="text" id="newGroupName" placeholder="e.g. E or Group 5">
+      <button onclick="addGroup()">Add Group</button>
 
-  <label>Team B</label><br>
-  <select id="matchTeamB"></select><br>
+      <div style="margin-top:12px;">
+        <label>Remove a group</label><br>
+        <select id="removeGroupSelect"></select><br>
+        <button onclick="removeGroup()">Remove Group</button>
 
-  <label>Date & Time</label><br>
-  <input type="datetime-local" id="matchTime"><br>
+        <p style="margin-top:6px; font-size:13px; opacity:0.7;">
+          You can’t remove a group that still has teams or matches.
+        </p>
+      </div>
+    </div>
 
-  <label>Pitch</label><br>
-  <input type="text" id="matchPitch" placeholder="e.g. Pitch 1"><br>
+    <!-- Match Schedule -->
+    <div class="section">
+      <h3>Match Schedule</h3>
 
-  <button onclick="addMatch()">Add Match</button>
+      <label>Group</label><br>
+      <select id="matchGroup"></select><br>
 
-  <h4 style="margin:14px 0 8px; font-size:14px; color:rgba(255,255,255,0.75);">Matches in this group</h4>
-  <div id="adminMatchesList"></div>
-</div>
+      <label>Team A</label><br>
+      <select id="matchTeamA"></select><br>
+
+      <label>Team B</label><br>
+      <select id="matchTeamB"></select><br>
+
+      <label>Date & Time</label><br>
+      <input type="datetime-local" id="matchTime"><br>
+
+      <label>Pitch</label><br>
+      <input type="text" id="matchPitch" placeholder="e.g. Pitch 1"><br>
+
+      <button onclick="addMatch()">Add Match</button>
+
+      <h4 style="margin:14px 0 8px; font-size:14px; opacity:0.75;">
+        Matches in this group
+      </h4>
+      <div id="adminMatchesList"></div>
+    </div>
 
     <!-- Manage Teams -->
     <div class="section">
@@ -124,22 +132,23 @@
         <button onclick="removeTeam()">Remove Team</button>
       </div>
     </div>
-   
-    <!-- Update Team + Match -->
+
+    <!-- Update Team -->
     <div class="section">
       <h3>Update Team</h3>
 
       <select id="teamSelect"></select><br>
-      <button onclick="addWin()">+3 Win</button>
-      <button onclick="addDraw()">+1 Draw</button>
-      <button onclick="addLoss()">Loss</button>
-      <button onclick="addGoal()">+ Goal</button>
-      <button onclick="removeGoal()">- Goal</button>
 
-      
+      <div style="margin-top:8px;">
+        <button onclick="addWin()">+3 Win</button>
+        <button onclick="addDraw()">+1 Draw</button>
+        <button onclick="addLoss()">Loss</button>
+        <button onclick="addGoal()">+ Goal</button>
+        <button onclick="removeGoal()">- Goal</button>
+      </div>
     </div>
 
-    <!-- Undo / Reset -->
+    <!-- Admin actions -->
     <div class="section">
       <h3>Admin Actions</h3>
       <button onclick="undoLastAction()">Undo Last Action</button>
