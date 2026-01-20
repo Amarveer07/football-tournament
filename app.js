@@ -21,6 +21,24 @@ function defaultGroups() {
     ]
   };
 }
+function toArray(maybeArrayOrObject) {
+  if (Array.isArray(maybeArrayOrObject)) return maybeArrayOrObject;
+  if (maybeArrayOrObject && typeof maybeArrayOrObject === "object") {
+    // Convert {"0": {...}, "1": {...}} -> [{...},{...}] in numeric key order
+    return Object.keys(maybeArrayOrObject)
+      .sort((a, b) => Number(a) - Number(b))
+      .map(k => maybeArrayOrObject[k]);
+  }
+  return [];
+}
+
+function normalizeGroups(raw) {
+  const out = { A: [], B: [], C: [], D: [] };
+  ["A", "B", "C", "D"].forEach(letter => {
+    out[letter] = toArray(raw?.[letter]);
+  });
+  return out;
+}
 
 function loadGroups() {
   const saved = localStorage.getItem("groups");
