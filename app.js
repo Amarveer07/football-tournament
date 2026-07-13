@@ -1400,7 +1400,7 @@ window.removeGroup = removeGroup;
 window.renameTeam = renameTeam;
 window.addTeam = addTeam;
 window.removeTeam = removeTeam;
-
+window.setTeamLogo = setTeamLogo;
 window.addWin = addWin;
 window.addDraw = addDraw;
 window.addLoss = addLoss;
