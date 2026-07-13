@@ -10,6 +10,7 @@
 function createTeam(name) {
   return {
     name,
+    logo: "",
     p: 0,
     w: 0,
     d: 0,
