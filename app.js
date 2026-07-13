@@ -1090,7 +1090,22 @@ async function removeTeam() {
     groups[currentGroup].splice(selection.index, 1);
   });
 }
+async function setTeamLogo() {
+  const selection = getSelectedTeam("logoTeamSelect");
+  const input = byId("logoInput");
 
+  if (!selection || !input) return;
+
+  const logoPath = input.value.trim();
+
+  const saved = await commitStateChange(() => {
+    groups[currentGroup][selection.index].logo = logoPath;
+  });
+
+  if (saved) {
+    input.value = "";
+  }
+}
 /* ==================================================
    Manual Standings Adjustments
 ================================================== */
