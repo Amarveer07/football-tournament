@@ -1,161 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Football Tournament – Admin</title>
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="admin.css?v=2" />
+  <!-- Admin styling -->
+  <link rel="stylesheet" href="admin.css?v=3">
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-auth-compat.js"></script>
   <script src="firebase-init.js" defer></script>
 
-  <!-- App logic -->
-  <script src="app.js?v=14" defer></script>
-
-  <!-- Simple password gate (extra safety) -->
-  <script>
-    const PASSWORD = "a"; // change later
-    const entered = prompt("Enter admin password:");
-    if (entered !== PASSWORD) {
-      alert("Access denied");
-      window.location.href = "index.html";
-    }
-  </script>
+  <!-- Tournament application -->
+  <script src="app.js?v=15" defer></script>
 </head>
 
 <body>
+  <main class="admin-page">
 
-  <!-- Admin login card -->
-  <div class="card" style="margin-bottom:16px;">
-    <h2 style="margin:0 0 10px;">Admin Login</h2>
+    <!-- Firebase admin login -->
+    <section class="card login-card">
+      <div class="section-heading">
+        <div>
+          <h1>Admin Dashboard</h1>
+          <p>Sign in to manage the tournament.</p>
+        </div>
 
-    <input type="text" id="adminEmail" placeholder="Email">
-    <input type="password" id="adminPassword" placeholder="Password">
-
-    <div style="margin-top:8px;">
-      <button onclick="adminLogin()">Login</button>
-      <button onclick="adminLogout()">Logout</button>
-    </div>
-
-    <p id="adminStatus" style="margin:10px 0 0; font-size:13px; opacity:0.75;">
-      Not signed in
-    </p>
-  </div>
-
-  <!-- Main admin panel -->
-  <div class="card">
-
-    <!-- Group tabs -->
-    <div class="tabs"></div>
-
-    <!-- Standings -->
-    <div class="section">
-      <h3>Standings</h3>
-      <div class="table-wrap">
-        <table id="groupTable"></table>
-      </div>
-    </div>
-
-    <!-- Manage Groups -->
-    <div class="section">
-      <h3>Manage Groups</h3>
-
-      <label>Add a group</label><br>
-      <input type="text" id="newGroupName" placeholder="e.g. E or Group 5">
-      <button onclick="addGroup()">Add Group</button>
-
-      <div style="margin-top:12px;">
-        <label>Remove a group</label><br>
-        <select id="removeGroupSelect"></select><br>
-        <button onclick="removeGroup()">Remove Group</button>
-
-        <p style="margin-top:6px; font-size:13px; opacity:0.7;">
-          You can’t remove a group that still has teams or matches.
+        <p id="adminStatus" class="admin-status">
+          Not signed in
         </p>
       </div>
-    </div>
 
-    <!-- Match Schedule -->
-    <div class="section">
-      <h3>Match Schedule</h3>
-
-      <label>Group</label><br>
-      <select id="matchGroup"></select><br>
-
-      <label>Team A</label><br>
-      <select id="matchTeamA"></select><br>
-
-      <label>Team B</label><br>
-      <select id="matchTeamB"></select><br>
-
-      <label>Date & Time</label><br>
-      <input type="datetime-local" id="matchTime"><br>
-
-      <label>Pitch</label><br>
-      <input type="text" id="matchPitch" placeholder="e.g. Pitch 1"><br>
-
-      <button onclick="addMatch()">Add Match</button>
-
-      <h4 style="margin:14px 0 8px; font-size:14px; opacity:0.75;">
-        Matches in this group
-      </h4>
-      <div id="adminMatchesList"></div>
-    </div>
-
-    <!-- Manage Teams -->
-    <div class="section">
-      <h3>Manage Teams</h3>
-
-      <div class="row">
-        <div>
-          <label>Rename a team</label><br>
-          <select id="renameSelect"></select><br>
-          <input type="text" id="renameInput" placeholder="New team name">
-          <button onclick="renameTeam()">Rename Team</button>
+      <div class="login-fields">
+        <div class="form-field">
+          <label for="adminEmail">Email</label>
+          <input
+            type="email"
+            id="adminEmail"
+            autocomplete="email"
+            placeholder="Admin email"
+          >
         </div>
 
-        <div>
-          <label>Add a team</label><br>
-          <input type="text" id="newTeamInput" placeholder="New team name">
-          <button onclick="addTeam()">Add Team</button>
+        <div class="form-field">
+          <label for="adminPassword">Password</label>
+          <input
+            type="password"
+            id="adminPassword"
+            autocomplete="current-password"
+            placeholder="Password"
+          >
         </div>
       </div>
 
-      <div style="margin-top:12px;">
-        <label>Remove a team</label><br>
-        <select id="removeSelect"></select><br>
-        <button onclick="removeTeam()">Remove Team</button>
+      <div class="button-row">
+        <button type="button" onclick="adminLogin()">
+          Sign in
+        </button>
+
+        <button type="button" class="secondary-button" onclick="adminLogout()">
+          Sign out
+        </button>
       </div>
-    </div>
+    </section>
 
-    <!-- Update Team -->
-    <div class="section">
-      <h3>Update Team</h3>
+    <!-- Main tournament controls -->
+    <section class="card" id="adminPanel">
 
-      <select id="teamSelect"></select><br>
+      <!-- Filled dynamically by app.js -->
+      <nav class="tabs" aria-label="Tournament groups"></nav>
 
-      <div style="margin-top:8px;">
-        <button onclick="addWin()">+3 Win</button>
-        <button onclick="addDraw()">+1 Draw</button>
-        <button onclick="addLoss()">Loss</button>
-        <button onclick="addGoal()">+ Goal</button>
-        <button onclick="removeGoal()">- Goal</button>
-      </div>
-    </div>
+      <!-- Standings -->
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <h2>Standings</h2>
+            <p>Current table for the selected group.</p>
+          </div>
+        </div>
 
-    <!-- Admin actions -->
-    <div class="section">
-      <h3>Admin Actions</h3>
-      <button onclick="undoLastAction()">Undo Last Action</button>
-      <button onclick="resetTournament()">Reset Tournament</button>
-    </div>
+        <div class="table-wrap">
+          <table id="groupTable">
+            <caption class="visually-hidden">
+              Tournament group standings
+            </caption>
+          </table>
+        </div>
+      </section>
 
-  </div>
+      <!-- Group management -->
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <h2>Manage Groups</h2>
+            <p>Add new groups or remove unused ones.</p>
+          </div>
+        </div>
 
+        <div class="form-grid">
+          <div class="form-panel">
+            <h3>Add a group</h3>
+
+            <div class="form-field">
+              <label for="newGroupName">Group name</label>
+              <input
+                type="text"
+                id="newGroupName"
+                placeholder="For example: E"
+              >
+            </div>
+
+            <button type="button" onclick="addGroup()">
+              Add Group
+            </button>
+          </div>
+
+          <div class="form-panel danger-panel">
+            <h3>Remove a group</h3>
+
+            <div class="form-field">
+              <label for="removeGroupSelect">Group</label>
+              <select id="removeGroupSelect"></select>
+            </div>
+
+            <button
+              type="button"
+              class="danger-button"
+              onclick="removeGroup()"
+            >
+              Remove Group
+            </button>
+
+            <p class="helper-text">
+              A group must have no teams or matches before it can be removed.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Match scheduling -->
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <h2>Match Schedule</h2>
+            <p>Create fixtures and enter completed results.</p>
+          </div>
+        </div>
+
+        <div class="form-grid match-form">
+          <div class="form-field">
+            <label for="matchGroup">Group</label>
+            <select id="matchGroup"></select>
+          </div>
+
+          <div class="form-field">
+            <label for="matchTeamA">Team A</label>
+            <select id="matchTeamA"></select>
+          </div>
+
+          <div class="form-field">
+            <label for="matchTeamB">Team B</label>
+            <select id="matchTeamB"></select>
+          </div>
+
+          <div class="form-field">
+            <label for="matchTime">Date and time</label>
+            <input type="datetime-local" id="matchTime">
+          </div>
+
+          <div class="form-field">
+            <label for="matchPitch">Pitch</label>
+            <input
+              type="text"
+              id="matchPitch"
+              placeholder="For example: Pitch 1"
+            >
+          </div>
+        </div>
+
+        <button type="button" onclick="addMatch()">
+          Add Match
+        </button>
+
+        <div class="subsection">
+          <h3>Matches in this group</h3>
+          <div id="adminMatchesList" aria-live="polite">
+            Loading matches…
+          </div>
+        </div>
+      </section>
+
+      <!-- Team management -->
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <h2>Manage Teams</h2>
+            <p>Add, rename or remove teams from the selected group.</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-panel">
+            <h3>Rename a team</h3>
+
+            <div class="form-field">
+              <label for="renameSelect">Team</label>
+              <select id="renameSelect"></select>
+            </div>
+
+            <div class="form-field">
+              <label for="renameInput">New name</label>
+              <input
+                type="text"
+                id="renameInput"
+                placeholder="New team name"
+              >
+            </div>
+
+            <button type="button" onclick="renameTeam()">
+              Rename Team
+            </button>
+          </div>
+
+          <div class="form-panel">
+            <h3>Add a team</h3>
+
+            <div class="form-field">
+              <label for="newTeamInput">Team name</label>
+              <input
+                type="text"
+                id="newTeamInput"
+                placeholder="New team name"
+              >
+            </div>
+
+            <button type="button" onclick="addTeam()">
+              Add Team
+            </button>
+          </div>
+
+          <div class="form-panel danger-panel">
+            <h3>Remove a team</h3>
+
+            <div class="form-field">
+              <label for="removeSelect">Team</label>
+              <select id="removeSelect"></select>
+            </div>
+
+            <button
+              type="button"
+              class="danger-button"
+              onclick="removeTeam()"
+            >
+              Remove Team
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Manual adjustments -->
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <h2>Manual Adjustments</h2>
+            <p>
+              Use these only when a correction cannot be made through a match result.
+            </p>
+          </div>
+        </div>
+
+        <div class="form-field compact-field">
+          <label for="teamSelect">Team</label>
+          <select id="teamSelect"></select>
+        </div>
+
+        <div class="button-row adjustment-buttons">
+          <button type="button" onclick="addWin()">Add Win</button>
+          <button type="button" onclick="addDraw()">Add Draw</button>
+          <button type="button" onclick="addLoss()">Add Loss</button>
+          <button type="button" onclick="addGoal()">Increase GD</button>
+          <button type="button" onclick="removeGoal()">Decrease GD</button>
+        </div>
+      </section>
+
+      <!-- Administrative actions -->
+      <section class="section danger-section">
+        <div class="section-heading">
+          <div>
+            <h2>Administrative Actions</h2>
+            <p>Undo the latest change or reset the entire tournament.</p>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button type="button" onclick="undoLastAction()">
+            Undo Last Action
+          </button>
+
+          <button
+            type="button"
+            class="danger-button"
+            onclick="resetTournament()"
+          >
+            Reset Tournament
+          </button>
+        </div>
+      </section>
+
+    </section>
+  </main>
 </body>
 </html>
