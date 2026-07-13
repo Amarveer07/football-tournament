@@ -194,73 +194,95 @@
         </div>
       </section>
 
-      <!-- Team management -->
-      <section class="section">
-        <div class="section-heading">
-          <div>
-            <h2>Manage Teams</h2>
-            <p>Add, rename or remove teams from the selected group.</p>
-          </div>
-        </div>
+     <!-- Team management -->
+<section class="section">
+  <div class="section-heading">
+    <div>
+      <h2>Manage Teams</h2>
+      <p>Add, rename or remove teams from the selected group.</p>
+    </div>
+  </div>
 
-        <div class="form-grid">
-          <div class="form-panel">
-            <h3>Rename a team</h3>
+  <div class="form-grid">
+    <div class="form-panel">
+      <h3>Rename a team</h3>
 
-            <div class="form-field">
-              <label for="renameSelect">Team</label>
-              <select id="renameSelect"></select>
-            </div>
+      <div class="form-field">
+        <label for="renameSelect">Team</label>
+        <select id="renameSelect"></select>
+      </div>
 
-            <div class="form-field">
-              <label for="renameInput">New name</label>
-              <input
-                type="text"
-                id="renameInput"
-                placeholder="New team name"
-              >
-            </div>
+      <div class="form-field">
+        <label for="renameInput">New name</label>
+        <input
+          type="text"
+          id="renameInput"
+          placeholder="New team name"
+        >
+      </div>
 
-            <button type="button" onclick="renameTeam()">
-              Rename Team
-            </button>
-          </div>
+      <button type="button" onclick="renameTeam()">
+        Rename Team
+      </button>
+    </div>
 
-          <div class="form-panel">
-            <h3>Add a team</h3>
+    <div class="form-panel">
+      <h3>Add a team</h3>
 
-            <div class="form-field">
-              <label for="newTeamInput">Team name</label>
-              <input
-                type="text"
-                id="newTeamInput"
-                placeholder="New team name"
-              >
-            </div>
+      <div class="form-field">
+        <label for="newTeamInput">Team name</label>
+        <input
+          type="text"
+          id="newTeamInput"
+          placeholder="New team name"
+        >
+      </div>
 
-            <button type="button" onclick="addTeam()">
-              Add Team
-            </button>
-          </div>
+      <button type="button" onclick="addTeam()">
+        Add Team
+      </button>
+    </div>
 
-          <div class="form-panel danger-panel">
-            <h3>Remove a team</h3>
+    <div class="form-panel danger-panel">
+      <h3>Remove a team</h3>
 
-            <div class="form-field">
-              <label for="removeSelect">Team</label>
-              <select id="removeSelect"></select>
-            </div>
+      <div class="form-field">
+        <label for="removeSelect">Team</label>
+        <select id="removeSelect"></select>
+      </div>
 
-            <button
-              type="button"
-              class="danger-button"
-              onclick="removeTeam()"
-            >
-              Remove Team
-            </button>
-          </div>
-        </div>
-      </section>
+      <button
+        type="button"
+        class="danger-button"
+        onclick="removeTeam()"
+      >
+        Remove Team
+      </button>
+    </div>
+
+    <div class="form-panel">
+      <h3>Team logo</h3>
+
+      <div class="form-field">
+        <label for="logoTeamSelect">Team</label>
+        <select id="logoTeamSelect"></select>
+      </div>
+
+      <div class="form-field">
+        <label for="logoInput">Logo file path</label>
+        <input
+          type="text"
+          id="logoInput"
+          placeholder="assets/logos/team-logo.png"
+        >
+      </div>
+
+      <button type="button" onclick="setTeamLogo()">
+        Save Logo
+      </button>
+    </div>
+  </div>
+</section>
 
       <!-- Manual adjustments -->
       <section class="section">
