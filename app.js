@@ -83,6 +83,7 @@ function normalizeAdjustments(raw) {
 function normalizeTeam(raw) {
   return {
     name: String(raw?.name || "Unnamed team").trim(),
+    logo: String(raw?.logo || "").trim(),
     p: toNumber(raw?.p),
     w: toNumber(raw?.w),
     d: toNumber(raw?.d),
@@ -255,7 +256,27 @@ function escapeHtml(value) {
     return entities[character];
   });
 }
+function renderTeamName(team) {
+  const logoPath = String(team.logo || "").trim();
 
+  const logoHtml = logoPath
+    ? `
+        <img
+          class="team-logo"
+          src="${escapeHtml(logoPath)}"
+          alt=""
+          loading="lazy"
+        >
+      `
+    : "";
+
+  return `
+    <div class="team-name-cell">
+      ${logoHtml}
+      <span>${escapeHtml(team.name)}</span>
+    </div>
+  `;
+}
 function setLastUpdatedNow() {
   const element = byId("lastUpdated");
   if (!element) return;
@@ -576,7 +597,7 @@ function renderStandingsTable(table, groupKey) {
 
       return `
         <tr class="${rowClass}">
-          <td>${escapeHtml(team.name)}</td>
+<td>${renderTeamName(team)}</td>
           <td>${team.p}</td>
           <td>${team.w}</td>
           <td>${team.d}</td>
