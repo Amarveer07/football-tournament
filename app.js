@@ -850,7 +850,12 @@ function renderAdminStandings() {
 }
 
 function updateAdminTeamDropdowns() {
-  const selectIds = ["teamSelect", "renameSelect", "removeSelect"];
+  const selectIds = [
+  "teamSelect",
+  "renameSelect",
+  "removeSelect",
+  "logoTeamSelect"
+];
   const teams = groups[currentGroup] || [];
 
   selectIds.forEach((selectId) => {
