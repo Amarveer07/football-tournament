@@ -452,3 +452,29 @@ tbody tr:hover td {
     font-size: 13px;
   }
 }
+/* Fit the full standings table onto phones */
+@media (max-width: 520px) {
+  table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  th,
+  td {
+    padding: 9px 3px;
+    font-size: 11px;
+  }
+
+  th:first-child,
+  td:first-child {
+    width: 34%;
+    padding-left: 7px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  th:not(:first-child),
+  td:not(:first-child) {
+    width: 11%;
+  }
+}
