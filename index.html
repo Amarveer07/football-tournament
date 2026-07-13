@@ -1,57 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Football Tournament – Standings</title>
 
-  <link rel="stylesheet" href="style.css?v=2" />
-  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-database-compat.js"></script>
-<script src="firebase-init.js" defer></script>
+  <!-- Public styling -->
+  <link rel="stylesheet" href="style.css?v=2">
 
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-database-compat.js"></script>
+  <script src="firebase-init.js" defer></script>
+
+  <!-- Tournament application -->
   <script src="app.js?v=14" defer></script>
 </head>
+
 <body>
+  <main class="public-page">
+    <div class="card" id="publicView">
 
-  <div class="card" id="publicView">
-    <h2>Standings</h2>
-<p id="liveStatus" style="margin:6px 0 14px; font-size:13px; color: rgba(255,255,255,0.75);">
-<span id="liveDot"
-  style="display:inline-block;width:8px;height:8px;border-radius:50%;
-  background:#22c55e;margin-right:8px;"></span>
+      <header class="public-header">
+        <h1>Football Tournament</h1>
+        <p class="page-subtitle">Live standings, fixtures and results</p>
 
-  Live • Last updated: <span id="lastUpdated">—</span>
-</p>
+        <p id="liveStatus" class="live-status">
+          <span id="liveDot" class="live-dot" aria-hidden="true"></span>
+          <span>
+            Live · Last updated:
+            <span id="lastUpdated">—</span>
+          </span>
+        </p>
+      </header>
 
-    <label for="publicGroupSelect">Select group</label><br>
-    <select id="publicGroupSelect" onchange="renderPublicGroup()">
-      <option value="A">Group A</option>
-      <option value="B">Group B</option>
-      <option value="C">Group C</option>
-      <option value="D">Group D</option>
-    </select>
+      <section class="section standings-section">
+        <div class="section-heading">
+          <div>
+            <h2>Standings</h2>
+            <p>Select a group to view its current table.</p>
+          </div>
 
-    <div class="table-wrap">
-      <table id="publicTable"></table>
-   <h3 style="margin-top:16px;">Matches</h3>
+          <div class="group-selector">
+            <label for="publicGroupSelect">Group</label>
+            <select
+              id="publicGroupSelect"
+              onchange="renderPublicGroup()"
+            >
+              <option value="">Loading groups…</option>
+            </select>
+          </div>
+        </div>
 
-<div class="section">
-  <h4 style="margin:0 0 8px; font-size:14px; color:rgba(255,255,255,0.75);">Upcoming</h4>
-  <div id="publicUpcoming"></div>
-</div>
+        <div class="table-wrap">
+          <table id="publicTable">
+            <caption class="visually-hidden">
+              Current football tournament standings
+            </caption>
+          </table>
+        </div>
+      </section>
 
-<div class="section" style="margin-top:12px;">
-  <h4 style="margin:0 0 8px; font-size:14px; color:rgba(255,255,255,0.75);">Results</h4>
-  <div id="publicResults"></div>
-</div>
+      <section class="section matches-section">
+        <h2>Matches</h2>
 
+        <div class="match-columns">
+          <div class="match-panel">
+            <h3>Upcoming fixtures</h3>
+            <div id="publicUpcoming" aria-live="polite">
+              Loading fixtures…
+            </div>
+          </div>
 
-    <p style="margin-top: 14px; color: rgba(255,255,255,0.65); font-size: 13px;">
-      Admin?
-      <a href="admin.html">Login</a>
-    </p>
-  </div>
+          <div class="match-panel">
+            <h3>Results</h3>
+            <div id="publicResults" aria-live="polite">
+              Loading results…
+            </div>
+          </div>
+        </div>
+      </section>
 
+      <footer class="public-footer">
+        <a href="admin.html">Admin login</a>
+      </footer>
+
+    </div>
+  </main>
 </body>
 </html>
