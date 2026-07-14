@@ -1,0 +1,845 @@
+/* ==================================================
+   FOOTBALL TOURNAMENT — VENUE DISPLAY
+   Designed for a 16:9 television or projector.
+================================================== */
+
+/* ==================================================
+   Variables
+================================================== */
+
+:root {
+  --display-background: #09000f;
+  --display-purple-dark: #16001f;
+  --display-purple: #7e22ce;
+  --display-purple-bright: #c026d3;
+  --display-purple-glow: rgba(192, 38, 211, 0.42);
+
+  --display-text: #ffffff;
+  --display-muted: rgba(255, 255, 255, 0.74);
+  --display-line: rgba(255, 255, 255, 0.72);
+  --display-soft-line: rgba(255, 255, 255, 0.2);
+
+  --display-panel: rgba(18, 2, 29, 0.84);
+  --display-panel-strong: rgba(28, 4, 43, 0.94);
+
+  --display-success: #22c55e;
+  --display-danger: #ef4444;
+
+  --ticker-height: 76px;
+  --status-height: 42px;
+}
+
+
+/* ==================================================
+   Reset
+================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden;
+
+  color: var(--display-text);
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  background:
+    radial-gradient(
+      circle at 12% 40%,
+      rgba(168, 36, 214, 0.3),
+      transparent 31%
+    ),
+    radial-gradient(
+      circle at 88% 42%,
+      rgba(168, 36, 214, 0.3),
+      transparent 31%
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(112, 20, 156, 0.32),
+      transparent 42%
+    ),
+    linear-gradient(
+      135deg,
+      #050008 0%,
+      #120019 46%,
+      #07000b 100%
+    );
+}
+
+
+/* ==================================================
+   Overall Display Shell
+================================================== */
+
+.display-shell {
+  position: relative;
+
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.015),
+      rgba(0, 0, 0, 0.2)
+    );
+}
+
+.display-shell::before {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+
+  pointer-events: none;
+
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.012) 0,
+      rgba(255, 255, 255, 0.012) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+
+  content: "";
+}
+
+.display-stage,
+.sponsor-strip,
+.display-status-bar {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* ==================================================
+   Sponsor Ticker
+================================================== */
+
+.sponsor-strip {
+  display: flex;
+  align-items: center;
+
+  height: var(--ticker-height);
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(15, 0, 23, 0.98),
+      rgba(42, 4, 59, 0.98),
+      rgba(15, 0, 23, 0.98)
+    );
+
+  border-bottom: 2px solid rgba(192, 38, 211, 0.62);
+  box-shadow:
+    0 4px 28px rgba(0, 0, 0, 0.55),
+    0 0 22px rgba(192, 38, 211, 0.16);
+}
+
+.sponsor-strip-window {
+  width: 100%;
+  overflow: hidden;
+}
+
+.sponsor-ticker-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+
+  animation: sponsorTicker 34s linear infinite;
+  will-change: transform;
+}
+
+.sponsor-strip:hover .sponsor-ticker-track {
+  animation-play-state: paused;
+}
+
+.sponsor-ticker-group {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.sponsor-ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+
+  min-width: 260px;
+  height: 58px;
+  margin-right: 42px;
+  padding: 8px 22px;
+
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+.sponsor-ticker-logo {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+
+  object-fit: contain;
+}
+
+.sponsor-ticker-name {
+  color: #ffffff;
+
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+@keyframes sponsorTicker {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+
+/* ==================================================
+   Status Bar
+================================================== */
+
+.display-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  min-height: var(--status-height);
+  padding: 7px 26px;
+
+  background: rgba(5, 0, 9, 0.84);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.display-live-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  color: var(--display-muted);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.display-live-dot {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+
+  background: var(--display-danger);
+  border-radius: 50%;
+}
+
+.display-live-dot.is-live {
+  background: var(--display-success);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+}
+
+.display-mode-label {
+  color: #e879f9;
+
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+
+/* ==================================================
+   Shared View Layout
+================================================== */
+
+.display-stage {
+  min-height:
+    calc(
+      100vh -
+      var(--ticker-height) -
+      var(--status-height)
+    );
+}
+
+.display-view {
+  width: 100%;
+  min-height:
+    calc(
+      100vh -
+      var(--ticker-height) -
+      var(--status-height)
+    );
+}
+
+.display-view[hidden] {
+  display: none !important;
+}
+
+.display-loading {
+  grid-column: 1 / -1;
+
+  margin: auto;
+
+  color: var(--display-muted);
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+}
+
+
+/* ==================================================
+   Group-Stage Display
+================================================== */
+
+.display-groups-view {
+  display: flex;
+  flex-direction: column;
+
+  padding: 22px 5vw 14px;
+}
+
+.display-groups-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  width: 100%;
+  flex: 1;
+}
+
+.display-group-card {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  flex-direction: column;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(37, 6, 51, 0.93),
+      rgba(15, 1, 25, 0.92)
+    );
+
+  border: 2px solid var(--display-line);
+  box-shadow:
+    0 10px 32px rgba(0, 0, 0, 0.35),
+    inset 0 0 25px rgba(192, 38, 211, 0.05);
+}
+
+.display-group-title {
+  display: grid;
+  min-height: 58px;
+  place-items: center;
+
+  margin: 0;
+  padding: 7px 12px;
+
+  color: #c044e5;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(55, 8, 77, 0.7),
+      rgba(26, 3, 38, 0.68)
+    );
+
+  border-bottom: 2px solid var(--display-line);
+
+  font-size: clamp(25px, 2.35vw, 43px);
+  font-weight: 950;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+
+  text-shadow:
+    0 0 13px rgba(192, 38, 211, 0.35);
+}
+
+.display-group-table {
+  width: 100%;
+  height: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.display-group-table tbody {
+  height: 100%;
+}
+
+.display-group-table tr {
+  height: 25%;
+}
+
+.display-group-table td {
+  padding: 6px 13px;
+
+  color: #ffffff;
+
+  border-right: 1px solid var(--display-line);
+  border-bottom: 1px solid var(--display-line);
+
+  font-size: clamp(17px, 1.55vw, 28px);
+  font-weight: 760;
+  line-height: 1.05;
+}
+
+.display-group-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.display-group-table td:last-child {
+  border-right: 0;
+}
+
+.display-position-cell {
+  width: 64px;
+
+  font-size: clamp(18px, 1.5vw, 28px) !important;
+  font-weight: 900 !important;
+  text-align: center;
+}
+
+.display-team-cell {
+  width: auto;
+}
+
+.display-table-team {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.display-team-logo {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+
+  object-fit: contain;
+}
+
+.display-team-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.display-team-stats {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.68em;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.display-team-stats strong {
+  color: #ffffff;
+}
+
+
+/* ==================================================
+   Main Sponsor Footer
+================================================== */
+
+.display-brand-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 124px;
+  padding: 12px 28px 0;
+}
+
+.main-sponsor-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+
+  min-width: 360px;
+}
+
+.main-sponsor-logo {
+  width: 105px;
+  height: 105px;
+  flex: 0 0 105px;
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(0 0 10px rgba(192, 38, 211, 0.52))
+    drop-shadow(0 0 20px rgba(192, 38, 211, 0.2));
+}
+
+.main-sponsor-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.main-sponsor-name {
+  color: #d946ef;
+
+  font-size: clamp(22px, 2vw, 35px);
+  font-weight: 950;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.main-sponsor-subtitle {
+  color: #ffffff;
+
+  font-size: clamp(16px, 1.4vw, 25px);
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.main-sponsor-tournament {
+  color: #ffffff;
+
+  font-size: clamp(22px, 2.1vw, 38px);
+  font-weight: 950;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+
+/* ==================================================
+   Knockout Display
+================================================== */
+
+.display-knockout-view {
+  position: relative;
+
+  padding: 10px 2.4vw 20px;
+}
+
+.display-knockout-heading {
+  text-align: center;
+}
+
+.display-knockout-heading h1 {
+  margin: 0 0 8px;
+
+  color: #d518ea;
+
+  font-size: clamp(40px, 5.5vw, 92px);
+  font-weight: 950;
+  letter-spacing: 0.015em;
+  line-height: 1;
+  text-transform: uppercase;
+
+  text-shadow:
+    0 0 17px rgba(213, 24, 234, 0.32);
+}
+
+.display-knockout-bracket {
+  position: relative;
+
+  display: grid;
+  grid-template-columns:
+    minmax(250px, 1.3fr)
+    minmax(145px, 0.72fr)
+    minmax(150px, 0.72fr)
+    minmax(260px, 1.12fr)
+    minmax(150px, 0.72fr)
+    minmax(145px, 0.72fr)
+    minmax(250px, 1.3fr);
+
+  gap: clamp(10px, 1.15vw, 22px);
+
+  width: 100%;
+  min-height: calc(100vh - 250px);
+}
+
+.display-bracket-column {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 13px;
+}
+
+.display-bracket-column-title {
+  margin: 0 0 4px;
+
+  color: var(--display-muted);
+
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.display-bracket-match {
+  position: relative;
+
+  overflow: visible;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(38, 4, 54, 0.96),
+      rgba(16, 1, 25, 0.96)
+    );
+
+  border: 2px solid rgba(255, 255, 255, 0.82);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.32),
+    inset 0 0 18px rgba(192, 38, 211, 0.06);
+}
+
+.display-bracket-match-label {
+  padding: 5px 9px;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.display-bracket-team {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  min-height: 41px;
+  padding: 5px 8px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.46);
+}
+
+.display-bracket-team:last-child {
+  border-bottom: 0;
+}
+
+.display-bracket-team.is-winner {
+  background: rgba(192, 38, 211, 0.15);
+}
+
+.display-bracket-team-logo {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+
+  object-fit: contain;
+}
+
+.display-bracket-team-name {
+  min-width: 0;
+  flex: 1;
+
+  overflow: hidden;
+
+  color: #ffffff;
+
+  font-size: clamp(12px, 1.05vw, 19px);
+  font-weight: 850;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.display-bracket-score {
+  display: grid;
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+  place-items: center;
+
+  color: #ffffff;
+
+  background: rgba(255, 255, 255, 0.08);
+  border-left: 1px solid rgba(255, 255, 255, 0.42);
+
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.display-bracket-placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+}
+
+.display-final-column {
+  justify-content: center;
+}
+
+.display-final-column .display-bracket-match {
+  box-shadow:
+    0 0 20px rgba(192, 38, 211, 0.22),
+    0 14px 32px rgba(0, 0, 0, 0.42);
+}
+
+.knockout-main-sponsor {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  z-index: 4;
+
+  width: min(430px, 31vw);
+  min-width: 0;
+
+  transform: translateX(-50%);
+}
+
+.knockout-main-sponsor .main-sponsor-logo {
+  width: 90px;
+  height: 90px;
+  flex-basis: 90px;
+}
+
+.knockout-main-sponsor .main-sponsor-name {
+  font-size: clamp(16px, 1.45vw, 27px);
+}
+
+.knockout-main-sponsor .main-sponsor-subtitle {
+  font-size: clamp(12px, 1vw, 18px);
+}
+
+.knockout-main-sponsor .main-sponsor-tournament {
+  font-size: clamp(17px, 1.55vw, 29px);
+}
+
+
+/* ==================================================
+   Crowd Silhouette Effect
+================================================== */
+
+.display-groups-view::after,
+.display-knockout-view::after {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+
+  height: 110px;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.94),
+      rgba(0, 0, 0, 0.58),
+      transparent
+    );
+
+  content: "";
+}
+
+
+/* ==================================================
+   Responsive Fallback
+================================================== */
+
+@media (max-width: 1100px) {
+  .display-groups-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(210px, 1fr));
+  }
+
+  .display-group-title {
+    font-size: 28px;
+  }
+
+  .display-group-table td {
+    font-size: 18px;
+  }
+
+  .display-knockout-bracket {
+    min-width: 1180px;
+  }
+
+  .display-knockout-view {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  :root {
+    --ticker-height: 64px;
+  }
+
+  .sponsor-ticker-item {
+    min-width: 225px;
+    margin-right: 24px;
+  }
+
+  .sponsor-ticker-name {
+    font-size: 16px;
+  }
+
+  .display-status-bar {
+    padding-inline: 14px;
+  }
+
+  .display-groups-view {
+    padding: 14px;
+  }
+
+  .display-groups-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+  }
+
+  .display-group-card {
+    min-height: 310px;
+  }
+
+  .display-brand-footer {
+    min-height: 150px;
+  }
+
+  .main-sponsor-brand {
+    min-width: 0;
+  }
+}
+
+
+/* ==================================================
+   Reduced Motion
+================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .sponsor-ticker-track {
+    animation-play-state: paused;
+  }
+}
