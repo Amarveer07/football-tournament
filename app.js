@@ -193,6 +193,50 @@ let matches = normalizeMatches(localState?.matches, groupKeys);
 let currentGroup = groupKeys[0] || "";
 let undoStack = [];
 let thirdPlaceQualifiers = [];
+const roundOf16Plan = [
+  {
+    matchNumber: 1,
+    teamOneSource: "Group A winner",
+    teamTwoSource: "Third-place rank 4 or 3"
+  },
+  {
+    matchNumber: 2,
+    teamOneSource: "Group C winner",
+    teamTwoSource: "Third-place rank 3 or 4"
+  },
+  {
+    matchNumber: 3,
+    teamOneSource: "Group F winner",
+    teamTwoSource: "Group B runner-up"
+  },
+  {
+    matchNumber: 4,
+    teamOneSource: "Group D runner-up",
+    teamTwoSource: "Group E runner-up"
+  },
+  {
+    matchNumber: 5,
+    teamOneSource: "Group B winner",
+    teamTwoSource: "Third-place rank 2 or 1"
+  },
+  {
+    matchNumber: 6,
+    teamOneSource: "Group D winner",
+    teamTwoSource: "Third-place rank 1 or 2"
+  },
+  {
+    matchNumber: 7,
+    teamOneSource: "Group E winner",
+    teamTwoSource: "Group A runner-up"
+  },
+  {
+    matchNumber: 8,
+    teamOneSource: "Group C runner-up",
+    teamTwoSource: "Group F runner-up"
+  }
+];
+
+let knockoutSetup = {};
 function getGroupKeys() {
   return [...groupKeys].sort((a, b) => a.localeCompare(b));
 }
@@ -743,7 +787,88 @@ function renderThirdPlaceQualifierControls() {
       `;
     })
     .join("");
+    }
+function getAllKnockoutTeamOptions() {
+  const teams = [];
+
+  getGroupKeys().forEach((groupKey) => {
+    (groups[groupKey] || []).forEach((team) => {
+      teams.push({
+        groupKey,
+        teamName: team.name
+      });
+    });
+  });
+
+  return teams;
 }
+
+function renderKnockoutSetup() {
+  const container = byId("knockoutSetup");
+  if (!container) return;
+
+  const allTeams = getAllKnockoutTeamOptions();
+
+  const teamOptions = allTeams
+    .map((team) => {
+      const value = encodeURIComponent(
+        JSON.stringify({
+          groupKey: team.groupKey,
+          teamName: team.teamName
+        })
+      );
+
+      return `
+        <option value="${value}">
+          ${escapeHtml(team.teamName)} — Group ${escapeHtml(team.groupKey)}
+        </option>
+      `;
+    })
+    .join("");
+
+  container.innerHTML = `
+    <div class="form-grid">
+      ${roundOf16Plan
+        .map(
+          (match) => `
+            <div class="form-panel knockout-match-panel">
+              <h3>Round of 16 — Match ${match.matchNumber}</h3>
+
+              <p class="helper-text">
+                ${escapeHtml(match.teamOneSource)}
+                vs
+                ${escapeHtml(match.teamTwoSource)}
+              </p>
+
+              <div class="form-field">
+                <label for="knockoutTeamOne_${match.matchNumber}">
+                  Team 1
+                </label>
+
+                <select id="knockoutTeamOne_${match.matchNumber}">
+                  <option value="">Select team</option>
+                  ${teamOptions}
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="knockoutTeamTwo_${match.matchNumber}">
+                  Team 2
+                </label>
+
+                <select id="knockoutTeamTwo_${match.matchNumber}">
+                  <option value="">Select team</option>
+                  ${teamOptions}
+                </select>
+              </div>
+            </div>
+          `
+        )
+        .join("")}
+    </div>
+  `;
+}
+
 /* ==================================================
    Dynamic Group Interface
 ================================================== */
@@ -1117,6 +1242,7 @@ function renderEverything() {
   renderPublicGroup();
 renderThirdPlaceTable();
 renderThirdPlaceQualifierControls();
+renderKnockoutSetup();
 }
 
 /* ==================================================
