@@ -1498,7 +1498,6 @@ function renderEverything() {
   renderAdminMatches();
   renderPublicGroup();
   renderThirdPlaceTable();
-  renderThirdPlaceQualifierControls();
   renderKnockoutSetup();
   renderPublicKnockoutBracket();
 }
