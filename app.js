@@ -700,6 +700,50 @@ function renderThirdPlaceTable() {
     </tbody>
   `;
 }
+function renderThirdPlaceQualifierControls() {
+  const container = byId("thirdPlaceQualifierControls");
+  if (!container) return;
+
+  const teams = getThirdPlacedTeams();
+
+  if (teams.length === 0) {
+    container.innerHTML = `
+      <p class="helper-text">
+        No third-placed teams are available yet.
+      </p>
+    `;
+    return;
+  }
+
+  container.innerHTML = teams
+    .map((team, index) => {
+      const qualifierValue = encodeURIComponent(
+        JSON.stringify({
+          groupKey: team.groupKey,
+          teamName: team.name
+        })
+      );
+
+      return `
+        <label class="qualifier-option">
+          <input
+            type="checkbox"
+            class="third-place-qualifier-checkbox"
+            value="${qualifierValue}"
+            ${index < 4 ? "checked" : ""}
+          >
+
+          <span>
+            <strong>${index + 1}. ${escapeHtml(team.name)}</strong>
+            — Group ${escapeHtml(team.groupKey)},
+            ${team.points} pts,
+            GD ${team.gd}
+          </span>
+        </label>
+      `;
+    })
+    .join("");
+}
 /* ==================================================
    Dynamic Group Interface
 ================================================== */
