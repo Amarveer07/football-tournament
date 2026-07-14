@@ -447,10 +447,11 @@ async function writeTournamentState() {
   }
 
   await window.db.ref("tournament").update({
-    groupKeys: groupRegistryFromKeys(groupKeys),
-    groups,
-    matches
-  });
+  groupKeys: groupRegistryFromKeys(groupKeys),
+  groups,
+  matches,
+  knockoutSetup
+});
 }
 
 async function commitStateChange(changeFunction) {
@@ -502,7 +503,11 @@ function listenToTournamentFromFirebase() {
           groupKeys = incomingKeys;
           groups = normalizeGroups(data.groups, groupKeys);
           matches = normalizeMatches(data.matches, groupKeys);
-
+knockoutSetup =
+  data.knockoutSetup &&
+  typeof data.knockoutSetup === "object"
+    ? data.knockoutSetup
+    : {};
           if (!groupKeys.includes(currentGroup)) {
             currentGroup = groupKeys[0] || "";
           }
@@ -831,6 +836,31 @@ function renderKnockoutSetup() {
       ${roundOf16Plan
         .map(
           (match) => `
+            roundOf16Plan.forEach((match) => {
+  const savedMatch = knockoutSetup?.[match.matchNumber];
+
+  if (!savedMatch) return;
+
+  const teamOneSelect = byId(
+    `knockoutTeamOne_${match.matchNumber}`
+  );
+
+  const teamTwoSelect = byId(
+    `knockoutTeamTwo_${match.matchNumber}`
+  );
+
+  if (teamOneSelect && savedMatch.teamOne) {
+    teamOneSelect.value = encodeURIComponent(
+      JSON.stringify(savedMatch.teamOne)
+    );
+  }
+
+  if (teamTwoSelect && savedMatch.teamTwo) {
+    teamTwoSelect.value = encodeURIComponent(
+      JSON.stringify(savedMatch.teamTwo)
+    );
+  }
+});
             <div class="form-panel knockout-match-panel">
               <h3>Round of 16 — Match ${match.matchNumber}</h3>
 
@@ -959,6 +989,68 @@ function autoFillKnockoutSetup() {
       }
     }
   );
+}
+
+
+async function saveKnockoutSetup() {
+  const newSetup = {};
+  const selectedTeams = new Set();
+
+  for (const match of roundOf16Plan) {
+    const teamOneValue = byId(
+      `knockoutTeamOne_${match.matchNumber}`
+    )?.value;
+
+    const teamTwoValue = byId(
+      `knockoutTeamTwo_${match.matchNumber}`
+    )?.value;
+
+    if (!teamOneValue || !teamTwoValue) {
+      alert(`Select both teams for Match ${match.matchNumber}.`);
+      return;
+    }
+
+    const teamOne = JSON.parse(
+      decodeURIComponent(teamOneValue)
+    );
+
+    const teamTwo = JSON.parse(
+      decodeURIComponent(teamTwoValue)
+    );
+
+    const teamOneKey =
+      `${teamOne.groupKey}:${teamOne.teamName}`;
+
+    const teamTwoKey =
+      `${teamTwo.groupKey}:${teamTwo.teamName}`;
+
+    if (
+      selectedTeams.has(teamOneKey) ||
+      selectedTeams.has(teamTwoKey) ||
+      teamOneKey === teamTwoKey
+    ) {
+      alert(
+        `A team has been selected more than once. Check Match ${match.matchNumber}.`
+      );
+      return;
+    }
+
+    selectedTeams.add(teamOneKey);
+    selectedTeams.add(teamTwoKey);
+
+    newSetup[match.matchNumber] = {
+      teamOne,
+      teamTwo
+    };
+  }
+
+  const saved = await commitStateChange(() => {
+    knockoutSetup = newSetup;
+  });
+
+  if (saved) {
+    alert("Knockout setup saved.");
+  }
 }
 /* ==================================================
    Dynamic Group Interface
@@ -1751,7 +1843,7 @@ window.deleteMatch = deleteMatch;
 window.autoFillKnockoutSetup = autoFillKnockoutSetup;
 window.undoLastAction = undoLastAction;
 window.resetTournament = resetTournament;
-
+window.saveKnockoutSetup = saveKnockoutSetup;
 window.adminLogin = adminLogin;
 window.adminLogout = adminLogout;
 window.renderPublicGroup = renderPublicGroup;
