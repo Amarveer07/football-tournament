@@ -242,6 +242,124 @@ let knockoutSetup =
     ? clone(localState.knockoutSetup)
     : {};
 
+const knockoutRoundConfig = {
+  roundOf16: {
+    label: "Round of 16",
+    shortLabel: "R16",
+    matchCount: 8
+  },
+  quarterFinals: {
+    label: "Quarter-finals",
+    shortLabel: "QF",
+    matchCount: 4
+  },
+  semiFinals: {
+    label: "Semi-finals",
+    shortLabel: "SF",
+    matchCount: 2
+  },
+  final: {
+    label: "Final",
+    shortLabel: "Final",
+    matchCount: 1
+  }
+};
+
+function createEmptyKnockoutMatchResult() {
+  return {
+    scoreOne: null,
+    scoreTwo: null,
+    winner: null
+  };
+}
+
+function createEmptyKnockoutResults() {
+  const results = {};
+
+  Object.entries(knockoutRoundConfig).forEach(
+    ([roundKey, round]) => {
+      results[roundKey] = {};
+
+      for (
+        let matchNumber = 1;
+        matchNumber <= round.matchCount;
+        matchNumber += 1
+      ) {
+        results[roundKey][matchNumber] =
+          createEmptyKnockoutMatchResult();
+      }
+    }
+  );
+
+  return results;
+}
+
+function normalizeKnockoutTeamReference(reference) {
+  if (!reference || typeof reference !== "object") return null;
+
+  const groupKey = String(reference.groupKey || "").trim();
+  const teamName = String(reference.teamName || "").trim();
+
+  if (!teamName) return null;
+
+  return {
+    groupKey,
+    teamName
+  };
+}
+
+function normalizeKnockoutResults(rawResults) {
+  const normalized = createEmptyKnockoutResults();
+
+  Object.entries(knockoutRoundConfig).forEach(
+    ([roundKey, round]) => {
+      for (
+        let matchNumber = 1;
+        matchNumber <= round.matchCount;
+        matchNumber += 1
+      ) {
+        const rawMatch = rawResults?.[roundKey]?.[matchNumber];
+
+        if (!rawMatch || typeof rawMatch !== "object") continue;
+
+        const scoreOne =
+          rawMatch.scoreOne === null ||
+          rawMatch.scoreOne === undefined ||
+          rawMatch.scoreOne === ""
+            ? null
+            : toNumber(rawMatch.scoreOne, null);
+
+        const scoreTwo =
+          rawMatch.scoreTwo === null ||
+          rawMatch.scoreTwo === undefined ||
+          rawMatch.scoreTwo === ""
+            ? null
+            : toNumber(rawMatch.scoreTwo, null);
+
+        normalized[roundKey][matchNumber] = {
+          scoreOne:
+            Number.isInteger(scoreOne) && scoreOne >= 0
+              ? scoreOne
+              : null,
+          scoreTwo:
+            Number.isInteger(scoreTwo) && scoreTwo >= 0
+              ? scoreTwo
+              : null,
+          winner: normalizeKnockoutTeamReference(
+            rawMatch.winner
+          )
+        };
+      }
+    }
+  );
+
+  return normalized;
+}
+
+let knockoutResults = normalizeKnockoutResults(
+  localState?.knockoutResults
+);
+
 function getGroupKeys() {
   return [...groupKeys].sort((a, b) => a.localeCompare(b));
 }
@@ -264,6 +382,7 @@ function createStateSnapshot() {
     groups,
     matches,
     knockoutSetup,
+    knockoutResults,
     currentGroup
   });
 }
@@ -273,6 +392,9 @@ function restoreState(snapshot) {
   groups = clone(snapshot.groups || {});
   matches = clone(snapshot.matches || {});
   knockoutSetup = clone(snapshot.knockoutSetup || {});
+  knockoutResults = normalizeKnockoutResults(
+    snapshot.knockoutResults
+  );
   currentGroup = snapshot.currentGroup || groupKeys[0] || "";
 }
 
@@ -280,7 +402,13 @@ function saveLocalState() {
   try {
     localStorage.setItem(
       "footballTournamentState",
-      JSON.stringify({ groupKeys, groups, matches, knockoutSetup })
+      JSON.stringify({
+        groupKeys,
+        groups,
+        matches,
+        knockoutSetup,
+        knockoutResults
+      })
     );
   } catch (error) {
     console.warn("Could not save the local tournament backup.", error);
@@ -457,7 +585,8 @@ async function writeTournamentState() {
     groupKeys: groupRegistryFromKeys(groupKeys),
     groups,
     matches,
-    knockoutSetup
+    knockoutSetup,
+    knockoutResults
   });
 }
 
@@ -515,6 +644,11 @@ function listenToTournamentFromFirebase() {
             typeof data.knockoutSetup === "object"
               ? clone(data.knockoutSetup)
               : {};
+
+          knockoutResults = normalizeKnockoutResults(
+            data.knockoutResults
+          );
+
           if (!groupKeys.includes(currentGroup)) {
             currentGroup = groupKeys[0] || "";
           }
@@ -771,6 +905,213 @@ function getAllKnockoutTeamOptions() {
   return teams;
 }
 
+function encodeTeamReference(reference) {
+  if (!reference) return "";
+
+  return encodeURIComponent(
+    JSON.stringify({
+      groupKey: reference.groupKey || "",
+      teamName: reference.teamName || ""
+    })
+  );
+}
+
+function decodeTeamReference(value) {
+  if (!value) return null;
+
+  try {
+    return normalizeKnockoutTeamReference(
+      JSON.parse(decodeURIComponent(value))
+    );
+  } catch (error) {
+    console.warn("Could not read the selected team.", error);
+    return null;
+  }
+}
+
+function teamReferencesMatch(first, second) {
+  return Boolean(
+    first &&
+      second &&
+      first.groupKey === second.groupKey &&
+      first.teamName === second.teamName
+  );
+}
+
+function knockoutSetupIsComplete() {
+  return roundOf16Plan.every((match) => {
+    const savedMatch = knockoutSetup?.[match.matchNumber];
+
+    return Boolean(savedMatch?.teamOne && savedMatch?.teamTwo);
+  });
+}
+
+function getKnockoutResult(roundKey, matchNumber) {
+  return (
+    knockoutResults?.[roundKey]?.[matchNumber] ||
+    createEmptyKnockoutMatchResult()
+  );
+}
+
+function getKnockoutWinner(roundKey, matchNumber) {
+  return normalizeKnockoutTeamReference(
+    getKnockoutResult(roundKey, matchNumber).winner
+  );
+}
+
+function getKnockoutMatchTeams(roundKey, matchNumber) {
+  if (roundKey === "roundOf16") {
+    const savedMatch = knockoutSetup?.[matchNumber];
+
+    return {
+      teamOne: normalizeKnockoutTeamReference(
+        savedMatch?.teamOne
+      ),
+      teamTwo: normalizeKnockoutTeamReference(
+        savedMatch?.teamTwo
+      )
+    };
+  }
+
+  const previousRoundKey =
+    roundKey === "quarterFinals"
+      ? "roundOf16"
+      : roundKey === "semiFinals"
+        ? "quarterFinals"
+        : roundKey === "final"
+          ? "semiFinals"
+          : null;
+
+  if (!previousRoundKey) {
+    return {
+      teamOne: null,
+      teamTwo: null
+    };
+  }
+
+  const firstPreviousMatch = matchNumber * 2 - 1;
+  const secondPreviousMatch = matchNumber * 2;
+
+  return {
+    teamOne: getKnockoutWinner(
+      previousRoundKey,
+      firstPreviousMatch
+    ),
+    teamTwo: getKnockoutWinner(
+      previousRoundKey,
+      secondPreviousMatch
+    )
+  };
+}
+
+function getNextKnockoutMatch(roundKey, matchNumber) {
+  if (roundKey === "roundOf16") {
+    return {
+      roundKey: "quarterFinals",
+      matchNumber: Math.ceil(matchNumber / 2)
+    };
+  }
+
+  if (roundKey === "quarterFinals") {
+    return {
+      roundKey: "semiFinals",
+      matchNumber: Math.ceil(matchNumber / 2)
+    };
+  }
+
+  if (roundKey === "semiFinals") {
+    return {
+      roundKey: "final",
+      matchNumber: 1
+    };
+  }
+
+  return null;
+}
+
+function clearKnockoutResultAndDependents(
+  roundKey,
+  matchNumber,
+  includeCurrent = true
+) {
+  if (includeCurrent && knockoutResults?.[roundKey]) {
+    knockoutResults[roundKey][matchNumber] =
+      createEmptyKnockoutMatchResult();
+  }
+
+  const nextMatch = getNextKnockoutMatch(
+    roundKey,
+    matchNumber
+  );
+
+  if (!nextMatch) return;
+
+  clearKnockoutResultAndDependents(
+    nextMatch.roundKey,
+    nextMatch.matchNumber,
+    true
+  );
+}
+
+function knockoutHasAnyResults() {
+  return Object.entries(knockoutRoundConfig).some(
+    ([roundKey, round]) => {
+      for (
+        let matchNumber = 1;
+        matchNumber <= round.matchCount;
+        matchNumber += 1
+      ) {
+        const result = getKnockoutResult(
+          roundKey,
+          matchNumber
+        );
+
+        if (
+          result.scoreOne !== null ||
+          result.scoreTwo !== null ||
+          result.winner
+        ) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+  );
+}
+
+function getKnockoutDisplayTeam(reference) {
+  if (!reference) {
+    return {
+      name: "TBC",
+      logo: "",
+      groupKey: ""
+    };
+  }
+
+  const savedTeam = (groups[reference.groupKey] || []).find(
+    (team) => team.name === reference.teamName
+  );
+
+  if (savedTeam) {
+    return {
+      ...savedTeam,
+      groupKey: reference.groupKey
+    };
+  }
+
+  return {
+    name: reference.teamName || "TBC",
+    logo: "",
+    groupKey: reference.groupKey || ""
+  };
+}
+
+function renderKnockoutTeamLabel(reference) {
+  const team = getKnockoutDisplayTeam(reference);
+  return renderTeamName(team);
+}
+
 function renderKnockoutSetup() {
   const container = byId("knockoutSetup");
   if (!container) return;
@@ -779,12 +1120,7 @@ function renderKnockoutSetup() {
 
   const teamOptions = allTeams
     .map((team) => {
-      const value = encodeURIComponent(
-        JSON.stringify({
-          groupKey: team.groupKey,
-          teamName: team.teamName
-        })
-      );
+      const value = encodeTeamReference(team);
 
       return `
         <option value="${value}">
@@ -794,45 +1130,61 @@ function renderKnockoutSetup() {
     })
     .join("");
 
+  const setupHtml = roundOf16Plan
+    .map(
+      (match) => `
+        <div class="form-panel knockout-match-panel">
+          <h3>Round of 16 — Match ${match.matchNumber}</h3>
+
+          <p class="helper-text">
+            ${escapeHtml(match.teamOneSource)}
+            vs
+            ${escapeHtml(match.teamTwoSource)}
+          </p>
+
+          <div class="form-field">
+            <label for="knockoutTeamOne_${match.matchNumber}">
+              Team 1
+            </label>
+
+            <select id="knockoutTeamOne_${match.matchNumber}">
+              <option value="">Select team</option>
+              ${teamOptions}
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="knockoutTeamTwo_${match.matchNumber}">
+              Team 2
+            </label>
+
+            <select id="knockoutTeamTwo_${match.matchNumber}">
+              <option value="">Select team</option>
+              ${teamOptions}
+            </select>
+          </div>
+        </div>
+      `
+    )
+    .join("");
+
   container.innerHTML = `
     <div class="form-grid">
-      ${roundOf16Plan
-        .map(
-          (match) => `
-            <div class="form-panel knockout-match-panel">
-              <h3>Round of 16 — Match ${match.matchNumber}</h3>
+      ${setupHtml}
+    </div>
 
-              <p class="helper-text">
-                ${escapeHtml(match.teamOneSource)}
-                vs
-                ${escapeHtml(match.teamTwoSource)}
-              </p>
+    <div class="subsection knockout-results-admin">
+      <div class="section-heading">
+        <div>
+          <h3>Knockout Results</h3>
+          <p>
+            Enter scores for every round. If a match is tied,
+            choose the winner after penalties.
+          </p>
+        </div>
+      </div>
 
-              <div class="form-field">
-                <label for="knockoutTeamOne_${match.matchNumber}">
-                  Team 1
-                </label>
-
-                <select id="knockoutTeamOne_${match.matchNumber}">
-                  <option value="">Select team</option>
-                  ${teamOptions}
-                </select>
-              </div>
-
-              <div class="form-field">
-                <label for="knockoutTeamTwo_${match.matchNumber}">
-                  Team 2
-                </label>
-
-                <select id="knockoutTeamTwo_${match.matchNumber}">
-                  <option value="">Select team</option>
-                  ${teamOptions}
-                </select>
-              </div>
-            </div>
-          `
-        )
-        .join("")}
+      ${renderAllAdminKnockoutRounds()}
     </div>
   `;
 
@@ -849,17 +1201,192 @@ function renderKnockoutSetup() {
     );
 
     if (teamOneSelect && savedMatch.teamOne) {
-      teamOneSelect.value = encodeURIComponent(
-        JSON.stringify(savedMatch.teamOne)
+      teamOneSelect.value = encodeTeamReference(
+        savedMatch.teamOne
       );
     }
 
     if (teamTwoSelect && savedMatch.teamTwo) {
-      teamTwoSelect.value = encodeURIComponent(
-        JSON.stringify(savedMatch.teamTwo)
+      teamTwoSelect.value = encodeTeamReference(
+        savedMatch.teamTwo
       );
     }
   });
+}
+
+function renderAllAdminKnockoutRounds() {
+  return Object.entries(knockoutRoundConfig)
+    .map(([roundKey, round]) => {
+      const matchCards = [];
+
+      for (
+        let matchNumber = 1;
+        matchNumber <= round.matchCount;
+        matchNumber += 1
+      ) {
+        matchCards.push(
+          renderAdminKnockoutMatch(
+            roundKey,
+            matchNumber
+          )
+        );
+      }
+
+      return `
+        <section class="knockout-admin-round">
+          <h4>${escapeHtml(round.label)}</h4>
+          <div class="form-grid">
+            ${matchCards.join("")}
+          </div>
+        </section>
+      `;
+    })
+    .join("");
+}
+
+function renderAdminKnockoutMatch(
+  roundKey,
+  matchNumber
+) {
+  const round = knockoutRoundConfig[roundKey];
+  const teams = getKnockoutMatchTeams(
+    roundKey,
+    matchNumber
+  );
+  const result = getKnockoutResult(
+    roundKey,
+    matchNumber
+  );
+
+  const teamOne = getKnockoutDisplayTeam(
+    teams.teamOne
+  );
+  const teamTwo = getKnockoutDisplayTeam(
+    teams.teamTwo
+  );
+
+  const teamsReady = Boolean(
+    teams.teamOne && teams.teamTwo
+  );
+
+  const winnerOneSelected = teamReferencesMatch(
+    result.winner,
+    teams.teamOne
+  )
+    ? "selected"
+    : "";
+
+  const winnerTwoSelected = teamReferencesMatch(
+    result.winner,
+    teams.teamTwo
+  )
+    ? "selected"
+    : "";
+
+  const encodedRoundKey = encodeURIComponent(roundKey);
+
+  return `
+    <div class="form-panel knockout-result-panel">
+      <h3>
+        ${escapeHtml(round.shortLabel)} ${matchNumber}
+      </h3>
+
+      <div class="knockout-admin-team">
+        ${renderTeamName(teamOne)}
+      </div>
+
+      <div class="form-field">
+        <label for="koScoreOne_${roundKey}_${matchNumber}">
+          ${escapeHtml(teamOne.name)} score
+        </label>
+        <input
+          type="number"
+          min="0"
+          step="1"
+          inputmode="numeric"
+          id="koScoreOne_${roundKey}_${matchNumber}"
+          value="${
+            result.scoreOne === null
+              ? ""
+              : result.scoreOne
+          }"
+          ${teamsReady ? "" : "disabled"}
+        >
+      </div>
+
+      <div class="knockout-admin-team">
+        ${renderTeamName(teamTwo)}
+      </div>
+
+      <div class="form-field">
+        <label for="koScoreTwo_${roundKey}_${matchNumber}">
+          ${escapeHtml(teamTwo.name)} score
+        </label>
+        <input
+          type="number"
+          min="0"
+          step="1"
+          inputmode="numeric"
+          id="koScoreTwo_${roundKey}_${matchNumber}"
+          value="${
+            result.scoreTwo === null
+              ? ""
+              : result.scoreTwo
+          }"
+          ${teamsReady ? "" : "disabled"}
+        >
+      </div>
+
+      <div class="form-field">
+        <label for="koWinner_${roundKey}_${matchNumber}">
+          Winner if tied
+        </label>
+        <select
+          id="koWinner_${roundKey}_${matchNumber}"
+          ${teamsReady ? "" : "disabled"}
+        >
+          <option value="">Choose after penalties</option>
+          <option value="one" ${winnerOneSelected}>
+            ${escapeHtml(teamOne.name)}
+          </option>
+          <option value="two" ${winnerTwoSelected}>
+            ${escapeHtml(teamTwo.name)}
+          </option>
+        </select>
+      </div>
+
+      <div class="button-row">
+        <button
+          type="button"
+          onclick="saveKnockoutMatchResult(
+            decodeURIComponent('${encodedRoundKey}'),
+            ${matchNumber}
+          )"
+          ${teamsReady ? "" : "disabled"}
+        >
+          Save Result
+        </button>
+
+        <button
+          type="button"
+          class="secondary-button"
+          onclick="clearKnockoutMatchResult(
+            decodeURIComponent('${encodedRoundKey}'),
+            ${matchNumber}
+          )"
+          ${
+            result.scoreOne === null &&
+            result.scoreTwo === null &&
+            !result.winner
+              ? "disabled"
+              : ""
+          }
+        >
+          Clear
+        </button>
+      </div>
+    </div>
+  `;
 }
 
 function autoFillKnockoutSetup() {
@@ -872,12 +1399,6 @@ function autoFillKnockoutSetup() {
       groupKey,
       teamName: team.name
     };
-  };
-
-  const encodeTeam = (team) => {
-    if (!team) return "";
-
-    return encodeURIComponent(JSON.stringify(team));
   };
 
   const choosePair = (
@@ -912,26 +1433,70 @@ function autoFillKnockoutSetup() {
     return;
   }
 
-  const rank1 = makeTeam(thirdPlaced[0].groupKey, thirdPlaced[0]);
-  const rank2 = makeTeam(thirdPlaced[1].groupKey, thirdPlaced[1]);
-  const rank3 = makeTeam(thirdPlaced[2].groupKey, thirdPlaced[2]);
-  const rank4 = makeTeam(thirdPlaced[3].groupKey, thirdPlaced[3]);
+  const rank1 = makeTeam(
+    thirdPlaced[0].groupKey,
+    thirdPlaced[0]
+  );
+  const rank2 = makeTeam(
+    thirdPlaced[1].groupKey,
+    thirdPlaced[1]
+  );
+  const rank3 = makeTeam(
+    thirdPlaced[2].groupKey,
+    thirdPlaced[2]
+  );
+  const rank4 = makeTeam(
+    thirdPlaced[3].groupKey,
+    thirdPlaced[3]
+  );
 
-  // Match 1 prioritises rank 4, with rank 3 as the alternative.
-  const lowerPair = choosePair(rank4, rank3, "A", "C");
+  const lowerPair = choosePair(
+    rank4,
+    rank3,
+    "A",
+    "C"
+  );
 
-  // Match 5 prioritises rank 2, with rank 1 as the alternative.
-  const higherPair = choosePair(rank2, rank1, "B", "D");
+  const higherPair = choosePair(
+    rank2,
+    rank1,
+    "B",
+    "D"
+  );
 
   const suggestedMatches = {
-    1: [makeTeam("A", group("A")[0]), lowerPair[0]],
-    2: [makeTeam("C", group("C")[0]), lowerPair[1]],
-    3: [makeTeam("F", group("F")[0]), makeTeam("B", group("B")[1])],
-    4: [makeTeam("D", group("D")[1]), makeTeam("E", group("E")[1])],
-    5: [makeTeam("B", group("B")[0]), higherPair[0]],
-    6: [makeTeam("D", group("D")[0]), higherPair[1]],
-    7: [makeTeam("E", group("E")[0]), makeTeam("A", group("A")[1])],
-    8: [makeTeam("C", group("C")[1]), makeTeam("F", group("F")[1])]
+    1: [
+      makeTeam("A", group("A")[0]),
+      lowerPair[0]
+    ],
+    2: [
+      makeTeam("C", group("C")[0]),
+      lowerPair[1]
+    ],
+    3: [
+      makeTeam("F", group("F")[0]),
+      makeTeam("B", group("B")[1])
+    ],
+    4: [
+      makeTeam("D", group("D")[1]),
+      makeTeam("E", group("E")[1])
+    ],
+    5: [
+      makeTeam("B", group("B")[0]),
+      higherPair[0]
+    ],
+    6: [
+      makeTeam("D", group("D")[0]),
+      higherPair[1]
+    ],
+    7: [
+      makeTeam("E", group("E")[0]),
+      makeTeam("A", group("A")[1])
+    ],
+    8: [
+      makeTeam("C", group("C")[1]),
+      makeTeam("F", group("F")[1])
+    ]
   };
 
   Object.entries(suggestedMatches).forEach(
@@ -945,42 +1510,43 @@ function autoFillKnockoutSetup() {
       );
 
       if (teamOneSelect) {
-        teamOneSelect.value = encodeTeam(teams[0]);
+        teamOneSelect.value = encodeTeamReference(
+          teams[0]
+        );
       }
 
       if (teamTwoSelect) {
-        teamTwoSelect.value = encodeTeam(teams[1]);
+        teamTwoSelect.value = encodeTeamReference(
+          teams[1]
+        );
       }
     }
   );
 }
-
 
 async function saveKnockoutSetup() {
   const newSetup = {};
   const selectedTeams = new Set();
 
   for (const match of roundOf16Plan) {
-    const teamOneValue = byId(
-      `knockoutTeamOne_${match.matchNumber}`
-    )?.value;
+    const teamOne = decodeTeamReference(
+      byId(
+        `knockoutTeamOne_${match.matchNumber}`
+      )?.value
+    );
 
-    const teamTwoValue = byId(
-      `knockoutTeamTwo_${match.matchNumber}`
-    )?.value;
+    const teamTwo = decodeTeamReference(
+      byId(
+        `knockoutTeamTwo_${match.matchNumber}`
+      )?.value
+    );
 
-    if (!teamOneValue || !teamTwoValue) {
-      alert(`Select both teams for Match ${match.matchNumber}.`);
+    if (!teamOne || !teamTwo) {
+      alert(
+        `Select both teams for Match ${match.matchNumber}.`
+      );
       return;
     }
-
-    const teamOne = JSON.parse(
-      decodeURIComponent(teamOneValue)
-    );
-
-    const teamTwo = JSON.parse(
-      decodeURIComponent(teamTwoValue)
-    );
 
     const teamOneKey =
       `${teamOne.groupKey}:${teamOne.teamName}`;
@@ -1008,13 +1574,173 @@ async function saveKnockoutSetup() {
     };
   }
 
+  const setupChanged =
+    JSON.stringify(newSetup) !==
+    JSON.stringify(knockoutSetup);
+
+  if (
+    setupChanged &&
+    knockoutHasAnyResults() &&
+    !confirm(
+      "Changing the knockout setup will clear every knockout result. Continue?"
+    )
+  ) {
+    return;
+  }
+
   const saved = await commitStateChange(() => {
     knockoutSetup = newSetup;
+
+    if (setupChanged) {
+      knockoutResults =
+        createEmptyKnockoutResults();
+    }
   });
 
   if (saved) {
     alert("Knockout setup saved.");
   }
+}
+
+async function saveKnockoutMatchResult(
+  roundKey,
+  matchNumber
+) {
+  const round = knockoutRoundConfig[roundKey];
+
+  if (
+    !round ||
+    !Number.isInteger(matchNumber) ||
+    matchNumber < 1 ||
+    matchNumber > round.matchCount
+  ) {
+    return;
+  }
+
+  const teams = getKnockoutMatchTeams(
+    roundKey,
+    matchNumber
+  );
+
+  if (!teams.teamOne || !teams.teamTwo) {
+    alert(
+      "Both teams must be confirmed before saving this result."
+    );
+    return;
+  }
+
+  const scoreOneValue = byId(
+    `koScoreOne_${roundKey}_${matchNumber}`
+  )?.value;
+
+  const scoreTwoValue = byId(
+    `koScoreTwo_${roundKey}_${matchNumber}`
+  )?.value;
+
+  if (
+    scoreOneValue === "" ||
+    scoreTwoValue === ""
+  ) {
+    alert("Enter both scores.");
+    return;
+  }
+
+  const scoreOne = Number(scoreOneValue);
+  const scoreTwo = Number(scoreTwoValue);
+
+  if (
+    !Number.isInteger(scoreOne) ||
+    !Number.isInteger(scoreTwo) ||
+    scoreOne < 0 ||
+    scoreTwo < 0
+  ) {
+    alert(
+      "Knockout scores must be whole numbers of 0 or more."
+    );
+    return;
+  }
+
+  let winner;
+
+  if (scoreOne > scoreTwo) {
+    winner = teams.teamOne;
+  } else if (scoreTwo > scoreOne) {
+    winner = teams.teamTwo;
+  } else {
+    const winnerChoice = byId(
+      `koWinner_${roundKey}_${matchNumber}`
+    )?.value;
+
+    if (winnerChoice === "one") {
+      winner = teams.teamOne;
+    } else if (winnerChoice === "two") {
+      winner = teams.teamTwo;
+    } else {
+      alert(
+        "The score is tied. Choose the winner after penalties."
+      );
+      return;
+    }
+  }
+
+  const previousWinner = getKnockoutWinner(
+    roundKey,
+    matchNumber
+  );
+
+  await commitStateChange(() => {
+    knockoutResults[roundKey][matchNumber] = {
+      scoreOne,
+      scoreTwo,
+      winner: clone(winner)
+    };
+
+    if (
+      previousWinner &&
+      !teamReferencesMatch(
+        previousWinner,
+        winner
+      )
+    ) {
+      clearKnockoutResultAndDependents(
+        roundKey,
+        matchNumber,
+        false
+      );
+    }
+  });
+}
+
+async function clearKnockoutMatchResult(
+  roundKey,
+  matchNumber
+) {
+  const round = knockoutRoundConfig[roundKey];
+
+  if (
+    !round ||
+    !Number.isInteger(matchNumber) ||
+    matchNumber < 1 ||
+    matchNumber > round.matchCount
+  ) {
+    return;
+  }
+
+  if (
+    !confirm(
+      "Clear this result and any later results that depend on it?"
+    )
+  ) {
+    return;
+  }
+
+  await commitStateChange(() => {
+    clearKnockoutResultAndDependents(
+      roundKey,
+      matchNumber,
+      true
+    );
+  });
 }
 
 /* ==================================================
@@ -1232,38 +1958,97 @@ function renderPublicResult(match) {
     </article>
   `;
 }
-function getKnockoutTeamFromReference(reference) {
-  if (!reference) return null;
-
-  const savedTeam = (groups[reference.groupKey] || []).find(
-    (team) => team.name === reference.teamName
+function renderPublicKnockoutTeamRow(
+  reference,
+  score,
+  winnerReference
+) {
+  const team = getKnockoutDisplayTeam(reference);
+  const isWinner = teamReferencesMatch(
+    reference,
+    winnerReference
   );
 
-  if (savedTeam) {
-    return {
-      ...savedTeam,
-      groupKey: reference.groupKey
-    };
-  }
+  return `
+    <div class="knockout-team-row ${
+      isWinner ? "knockout-team-winner" : ""
+    }">
+      ${renderTeamName(team)}
+      <span class="knockout-score">
+        ${score === null ? "—" : score}
+      </span>
+    </div>
+  `;
+}
 
-  return {
-    name: reference.teamName || "Team TBC",
-    logo: "",
-    groupKey: reference.groupKey || ""
-  };
+function renderPublicKnockoutMatch(
+  roundKey,
+  matchNumber
+) {
+  const round = knockoutRoundConfig[roundKey];
+  const teams = getKnockoutMatchTeams(
+    roundKey,
+    matchNumber
+  );
+  const result = getKnockoutResult(
+    roundKey,
+    matchNumber
+  );
+
+  return `
+    <article
+      class="knockout-match-card"
+      data-round="${escapeHtml(roundKey)}"
+      data-match="${matchNumber}"
+    >
+      <div class="knockout-match-number">
+        ${escapeHtml(round.shortLabel)} ${matchNumber}
+      </div>
+
+      ${renderPublicKnockoutTeamRow(
+        teams.teamOne,
+        result.scoreOne,
+        result.winner
+      )}
+
+      ${renderPublicKnockoutTeamRow(
+        teams.teamTwo,
+        result.scoreTwo,
+        result.winner
+      )}
+    </article>
+  `;
+}
+
+function renderPublicKnockoutRound(
+  roundKey,
+  matchNumbers,
+  extraClass = ""
+) {
+  const round = knockoutRoundConfig[roundKey];
+
+  return `
+    <section class="knockout-column ${extraClass}">
+      <h3>${escapeHtml(round.label)}</h3>
+      <div class="knockout-column-matches">
+        ${matchNumbers
+          .map((matchNumber) =>
+            renderPublicKnockoutMatch(
+              roundKey,
+              matchNumber
+            )
+          )
+          .join("")}
+      </div>
+    </section>
+  `;
 }
 
 function renderPublicKnockoutBracket() {
   const container = byId("publicKnockoutBracket");
   if (!container) return;
 
-  const hasSavedSetup = roundOf16Plan.some((match) => {
-    const savedMatch = knockoutSetup?.[match.matchNumber];
-
-    return savedMatch?.teamOne && savedMatch?.teamTwo;
-  });
-
-  if (!hasSavedSetup) {
+  if (!knockoutSetupIsComplete()) {
     container.innerHTML = `
       <p class="empty-state">
         Knockout matches have not been confirmed yet.
@@ -1272,72 +2057,54 @@ function renderPublicKnockoutBracket() {
     return;
   }
 
-  const matchesHtml = roundOf16Plan
-    .map((match) => {
-      const savedMatch = knockoutSetup?.[match.matchNumber];
-
-      const teamOne = getKnockoutTeamFromReference(
-        savedMatch?.teamOne
-      );
-
-      const teamTwo = getKnockoutTeamFromReference(
-        savedMatch?.teamTwo
-      );
-
-      return `
-        <article class="knockout-match-card">
-          <div class="knockout-match-number">
-            Round of 16 — Match ${match.matchNumber}
-          </div>
-
-          <div class="knockout-team-row">
-            ${
-              teamOne
-                ? renderTeamName(teamOne)
-                : "<span>Team TBC</span>"
-            }
-
-            ${
-              teamOne?.groupKey
-                ? `
-                    <span class="knockout-group-label">
-                      Group ${escapeHtml(teamOne.groupKey)}
-                    </span>
-                  `
-                : ""
-            }
-          </div>
-
-          <div class="knockout-versus">vs</div>
-
-          <div class="knockout-team-row">
-            ${
-              teamTwo
-                ? renderTeamName(teamTwo)
-                : "<span>Team TBC</span>"
-            }
-
-            ${
-              teamTwo?.groupKey
-                ? `
-                    <span class="knockout-group-label">
-                      Group ${escapeHtml(teamTwo.groupKey)}
-                    </span>
-                  `
-                : ""
-            }
-          </div>
-        </article>
-      `;
-    })
-    .join("");
-
   container.innerHTML = `
-    <div class="knockout-round">
-      <h3>Round of 16</h3>
+    <div class="knockout-bracket">
+      <div class="knockout-side knockout-side-left">
+        ${renderPublicKnockoutRound(
+          "roundOf16",
+          [1, 2, 3, 4],
+          "knockout-round-of-16"
+        )}
 
-      <div class="knockout-match-list">
-        ${matchesHtml}
+        ${renderPublicKnockoutRound(
+          "quarterFinals",
+          [1, 2],
+          "knockout-quarter-finals"
+        )}
+
+        ${renderPublicKnockoutRound(
+          "semiFinals",
+          [1],
+          "knockout-semi-finals"
+        )}
+      </div>
+
+      <div class="knockout-centre">
+        ${renderPublicKnockoutRound(
+          "final",
+          [1],
+          "knockout-final"
+        )}
+      </div>
+
+      <div class="knockout-side knockout-side-right">
+        ${renderPublicKnockoutRound(
+          "semiFinals",
+          [2],
+          "knockout-semi-finals"
+        )}
+
+        ${renderPublicKnockoutRound(
+          "quarterFinals",
+          [3, 4],
+          "knockout-quarter-finals"
+        )}
+
+        ${renderPublicKnockoutRound(
+          "roundOf16",
+          [5, 6, 7, 8],
+          "knockout-round-of-16"
+        )}
       </div>
     </div>
   `;
@@ -1502,16 +2269,46 @@ function renderEverything() {
   renderPublicKnockoutBracket();
 }
 
-function updateKnockoutTeamName(groupKey, oldName, newName) {
-  Object.values(knockoutSetup || {}).forEach((match) => {
-    ["teamOne", "teamTwo"].forEach((slot) => {
-      const team = match?.[slot];
+function updateKnockoutTeamName(
+  groupKey,
+  oldName,
+  newName
+) {
+  Object.values(knockoutSetup || {}).forEach(
+    (match) => {
+      ["teamOne", "teamTwo"].forEach((slot) => {
+        const team = match?.[slot];
 
-      if (team?.groupKey === groupKey && team.teamName === oldName) {
-        team.teamName = newName;
+        if (
+          team?.groupKey === groupKey &&
+          team.teamName === oldName
+        ) {
+          team.teamName = newName;
+        }
+      });
+    }
+  );
+
+  Object.entries(knockoutRoundConfig).forEach(
+    ([roundKey, round]) => {
+      for (
+        let matchNumber = 1;
+        matchNumber <= round.matchCount;
+        matchNumber += 1
+      ) {
+        const winner =
+          knockoutResults?.[roundKey]?.[matchNumber]
+            ?.winner;
+
+        if (
+          winner?.groupKey === groupKey &&
+          winner.teamName === oldName
+        ) {
+          winner.teamName = newName;
+        }
       }
-    });
-  });
+    }
+  );
 }
 
 function teamIsInKnockoutSetup(groupKey, teamName) {
@@ -1827,6 +2624,7 @@ async function resetTournament() {
     groupKeys = Object.keys(groups);
     matches = normalizeMatches({}, groupKeys);
     knockoutSetup = {};
+    knockoutResults = createEmptyKnockoutResults();
     currentGroup = groupKeys[0] || "";
   });
 }
@@ -1946,6 +2744,8 @@ window.addMatch = addMatch;
 window.saveMatchScore = saveMatchScore;
 window.deleteMatch = deleteMatch;
 window.autoFillKnockoutSetup = autoFillKnockoutSetup;
+window.saveKnockoutMatchResult = saveKnockoutMatchResult;
+window.clearKnockoutMatchResult = clearKnockoutMatchResult;
 window.undoLastAction = undoLastAction;
 window.resetTournament = resetTournament;
 window.saveKnockoutSetup = saveKnockoutSetup;
