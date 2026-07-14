@@ -1232,7 +1232,116 @@ function renderPublicResult(match) {
     </article>
   `;
 }
+function getKnockoutTeamFromReference(reference) {
+  if (!reference) return null;
 
+  const savedTeam = (groups[reference.groupKey] || []).find(
+    (team) => team.name === reference.teamName
+  );
+
+  if (savedTeam) {
+    return {
+      ...savedTeam,
+      groupKey: reference.groupKey
+    };
+  }
+
+  return {
+    name: reference.teamName || "Team TBC",
+    logo: "",
+    groupKey: reference.groupKey || ""
+  };
+}
+
+function renderPublicKnockoutBracket() {
+  const container = byId("publicKnockoutBracket");
+  if (!container) return;
+
+  const hasSavedSetup = roundOf16Plan.some((match) => {
+    const savedMatch = knockoutSetup?.[match.matchNumber];
+
+    return savedMatch?.teamOne && savedMatch?.teamTwo;
+  });
+
+  if (!hasSavedSetup) {
+    container.innerHTML = `
+      <p class="empty-state">
+        Knockout matches have not been confirmed yet.
+      </p>
+    `;
+    return;
+  }
+
+  const matchesHtml = roundOf16Plan
+    .map((match) => {
+      const savedMatch = knockoutSetup?.[match.matchNumber];
+
+      const teamOne = getKnockoutTeamFromReference(
+        savedMatch?.teamOne
+      );
+
+      const teamTwo = getKnockoutTeamFromReference(
+        savedMatch?.teamTwo
+      );
+
+      return `
+        <article class="knockout-match-card">
+          <div class="knockout-match-number">
+            Round of 16 — Match ${match.matchNumber}
+          </div>
+
+          <div class="knockout-team-row">
+            ${
+              teamOne
+                ? renderTeamName(teamOne)
+                : "<span>Team TBC</span>"
+            }
+
+            ${
+              teamOne?.groupKey
+                ? `
+                    <span class="knockout-group-label">
+                      Group ${escapeHtml(teamOne.groupKey)}
+                    </span>
+                  `
+                : ""
+            }
+          </div>
+
+          <div class="knockout-versus">vs</div>
+
+          <div class="knockout-team-row">
+            ${
+              teamTwo
+                ? renderTeamName(teamTwo)
+                : "<span>Team TBC</span>"
+            }
+
+            ${
+              teamTwo?.groupKey
+                ? `
+                    <span class="knockout-group-label">
+                      Group ${escapeHtml(teamTwo.groupKey)}
+                    </span>
+                  `
+                : ""
+            }
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+
+  container.innerHTML = `
+    <div class="knockout-round">
+      <h3>Round of 16</h3>
+
+      <div class="knockout-match-list">
+        ${matchesHtml}
+      </div>
+    </div>
+  `;
+}
 /* ==================================================
    Admin Page Rendering
 ================================================== */
@@ -1389,7 +1498,9 @@ function renderEverything() {
   renderAdminMatches();
   renderPublicGroup();
   renderThirdPlaceTable();
+  renderThirdPlaceQualifierControls();
   renderKnockoutSetup();
+  renderPublicKnockoutBracket();
 }
 
 function updateKnockoutTeamName(groupKey, oldName, newName) {
