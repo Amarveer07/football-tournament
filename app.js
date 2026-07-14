@@ -868,7 +868,98 @@ function renderKnockoutSetup() {
     </div>
   `;
 }
+function autoFillKnockoutSetup() {
+  const group = (groupKey) => getSortedGroup(groupKey);
 
+  const makeTeam = (groupKey, team) => {
+    if (!team) return null;
+
+    return {
+      groupKey,
+      teamName: team.name
+    };
+  };
+
+  const encodeTeam = (team) => {
+    if (!team) return "";
+
+    return encodeURIComponent(JSON.stringify(team));
+  };
+
+  const choosePair = (
+    priorityTeam,
+    otherTeam,
+    firstGroupToAvoid,
+    secondGroupToAvoid
+  ) => {
+    const preferredOrderWorks =
+      priorityTeam.groupKey !== firstGroupToAvoid &&
+      otherTeam.groupKey !== secondGroupToAvoid;
+
+    if (preferredOrderWorks) {
+      return [priorityTeam, otherTeam];
+    }
+
+    const swappedOrderWorks =
+      otherTeam.groupKey !== firstGroupToAvoid &&
+      priorityTeam.groupKey !== secondGroupToAvoid;
+
+    if (swappedOrderWorks) {
+      return [otherTeam, priorityTeam];
+    }
+
+    return [priorityTeam, otherTeam];
+  };
+
+  const thirdPlaced = getThirdPlacedTeams();
+
+  if (thirdPlaced.length < 4) {
+    alert("Four third-placed teams are required.");
+    return;
+  }
+
+  const rank1 = makeTeam(thirdPlaced[0].groupKey, thirdPlaced[0]);
+  const rank2 = makeTeam(thirdPlaced[1].groupKey, thirdPlaced[1]);
+  const rank3 = makeTeam(thirdPlaced[2].groupKey, thirdPlaced[2]);
+  const rank4 = makeTeam(thirdPlaced[3].groupKey, thirdPlaced[3]);
+
+  // Match 1 prioritises rank 4, with rank 3 as the alternative.
+  const lowerPair = choosePair(rank4, rank3, "A", "C");
+
+  // Match 5 prioritises rank 2, with rank 1 as the alternative.
+  const higherPair = choosePair(rank2, rank1, "B", "D");
+
+  const suggestedMatches = {
+    1: [makeTeam("A", group("A")[0]), lowerPair[0]],
+    2: [makeTeam("C", group("C")[0]), lowerPair[1]],
+    3: [makeTeam("F", group("F")[0]), makeTeam("B", group("B")[1])],
+    4: [makeTeam("D", group("D")[1]), makeTeam("E", group("E")[1])],
+    5: [makeTeam("B", group("B")[0]), higherPair[0]],
+    6: [makeTeam("D", group("D")[0]), higherPair[1]],
+    7: [makeTeam("E", group("E")[0]), makeTeam("A", group("A")[1])],
+    8: [makeTeam("C", group("C")[1]), makeTeam("F", group("F")[1])]
+  };
+
+  Object.entries(suggestedMatches).forEach(
+    ([matchNumber, teams]) => {
+      const teamOneSelect = byId(
+        `knockoutTeamOne_${matchNumber}`
+      );
+
+      const teamTwoSelect = byId(
+        `knockoutTeamTwo_${matchNumber}`
+      );
+
+      if (teamOneSelect) {
+        teamOneSelect.value = encodeTeam(teams[0]);
+      }
+
+      if (teamTwoSelect) {
+        teamTwoSelect.value = encodeTeam(teams[1]);
+      }
+    }
+  );
+}
 /* ==================================================
    Dynamic Group Interface
 ================================================== */
@@ -1657,7 +1748,7 @@ window.removeGoal = removeGoal;
 window.addMatch = addMatch;
 window.saveMatchScore = saveMatchScore;
 window.deleteMatch = deleteMatch;
-
+window.autoFillKnockoutSetup = autoFillKnockoutSetup;
 window.undoLastAction = undoLastAction;
 window.resetTournament = resetTournament;
 
