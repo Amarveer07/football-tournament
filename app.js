@@ -192,7 +192,7 @@ let groups = normalizeGroups(initialGroups, groupKeys);
 let matches = normalizeMatches(localState?.matches, groupKeys);
 let currentGroup = groupKeys[0] || "";
 let undoStack = [];
-
+let thirdPlaceQualifiers = [];
 function getGroupKeys() {
   return [...groupKeys].sort((a, b) => a.localeCompare(b));
 }
