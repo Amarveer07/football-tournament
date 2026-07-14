@@ -30,13 +30,14 @@ function createTeam(name) {
 
 function defaultGroups() {
   return {
-    A: [createTeam("Lions"), createTeam("Tigers")],
-    B: [createTeam("Eagles"), createTeam("Sharks")],
-    C: [createTeam("Bears"), createTeam("Spiders")],
-    D: [createTeam("Monkeys"), createTeam("Fishes")]
+    A: [createTeam("A"), createTeam("B"), createTeam("C"), createTeam("D")],
+    B: [createTeam("E"), createTeam("F"), createTeam("G"), createTeam("H")],
+    C: [createTeam("I"), createTeam("J"), createTeam("K"), createTeam("L")],
+    D: [createTeam("M"), createTeam("N"), createTeam("O"), createTeam("P")],
+    E: [createTeam("Q"), createTeam("R"), createTeam("S"), createTeam("T")],
+    F: [createTeam("U"), createTeam("V"), createTeam("W"), createTeam("X")]
   };
 }
-
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
