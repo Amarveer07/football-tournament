@@ -94,18 +94,30 @@
 <section class="section">
   <div class="section-heading">
     <div>
-      <h2>Third-Place Qualifiers</h2>
-      <p>Select the four third-placed teams that will enter the knockout stage.</p>
+      <h2>Knockout Setup</h2>
+      <p>
+        Assign all 16 qualified teams to the eight Round of 16 matches.
+      </p>
     </div>
   </div>
 
-  <div id="thirdPlaceQualifierControls">
-    Loading third-placed teams…
+  <div id="knockoutSetup">
+    Loading knockout setup…
   </div>
 
-  <button type="button" onclick="saveThirdPlaceQualifiers()">
-    Save Qualifiers
-  </button>
+  <div class="button-row">
+    <button type="button" onclick="autoFillKnockoutSetup()">
+      Auto-Fill Suggested Teams
+    </button>
+
+    <button type="button" onclick="saveKnockoutSetup()">
+      Save Knockout Setup
+    </button>
+  </div>
+
+  <p class="helper-text">
+    You will be able to override every team manually before saving.
+  </p>
 </section>
       <!-- Group management -->
       <section class="section">
