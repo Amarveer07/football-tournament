@@ -855,15 +855,10 @@ tbody tr:hover td {
   }
 }
 /* ==================================================
-   MOBILE KNOCKOUT BRACKET — KEEP MIRRORED FORMAT
+   MOBILE KNOCKOUT BRACKET — TRUE MIRRORED FORMAT
 ================================================== */
 
 @media (max-width: 700px) {
-  /*
-    Keep the complete mirrored bracket at a readable size.
-    The user can swipe horizontally to see each side.
-  */
-
   #publicKnockoutBracket {
     width: 100%;
     overflow-x: auto;
@@ -911,17 +906,60 @@ tbody tr:hover td {
     min-height: 720px;
 
     padding: 12px;
-    flex-direction: initial;
   }
 
-  .knockout-side {
+  /*
+    Left side:
+    Round of 16 → Quarter-final → Semi-final
+  */
+
+  .knockout-side-left {
     display: grid;
 
     grid-template-columns:
       repeat(3, minmax(145px, 1fr));
 
+    grid-template-areas:
+      "r16 qf sf";
+
     gap: 10px;
     min-width: 0;
+  }
+
+  /*
+    Right side is deliberately reversed:
+    Semi-final ← Quarter-final ← Round of 16
+  */
+
+  .knockout-side-right {
+    display: grid;
+
+    grid-template-columns:
+      repeat(3, minmax(145px, 1fr));
+
+    grid-template-areas:
+      "sf qf r16";
+
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .knockout-side-left .knockout-round-of-16,
+  .knockout-side-right .knockout-round-of-16 {
+    grid-area: r16;
+    order: initial;
+  }
+
+  .knockout-side-left .knockout-quarter-finals,
+  .knockout-side-right .knockout-quarter-finals {
+    grid-area: qf;
+    order: initial;
+  }
+
+  .knockout-side-left .knockout-semi-finals,
+  .knockout-side-right .knockout-semi-finals {
+    grid-area: sf;
+    order: initial;
   }
 
   .knockout-centre {
@@ -929,12 +967,14 @@ tbody tr:hover td {
     min-width: 0;
   }
 
+  .knockout-centre .knockout-final {
+    order: initial;
+  }
+
   .knockout-column {
     display: flex;
     min-width: 0;
     flex-direction: column;
-
-    order: initial;
   }
 
   .knockout-column h3 {
@@ -964,6 +1004,11 @@ tbody tr:hover td {
     width: auto;
   }
 
+  /*
+    Restore the simple connector lines removed by the
+    original phone layout.
+  */
+
   .knockout-side-left
   .knockout-column:not(:last-child)
   .knockout-match-card::after {
@@ -971,7 +1016,10 @@ tbody tr:hover td {
   }
 
   .knockout-side-right
-  .knockout-column:not(:first-child)
+  .knockout-round-of-16
+  .knockout-match-card::before,
+  .knockout-side-right
+  .knockout-quarter-finals
   .knockout-match-card::before {
     display: block;
   }
@@ -983,19 +1031,21 @@ tbody tr:hover td {
 
 @media (max-width: 520px) {
   .knockout-bracket {
-    width: 1140px;
-    min-width: 1140px;
-
     grid-template-columns:
       475px
       160px
       475px;
 
     gap: 10px;
+
+    width: 1140px;
+    min-width: 1140px;
+
     padding: 10px;
   }
 
-  .knockout-side {
+  .knockout-side-left,
+  .knockout-side-right {
     grid-template-columns:
       repeat(3, minmax(138px, 1fr));
 
