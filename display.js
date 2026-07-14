@@ -569,10 +569,8 @@ function displayKnockoutSetupIsComplete() {
 }
 
 function getDisplayKnockoutHeading() {
-  if (getDisplayKnockoutWinner("final", 1)) {
-    return "Tournament Complete";
-  }
-
+  return "Knockout Stages";
+}
   const finalTeams = getDisplayKnockoutMatchTeams("final", 1);
   if (finalTeams.teamOne && finalTeams.teamTwo) return "Final";
 
