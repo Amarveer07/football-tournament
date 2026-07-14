@@ -854,3 +854,164 @@ tbody tr:hover td {
     flex-basis: 28px;
   }
 }
+/* ==================================================
+   MOBILE KNOCKOUT BRACKET — KEEP MIRRORED FORMAT
+================================================== */
+
+@media (max-width: 700px) {
+  /*
+    Keep the complete mirrored bracket at a readable size.
+    The user can swipe horizontally to see each side.
+  */
+
+  #publicKnockoutBracket {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding: 8px 0 16px;
+
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-inline: contain;
+    touch-action: pan-x pan-y;
+  }
+
+  #publicKnockoutBracket::before {
+    display: block;
+
+    width: max-content;
+    margin: 0 0 10px;
+    padding: 7px 10px;
+
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    content: "Swipe left and right to view the full bracket";
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+
+  .knockout-bracket {
+    display: grid;
+
+    grid-template-columns:
+      500px
+      170px
+      500px;
+
+    gap: 16px;
+
+    width: 1202px;
+    min-width: 1202px;
+    min-height: 720px;
+
+    padding: 12px;
+    flex-direction: initial;
+  }
+
+  .knockout-side {
+    display: grid;
+
+    grid-template-columns:
+      repeat(3, minmax(145px, 1fr));
+
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .knockout-centre {
+    display: grid;
+    min-width: 0;
+  }
+
+  .knockout-column {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+
+    order: initial;
+  }
+
+  .knockout-column h3 {
+    min-height: 38px;
+    margin: 0;
+    padding: 4px 6px 10px;
+
+    font-size: 11px;
+    text-align: center;
+  }
+
+  .knockout-column-matches {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-around;
+
+    gap: 12px;
+    min-height: 0;
+  }
+
+  .knockout-centre .knockout-column-matches {
+    justify-content: center;
+  }
+
+  .knockout-match-card {
+    width: auto;
+  }
+
+  .knockout-side-left
+  .knockout-column:not(:last-child)
+  .knockout-match-card::after {
+    display: block;
+  }
+
+  .knockout-side-right
+  .knockout-column:not(:first-child)
+  .knockout-match-card::before {
+    display: block;
+  }
+
+  .knockout-team-row .team-name-cell span {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 520px) {
+  .knockout-bracket {
+    width: 1140px;
+    min-width: 1140px;
+
+    grid-template-columns:
+      475px
+      160px
+      475px;
+
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .knockout-side {
+    grid-template-columns:
+      repeat(3, minmax(138px, 1fr));
+
+    gap: 8px;
+  }
+
+  .knockout-team-row {
+    min-height: 40px;
+    padding: 5px 7px;
+  }
+
+  .knockout-team-row .team-name-cell span {
+    font-size: 11px;
+  }
+
+  .knockout-column h3 {
+    font-size: 10px;
+  }
+}
