@@ -1,5 +1,9 @@
 /* ==================================================
-   Admin Dashboard — Variables
+   ADMIN DASHBOARD
+================================================== */
+
+/* ==================================================
+   Design Variables
 ================================================== */
 
 :root {
@@ -24,7 +28,7 @@
   --radius-medium: 14px;
   --radius-small: 10px;
 
-  --page-width: 1100px;
+  --page-width: 1180px;
 }
 
 
@@ -136,6 +140,7 @@ select {
 h1,
 h2,
 h3,
+h4,
 p {
   margin-top: 0;
 }
@@ -157,6 +162,12 @@ h3 {
   font-size: 13px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+h4 {
+  margin-bottom: 12px;
+  color: var(--text);
+  font-size: 15px;
 }
 
 p {
@@ -458,7 +469,35 @@ tbody tr:hover td {
 
 
 /* ==================================================
-   Match List
+   Team Names and Logos
+================================================== */
+
+.team-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.team-logo {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  object-fit: contain;
+  padding: 2px;
+
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 6px;
+}
+
+.team-name-cell span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+
+/* ==================================================
+   Group Match List
 ================================================== */
 
 .subsection {
@@ -468,7 +507,7 @@ tbody tr:hover td {
   border-top: 1px solid var(--border);
 }
 
-#adminMatchesList > * {
+.admin-match-card {
   margin-bottom: 12px;
   padding: 14px;
 
@@ -477,15 +516,132 @@ tbody tr:hover td {
   border-radius: var(--radius-small);
 }
 
-#adminMatchesList > *:last-child {
+.admin-match-card:last-child {
   margin-bottom: 0;
 }
 
-#adminMatchesList input {
-  width: auto;
-  min-width: 70px;
+.match-title {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.match-meta {
+  margin-top: 4px;
+
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.match-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  margin-top: 12px;
+}
+
+.match-actions input {
+  width: 90px;
+  min-width: 90px;
+}
+
+
+/* ==================================================
+   Knockout Setup and Results
+================================================== */
+
+.knockout-match-panel {
+  border-color: rgba(96, 165, 250, 0.22);
+}
+
+.knockout-results-admin {
+  margin-top: 26px;
+}
+
+.knockout-admin-round {
+  margin-top: 22px;
+}
+
+.knockout-admin-round:first-of-type {
+  margin-top: 0;
+}
+
+.knockout-admin-round > h4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 12px;
+}
+
+.knockout-admin-round > h4::after {
+  height: 1px;
+  flex: 1;
+
+  background: var(--border);
+  content: "";
+}
+
+.knockout-result-panel {
+  border-color: rgba(255, 255, 255, 0.13);
+}
+
+.knockout-result-panel h3 {
+  margin-bottom: 14px;
+}
+
+.knockout-admin-team {
+  min-height: 46px;
+  margin-bottom: 10px;
+  padding: 9px 10px;
+
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.knockout-admin-team .team-name-cell {
+  min-height: 26px;
+}
+
+.knockout-admin-team .team-name-cell span {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.knockout-admin-team .team-logo {
+  width: 26px;
+  height: 26px;
+  flex-basis: 26px;
+}
+
+.knockout-result-panel input[type="number"] {
   max-width: 130px;
-  margin: 4px;
+}
+
+.knockout-result-panel select {
+  width: 100%;
+}
+
+.knockout-result-panel .button-row {
+  margin-top: 4px;
+}
+
+.knockout-result-panel button {
+  flex: 1 1 130px;
+}
+
+
+/* ==================================================
+   Empty States
+================================================== */
+
+.empty-state {
+  margin: 0;
+
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
 
@@ -513,8 +669,12 @@ tbody tr:hover td {
    Responsive Layout
 ================================================== */
 
-@media (max-width: 850px) {
+@media (max-width: 900px) {
   .match-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .knockout-results-admin .form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -527,7 +687,8 @@ tbody tr:hover td {
 
   .login-fields,
   .form-grid,
-  .match-form {
+  .match-form,
+  .knockout-results-admin .form-grid {
     grid-template-columns: 1fr;
   }
 
@@ -560,5 +721,19 @@ tbody tr:hover td {
 
   .button-row button {
     width: 100%;
+  }
+
+  .match-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .match-actions input,
+  .match-actions button {
+    width: 100%;
+  }
+
+  .knockout-result-panel input[type="number"] {
+    max-width: none;
   }
 }
