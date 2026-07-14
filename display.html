@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Football Tournament – Live Display</title>
+
+  <!-- Venue display styling -->
+  <link rel="stylesheet" href="display.css?v=1">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-database-compat.js"></script>
+  <script src="firebase-init.js" defer></script>
+
+  <!-- Venue display logic -->
+  <script src="display.js?v=1" defer></script>
+</head>
+
+<body>
+  <div class="display-shell">
+
+    <!-- Sponsor strip shown in both display modes -->
+    <header class="sponsor-strip" aria-label="Tournament sponsors">
+      <div class="sponsor-strip-window">
+        <div
+          id="sponsorTickerTrack"
+          class="sponsor-ticker-track"
+        >
+          Loading sponsors…
+        </div>
+      </div>
+    </header>
+
+    <!-- Connection and current-mode indicator -->
+    <div class="display-status-bar">
+      <div class="display-live-status">
+        <span
+          id="displayLiveDot"
+          class="display-live-dot"
+          aria-hidden="true"
+        ></span>
+
+        <span id="displayLiveText">
+          Connecting…
+        </span>
+      </div>
+
+      <div
+        id="displayModeLabel"
+        class="display-mode-label"
+      >
+        Group Stage
+      </div>
+    </div>
+
+    <main class="display-stage">
+
+      <!-- Group-stage mode -->
+      <section
+        id="displayGroupsView"
+        class="display-view display-groups-view"
+        aria-label="Live group standings"
+      >
+        <div
+          id="displayGroupsGrid"
+          class="display-groups-grid"
+        >
+          <p class="display-loading">
+            Loading all six groups…
+          </p>
+        </div>
+
+        <footer class="display-brand-footer">
+          <div
+            id="groupMainSponsor"
+            class="main-sponsor-brand"
+            aria-label="Main tournament sponsor"
+          >
+            Loading main sponsor…
+          </div>
+        </footer>
+      </section>
+
+      <!-- Knockout-stage mode -->
+      <section
+        id="displayKnockoutView"
+        class="display-view display-knockout-view"
+        aria-label="Live knockout bracket"
+        hidden
+      >
+        <div class="display-knockout-heading">
+          <h1 id="displayKnockoutTitle">
+            Knockout Stage
+          </h1>
+        </div>
+
+        <div
+          id="displayKnockoutBracket"
+          class="display-knockout-bracket"
+          aria-live="polite"
+        >
+          <p class="display-loading">
+            Loading knockout bracket…
+          </p>
+        </div>
+
+        <div
+          id="knockoutMainSponsor"
+          class="main-sponsor-brand knockout-main-sponsor"
+          aria-label="Main tournament sponsor"
+        >
+          Loading main sponsor…
+        </div>
+      </section>
+
+    </main>
+  </div>
+</body>
+</html>
