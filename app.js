@@ -1116,6 +1116,7 @@ function renderEverything() {
   renderAdminMatches();
   renderPublicGroup();
 renderThirdPlaceTable();
+renderThirdPlaceQualifierControls();
 }
 
 /* ==================================================
