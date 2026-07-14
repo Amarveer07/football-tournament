@@ -1,6 +1,7 @@
 /* ==================================================
    FOOTBALL TOURNAMENT APPLICATION
    Shared by the public and admin pages.
+   Designed for current Chrome, Safari, Edge and Firefox browsers.
 ================================================== */
 
 /* ==================================================
@@ -192,7 +193,7 @@ let groups = normalizeGroups(initialGroups, groupKeys);
 let matches = normalizeMatches(localState?.matches, groupKeys);
 let currentGroup = groupKeys[0] || "";
 let undoStack = [];
-let thirdPlaceQualifiers = [];
+
 const roundOf16Plan = [
   {
     matchNumber: 1,
@@ -236,7 +237,11 @@ const roundOf16Plan = [
   }
 ];
 
-let knockoutSetup = {};
+let knockoutSetup =
+  localState?.knockoutSetup && typeof localState.knockoutSetup === "object"
+    ? clone(localState.knockoutSetup)
+    : {};
+
 function getGroupKeys() {
   return [...groupKeys].sort((a, b) => a.localeCompare(b));
 }
@@ -258,6 +263,7 @@ function createStateSnapshot() {
     groupKeys,
     groups,
     matches,
+    knockoutSetup,
     currentGroup
   });
 }
@@ -266,6 +272,7 @@ function restoreState(snapshot) {
   groupKeys = [...(snapshot.groupKeys || [])];
   groups = clone(snapshot.groups || {});
   matches = clone(snapshot.matches || {});
+  knockoutSetup = clone(snapshot.knockoutSetup || {});
   currentGroup = snapshot.currentGroup || groupKeys[0] || "";
 }
 
@@ -273,7 +280,7 @@ function saveLocalState() {
   try {
     localStorage.setItem(
       "footballTournamentState",
-      JSON.stringify({ groupKeys, groups, matches })
+      JSON.stringify({ groupKeys, groups, matches, knockoutSetup })
     );
   } catch (error) {
     console.warn("Could not save the local tournament backup.", error);
@@ -447,11 +454,11 @@ async function writeTournamentState() {
   }
 
   await window.db.ref("tournament").update({
-  groupKeys: groupRegistryFromKeys(groupKeys),
-  groups,
-  matches,
-  knockoutSetup
-});
+    groupKeys: groupRegistryFromKeys(groupKeys),
+    groups,
+    matches,
+    knockoutSetup
+  });
 }
 
 async function commitStateChange(changeFunction) {
@@ -503,11 +510,11 @@ function listenToTournamentFromFirebase() {
           groupKeys = incomingKeys;
           groups = normalizeGroups(data.groups, groupKeys);
           matches = normalizeMatches(data.matches, groupKeys);
-knockoutSetup =
-  data.knockoutSetup &&
-  typeof data.knockoutSetup === "object"
-    ? data.knockoutSetup
-    : {};
+          knockoutSetup =
+            data.knockoutSetup &&
+            typeof data.knockoutSetup === "object"
+              ? clone(data.knockoutSetup)
+              : {};
           if (!groupKeys.includes(currentGroup)) {
             currentGroup = groupKeys[0] || "";
           }
@@ -749,50 +756,6 @@ function renderThirdPlaceTable() {
     </tbody>
   `;
 }
-function renderThirdPlaceQualifierControls() {
-  const container = byId("thirdPlaceQualifierControls");
-  if (!container) return;
-
-  const teams = getThirdPlacedTeams();
-
-  if (teams.length === 0) {
-    container.innerHTML = `
-      <p class="helper-text">
-        No third-placed teams are available yet.
-      </p>
-    `;
-    return;
-  }
-
-  container.innerHTML = teams
-    .map((team, index) => {
-      const qualifierValue = encodeURIComponent(
-        JSON.stringify({
-          groupKey: team.groupKey,
-          teamName: team.name
-        })
-      );
-
-      return `
-        <label class="qualifier-option">
-          <input
-            type="checkbox"
-            class="third-place-qualifier-checkbox"
-            value="${qualifierValue}"
-            ${index < 4 ? "checked" : ""}
-          >
-
-          <span>
-            <strong>${index + 1}. ${escapeHtml(team.name)}</strong>
-            — Group ${escapeHtml(team.groupKey)},
-            ${team.points} pts,
-            GD ${team.gd}
-          </span>
-        </label>
-      `;
-    })
-    .join("");
-    }
 function getAllKnockoutTeamOptions() {
   const teams = [];
 
@@ -836,31 +799,6 @@ function renderKnockoutSetup() {
       ${roundOf16Plan
         .map(
           (match) => `
-            roundOf16Plan.forEach((match) => {
-  const savedMatch = knockoutSetup?.[match.matchNumber];
-
-  if (!savedMatch) return;
-
-  const teamOneSelect = byId(
-    `knockoutTeamOne_${match.matchNumber}`
-  );
-
-  const teamTwoSelect = byId(
-    `knockoutTeamTwo_${match.matchNumber}`
-  );
-
-  if (teamOneSelect && savedMatch.teamOne) {
-    teamOneSelect.value = encodeURIComponent(
-      JSON.stringify(savedMatch.teamOne)
-    );
-  }
-
-  if (teamTwoSelect && savedMatch.teamTwo) {
-    teamTwoSelect.value = encodeURIComponent(
-      JSON.stringify(savedMatch.teamTwo)
-    );
-  }
-});
             <div class="form-panel knockout-match-panel">
               <h3>Round of 16 — Match ${match.matchNumber}</h3>
 
@@ -897,7 +835,33 @@ function renderKnockoutSetup() {
         .join("")}
     </div>
   `;
+
+  roundOf16Plan.forEach((match) => {
+    const savedMatch = knockoutSetup?.[match.matchNumber];
+    if (!savedMatch) return;
+
+    const teamOneSelect = byId(
+      `knockoutTeamOne_${match.matchNumber}`
+    );
+
+    const teamTwoSelect = byId(
+      `knockoutTeamTwo_${match.matchNumber}`
+    );
+
+    if (teamOneSelect && savedMatch.teamOne) {
+      teamOneSelect.value = encodeURIComponent(
+        JSON.stringify(savedMatch.teamOne)
+      );
+    }
+
+    if (teamTwoSelect && savedMatch.teamTwo) {
+      teamTwoSelect.value = encodeURIComponent(
+        JSON.stringify(savedMatch.teamTwo)
+      );
+    }
+  });
 }
+
 function autoFillKnockoutSetup() {
   const group = (groupKey) => getSortedGroup(groupKey);
 
@@ -1052,6 +1016,7 @@ async function saveKnockoutSetup() {
     alert("Knockout setup saved.");
   }
 }
+
 /* ==================================================
    Dynamic Group Interface
 ================================================== */
@@ -1423,9 +1388,28 @@ function renderEverything() {
   fillMatchTeamDropdowns();
   renderAdminMatches();
   renderPublicGroup();
-renderThirdPlaceTable();
-renderThirdPlaceQualifierControls();
-renderKnockoutSetup();
+  renderThirdPlaceTable();
+  renderKnockoutSetup();
+}
+
+function updateKnockoutTeamName(groupKey, oldName, newName) {
+  Object.values(knockoutSetup || {}).forEach((match) => {
+    ["teamOne", "teamTwo"].forEach((slot) => {
+      const team = match?.[slot];
+
+      if (team?.groupKey === groupKey && team.teamName === oldName) {
+        team.teamName = newName;
+      }
+    });
+  });
+}
+
+function teamIsInKnockoutSetup(groupKey, teamName) {
+  return Object.values(knockoutSetup || {}).some((match) => {
+    return [match?.teamOne, match?.teamTwo].some((team) => {
+      return team?.groupKey === groupKey && team.teamName === teamName;
+    });
+  });
 }
 
 /* ==================================================
@@ -1458,6 +1442,8 @@ async function renameTeam() {
       if (match.teamA === oldName) match.teamA = newName;
       if (match.teamB === oldName) match.teamB = newName;
     });
+
+    updateKnockoutTeamName(currentGroup, oldName, newName);
   });
 
   if (saved) input.value = "";
@@ -1508,6 +1494,13 @@ async function removeTeam() {
     return;
   }
 
+  if (teamIsInKnockoutSetup(currentGroup, selection.team.name)) {
+    alert(
+      "Replace this team in the saved knockout setup before removing it."
+    );
+    return;
+  }
+
   if (
     !confirm(
       `Remove ${selection.team.name} from Group ${currentGroup}?`
@@ -1520,6 +1513,7 @@ async function removeTeam() {
     groups[currentGroup].splice(selection.index, 1);
   });
 }
+
 async function setTeamLogo() {
   const selection = getSelectedTeam("logoTeamSelect");
   const input = byId("logoInput");
@@ -1722,6 +1716,7 @@ async function resetTournament() {
     groups = defaultGroups();
     groupKeys = Object.keys(groups);
     matches = normalizeMatches({}, groupKeys);
+    knockoutSetup = {};
     currentGroup = groupKeys[0] || "";
   });
 }
