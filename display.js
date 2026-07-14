@@ -6,11 +6,13 @@
 ================================================== */
 
 /* ==================================================
-   Sponsor Configuration
+   Branding and Sponsor Configuration
 
-   To add another sponsor later, copy one sponsor object and
-   change its name and logo path. Upload logos into:
-   assets/sponsors/
+   Add future ticker sponsors by copying an object in
+   DISPLAY_SPONSORS and changing the name/logo path.
+
+   Add each group sponsor name inside GROUP_SPONSORS.
+   Leave a value as an empty string until it is confirmed.
 ================================================== */
 
 const DISPLAY_SPONSORS = [
@@ -20,10 +22,24 @@ const DISPLAY_SPONSORS = [
   }
 ];
 
+const GROUP_SPONSORS = {
+  A: "",
+  B: "",
+  C: "",
+  D: "",
+  E: "",
+  F: ""
+};
+
+const TOURNAMENT_BRAND = {
+  name: "Sikh Tournament",
+  logo: "assets/branding/tournament-logo.png"
+};
+
 const MAIN_SPONSOR = {
   name: "Ladhar Investments",
+  label: "Main Sponsor",
   subtitle: "North East",
-  tournamentName: "Sikh Tournament",
   logo: "assets/sponsors/ladhar-investments.png"
 };
 
@@ -254,24 +270,45 @@ function renderSponsorTicker() {
 }
 
 function renderMainSponsor() {
-  const sponsorHtml = `
-    ${renderOptionalImage(
-      MAIN_SPONSOR.logo,
-      "main-sponsor-logo",
-      MAIN_SPONSOR.name
-    )}
+  const brandingHtml = `
+    <div class="display-brand-lockup">
+      <div class="tournament-brand-block">
+        ${renderOptionalImage(
+          TOURNAMENT_BRAND.logo,
+          "tournament-brand-logo",
+          TOURNAMENT_BRAND.name
+        )}
 
-    <div class="main-sponsor-copy">
-      <div class="main-sponsor-name">
-        ${escapeDisplayHtml(MAIN_SPONSOR.name)}
+        <div class="tournament-brand-copy">
+          <span class="display-brand-eyebrow">Tournament</span>
+          <span class="tournament-brand-name">
+            ${escapeDisplayHtml(TOURNAMENT_BRAND.name)}
+          </span>
+        </div>
       </div>
 
-      <div class="main-sponsor-subtitle">
-        ${escapeDisplayHtml(MAIN_SPONSOR.subtitle)}
-      </div>
+      <div class="display-brand-divider" aria-hidden="true"></div>
 
-      <div class="main-sponsor-tournament">
-        ${escapeDisplayHtml(MAIN_SPONSOR.tournamentName)}
+      <div class="main-sponsor-block">
+        ${renderOptionalImage(
+          MAIN_SPONSOR.logo,
+          "main-sponsor-logo",
+          MAIN_SPONSOR.name
+        )}
+
+        <div class="main-sponsor-copy">
+          <span class="display-brand-eyebrow">
+            ${escapeDisplayHtml(MAIN_SPONSOR.label)}
+          </span>
+
+          <span class="main-sponsor-name">
+            ${escapeDisplayHtml(MAIN_SPONSOR.name)}
+          </span>
+
+          <span class="main-sponsor-subtitle">
+            ${escapeDisplayHtml(MAIN_SPONSOR.subtitle)}
+          </span>
+        </div>
       </div>
     </div>
   `;
@@ -279,8 +316,8 @@ function renderMainSponsor() {
   const groupSponsor = displayById("groupMainSponsor");
   const knockoutSponsor = displayById("knockoutMainSponsor");
 
-  if (groupSponsor) groupSponsor.innerHTML = sponsorHtml;
-  if (knockoutSponsor) knockoutSponsor.innerHTML = sponsorHtml;
+  if (groupSponsor) groupSponsor.innerHTML = brandingHtml;
+  if (knockoutSponsor) knockoutSponsor.innerHTML = brandingHtml;
 }
 
 /* ==================================================
@@ -295,18 +332,37 @@ function renderDisplayTeamLogo(team) {
   );
 }
 
+function getDisplayGroupSponsor(groupKey) {
+  return String(GROUP_SPONSORS[groupKey] || "").trim();
+}
+
+function formatDisplayGoalDifference(value) {
+  const goalDifference = displayToNumber(value);
+
+  return goalDifference > 0
+    ? `+${goalDifference}`
+    : String(goalDifference);
+}
+
 function renderDisplayGroupCard(groupKey) {
   const teams = getSortedDisplayGroup(groupKey);
+  const groupSponsor = getDisplayGroupSponsor(groupKey);
+  const topPoints = teams[0]?.points;
+  const bottomPoints = teams[teams.length - 1]?.points;
 
   const teamRows = teams
     .slice(0, 4)
-    .map(
-      (team, index) => `
-        <tr>
-          <td class="display-position-cell">
-            ${index + 1}.
-          </td>
+    .map((team) => {
+      let rowClass = "";
 
+      if (team.points === topPoints) {
+        rowClass = "top-team";
+      } else if (team.points === bottomPoints) {
+        rowClass = "bottom-team";
+      }
+
+      return `
+        <tr class="${rowClass}">
           <td class="display-team-cell">
             <div class="display-table-team">
               ${renderDisplayTeamLogo(team)}
@@ -314,32 +370,71 @@ function renderDisplayGroupCard(groupKey) {
               <span class="display-team-name">
                 ${escapeDisplayHtml(team.name)}
               </span>
-
-              <span class="display-team-stats">
-                <span><strong>${team.points}</strong> PTS</span>
-                <span>GD <strong>${team.gd}</strong></span>
-              </span>
             </div>
           </td>
+
+          <td>${team.p}</td>
+          <td>${team.w}</td>
+          <td>${team.d}</td>
+          <td>${team.l}</td>
+          <td class="display-points-cell">${team.points}</td>
+          <td>${escapeDisplayHtml(
+            formatDisplayGoalDifference(team.gd)
+          )}</td>
         </tr>
-      `
-    )
+      `;
+    })
     .join("");
 
   return `
     <article class="display-group-card">
-      <h2 class="display-group-title">
-        Group ${escapeDisplayHtml(groupKey)}
-      </h2>
+      <header class="display-group-heading">
+        <h2 class="display-group-title">
+          Group ${escapeDisplayHtml(groupKey)}
+        </h2>
+
+        <div class="display-group-sponsor">
+          <span class="display-group-sponsor-label">
+            Sponsored by
+          </span>
+
+          <span class="display-group-sponsor-name">
+            ${groupSponsor ? escapeDisplayHtml(groupSponsor) : "&nbsp;"}
+          </span>
+        </div>
+      </header>
 
       <table class="display-group-table">
+        <colgroup>
+          <col class="display-team-column">
+          <col class="display-stat-column">
+          <col class="display-stat-column">
+          <col class="display-stat-column">
+          <col class="display-stat-column">
+          <col class="display-stat-column">
+          <col class="display-stat-column">
+        </colgroup>
+
+        <thead>
+          <tr>
+            <th class="display-team-heading">Team</th>
+            <th>P</th>
+            <th>W</th>
+            <th>D</th>
+            <th>L</th>
+            <th>Pts</th>
+            <th>GD</th>
+          </tr>
+        </thead>
+
         <tbody>
           ${
             teamRows ||
             `
               <tr>
-                <td class="display-position-cell">—</td>
-                <td class="display-team-cell">No teams yet</td>
+                <td colspan="7" class="display-empty-group">
+                  No teams yet
+                </td>
               </tr>
             `
           }
