@@ -571,22 +571,6 @@ function displayKnockoutSetupIsComplete() {
 function getDisplayKnockoutHeading() {
   return "Knockout Stages";
 }
-  const finalTeams = getDisplayKnockoutMatchTeams("final", 1);
-  if (finalTeams.teamOne && finalTeams.teamTwo) return "Final";
-
-  const semiTeams = getDisplayKnockoutMatchTeams("semiFinals", 1);
-  if (semiTeams.teamOne && semiTeams.teamTwo) return "Semi-Finals";
-
-  const quarterTeams = getDisplayKnockoutMatchTeams(
-    "quarterFinals",
-    1
-  );
-  if (quarterTeams.teamOne && quarterTeams.teamTwo) {
-    return "Quarter-Finals";
-  }
-
-  return "Round of 16";
-}
 
 function renderDisplayBracketTeam(reference, score, winner) {
   const team = findDisplayTeam(reference);
