@@ -24,10 +24,18 @@
 
       <header class="public-header">
         <h1>Football Tournament</h1>
-        <p class="page-subtitle">Live standings, fixtures and results</p>
+
+        <p class="page-subtitle">
+          Live standings, fixtures and results
+        </p>
 
         <p id="liveStatus" class="live-status">
-          <span id="liveDot" class="live-dot" aria-hidden="true"></span>
+          <span
+            id="liveDot"
+            class="live-dot"
+            aria-hidden="true"
+          ></span>
+
           <span>
             Live · Last updated:
             <span id="lastUpdated">—</span>
@@ -35,6 +43,7 @@
         </p>
       </header>
 
+      <!-- Group standings -->
       <section class="section standings-section">
         <div class="section-heading">
           <div>
@@ -44,6 +53,7 @@
 
           <div class="group-selector">
             <label for="publicGroupSelect">Group</label>
+
             <select
               id="publicGroupSelect"
               onchange="renderPublicGroup()"
@@ -61,36 +71,72 @@
           </table>
         </div>
       </section>
-<section class="section third-place-section">
-  <div class="section-heading">
-    <div>
-      <h2>Third-Place Ranking</h2>
-      <p>The third-placed team from each group, ranked across the tournament.</p>
-    </div>
-  </div>
 
-  <div class="table-wrap">
-    <table id="thirdPlaceTable">
-      <caption class="visually-hidden">
-        Ranking of third-placed teams
-      </caption>
-    </table>
-  </div>
-</section>
+      <!-- Third-place leaderboard -->
+      <section class="section third-place-section">
+        <div class="section-heading">
+          <div>
+            <h2>Third-Place Ranking</h2>
+
+            <p>
+              The third-placed team from each group,
+              ranked across the tournament.
+            </p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table id="thirdPlaceTable">
+            <caption class="visually-hidden">
+              Ranking of third-placed teams
+            </caption>
+          </table>
+        </div>
+      </section>
+
+      <!-- Knockout stage -->
+      <section class="section knockout-section">
+        <div class="section-heading">
+          <div>
+            <h2>Knockout Stage</h2>
+
+            <p>
+              Round of 16 through to the tournament final.
+            </p>
+          </div>
+        </div>
+
+        <div
+          id="publicKnockoutBracket"
+          aria-live="polite"
+        >
+          Knockout matches have not been confirmed yet.
+        </div>
+      </section>
+
+      <!-- Group fixtures and results -->
       <section class="section matches-section">
         <h2>Matches</h2>
 
         <div class="match-columns">
           <div class="match-panel">
             <h3>Upcoming fixtures</h3>
-            <div id="publicUpcoming" aria-live="polite">
+
+            <div
+              id="publicUpcoming"
+              aria-live="polite"
+            >
               Loading fixtures…
             </div>
           </div>
 
           <div class="match-panel">
             <h3>Results</h3>
-            <div id="publicResults" aria-live="polite">
+
+            <div
+              id="publicResults"
+              aria-live="polite"
+            >
               Loading results…
             </div>
           </div>
