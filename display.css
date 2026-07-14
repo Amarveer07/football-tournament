@@ -1,39 +1,24 @@
 /* ==================================================
-   FOOTBALL TOURNAMENT — VENUE DISPLAY
-   Designed for a 16:9 television or projector.
-================================================== */
-
-
-/* ==================================================
-   Variables
+   FOOTBALL TOURNAMENT â€” LIVE VENUE DISPLAY
+   Built for a widescreen TV/projector, with laptop
+   fallbacks for testing.
 ================================================== */
 
 :root {
-  --display-background: #09000f;
-  --display-purple-dark: #16001f;
-  --display-purple: #7e22ce;
-  --display-purple-bright: #c026d3;
-  --display-purple-glow: rgba(192, 38, 211, 0.42);
-
+  --display-bg: #08000d;
+  --display-panel: rgba(27, 4, 39, 0.94);
+  --display-panel-dark: rgba(12, 1, 20, 0.96);
+  --display-purple: #c026d3;
+  --display-purple-bright: #e879f9;
   --display-text: #ffffff;
-  --display-muted: rgba(255, 255, 255, 0.74);
-  --display-line: rgba(255, 255, 255, 0.72);
-  --display-soft-line: rgba(255, 255, 255, 0.2);
-
-  --display-panel: rgba(18, 2, 29, 0.84);
-  --display-panel-strong: rgba(28, 4, 43, 0.94);
-
-  --display-success: #22c55e;
-  --display-danger: #ef4444;
-
-  --ticker-height: 76px;
-  --status-height: 42px;
+  --display-muted: rgba(255, 255, 255, 0.72);
+  --display-border: rgba(255, 255, 255, 0.72);
+  --display-soft-border: rgba(255, 255, 255, 0.18);
+  --display-green: #22c55e;
+  --display-red: #ef4444;
+  --ticker-height: 72px;
+  --status-height: 38px;
 }
-
-
-/* ==================================================
-   Reset
-================================================== */
 
 *,
 *::before,
@@ -50,65 +35,28 @@ body {
 
 body {
   overflow-x: hidden;
-
   color: var(--display-text);
-
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
+  font-family: Arial, Helvetica, sans-serif;
   background:
-    radial-gradient(
-      circle at 12% 40%,
-      rgba(168, 36, 214, 0.3),
-      transparent 31%
-    ),
-    radial-gradient(
-      circle at 88% 42%,
-      rgba(168, 36, 214, 0.3),
-      transparent 31%
-    ),
-    radial-gradient(
-      circle at 50% 100%,
-      rgba(112, 20, 156, 0.32),
-      transparent 42%
-    ),
-    linear-gradient(
-      135deg,
-      #050008 0%,
-      #120019 46%,
-      #07000b 100%
-    );
+    radial-gradient(circle at 11% 38%, rgba(168, 36, 214, 0.3), transparent 30%),
+    radial-gradient(circle at 89% 38%, rgba(168, 36, 214, 0.3), transparent 30%),
+    radial-gradient(circle at 50% 100%, rgba(112, 20, 156, 0.32), transparent 42%),
+    linear-gradient(135deg, #050008 0%, #15001f 48%, #07000b 100%);
 }
-
-
-/* ==================================================
-   Overall Display Shell
-================================================== */
 
 .display-shell {
   position: relative;
-
   width: 100%;
   min-height: 100vh;
   overflow: hidden;
-
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.015),
-      rgba(0, 0, 0, 0.2)
-    );
 }
 
 .display-shell::before {
   position: fixed;
   inset: 0;
   z-index: 0;
-
   pointer-events: none;
-
+  content: "";
   background:
     repeating-linear-gradient(
       0deg,
@@ -117,42 +65,37 @@ body {
       transparent 1px,
       transparent 4px
     );
-
-  content: "";
 }
 
-.display-stage,
 .sponsor-strip,
-.display-status-bar {
+.display-status-bar,
+.display-stage {
   position: relative;
   z-index: 1;
 }
 
-
 /* ==================================================
-   Sponsor Ticker
+   Sponsor ticker â€” visible in both modes
 ================================================== */
 
 .sponsor-strip {
   display: flex;
   align-items: center;
-
   height: var(--ticker-height);
   overflow: hidden;
-
   background:
     linear-gradient(
       90deg,
-      rgba(15, 0, 23, 0.98),
-      rgba(42, 4, 59, 0.98),
-      rgba(15, 0, 23, 0.98)
+      rgba(14, 0, 22, 0.98),
+      rgba(44, 5, 62, 0.98),
+      rgba(14, 0, 22, 0.98)
     );
+  border-bottom: 2px solid rgba(192, 38, 211, 0.65);
+  box-shadow: 0 4px 26px rgba(0, 0, 0, 0.5);
+}
 
-  border-bottom: 2px solid rgba(192, 38, 211, 0.62);
-
-  box-shadow:
-    0 4px 28px rgba(0, 0, 0, 0.55),
-    0 0 22px rgba(192, 38, 211, 0.16);
+.sponsor-strip[hidden] {
+  display: none;
 }
 
 .sponsor-strip-window {
@@ -163,11 +106,8 @@ body {
 .sponsor-ticker-track {
   display: flex;
   align-items: center;
-
   width: max-content;
-
   animation: sponsorTicker 34s linear infinite;
-
   will-change: transform;
 }
 
@@ -184,31 +124,27 @@ body {
 .sponsor-ticker-item {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 13px;
   flex-shrink: 0;
-
-  min-width: 260px;
-  height: 58px;
-  margin-right: 42px;
-  padding: 8px 22px;
-
+  min-width: 250px;
+  height: 54px;
+  margin-right: 38px;
+  padding: 7px 20px;
   background: rgba(255, 255, 255, 0.045);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
 }
 
 .sponsor-ticker-logo {
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
-
+  width: 39px;
+  height: 39px;
+  flex: 0 0 39px;
   object-fit: contain;
 }
 
 .sponsor-ticker-name {
-  color: #ffffff;
-
-  font-size: 19px;
+  color: #fff;
+  font-size: 18px;
   font-weight: 800;
   letter-spacing: 0.03em;
   white-space: nowrap;
@@ -224,33 +160,28 @@ body {
   }
 }
 
-
 /* ==================================================
-   Status Bar
+   Connection / mode status
 ================================================== */
 
 .display-status-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   min-height: var(--status-height);
-  padding: 7px 26px;
-
-  background: rgba(5, 0, 9, 0.84);
+  padding: 6px 24px;
+  background: rgba(5, 0, 9, 0.86);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .display-live-status {
   display: flex;
   align-items: center;
-  gap: 9px;
-
+  gap: 8px;
   color: var(--display-muted);
-
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
@@ -258,40 +189,29 @@ body {
   width: 10px;
   height: 10px;
   flex: 0 0 10px;
-
-  background: var(--display-danger);
+  background: var(--display-red);
   border-radius: 50%;
 }
 
 .display-live-dot.is-live {
-  background: var(--display-success);
-
-  box-shadow:
-    0 0 12px rgba(34, 197, 94, 0.8);
+  background: var(--display-green);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.82);
 }
 
 .display-mode-label {
-  color: #e879f9;
-
-  font-size: 14px;
+  color: var(--display-purple-bright);
+  font-size: 13px;
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-
 /* ==================================================
-   Shared View Layout
+   Shared stage
 ================================================== */
 
 .display-stage {
-  height:
-    calc(
-      100vh -
-      var(--ticker-height) -
-      var(--status-height)
-    );
-
+  height: calc(100vh - var(--ticker-height) - var(--status-height));
   min-height: 0;
 }
 
@@ -307,42 +227,30 @@ body {
 
 .display-loading {
   grid-column: 1 / -1;
-
   margin: auto;
-
   color: var(--display-muted);
-
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   text-align: center;
 }
 
-
 /* ==================================================
-   Group-Stage Display
+   Six-group view
 ================================================== */
 
 .display-groups-view {
   display: flex;
   flex-direction: column;
-
   height: 100%;
   min-height: 0;
-
-  padding: 18px 5vw 10px;
+  padding: 12px 3vw 8px;
 }
 
 .display-groups-grid {
   display: grid;
-
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-
-  grid-template-rows:
-    repeat(2, minmax(0, 1fr));
-
-  gap: 12px;
-
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 10px;
   width: 100%;
   min-height: 0;
   flex: 1 1 auto;
@@ -354,223 +262,278 @@ body {
   min-height: 0;
   overflow: hidden;
   flex-direction: column;
-
   background:
-    linear-gradient(
-      180deg,
-      rgba(37, 6, 51, 0.93),
-      rgba(15, 1, 25, 0.92)
-    );
-
-  border: 2px solid var(--display-line);
-
+    linear-gradient(180deg, rgba(41, 7, 57, 0.95), rgba(15, 1, 24, 0.95));
+  border: 2px solid var(--display-border);
   box-shadow:
-    0 10px 32px rgba(0, 0, 0, 0.35),
-    inset 0 0 25px rgba(192, 38, 211, 0.05);
+    0 9px 28px rgba(0, 0, 0, 0.34),
+    inset 0 0 22px rgba(192, 38, 211, 0.06);
+}
+
+.display-group-heading {
+  display: flex;
+  min-height: 54px;
+  flex: 0 0 54px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 10px 5px 14px;
+  background:
+    linear-gradient(180deg, rgba(58, 10, 80, 0.78), rgba(26, 3, 38, 0.74));
+  border-bottom: 1px solid var(--display-border);
 }
 
 .display-group-title {
-  display: grid;
-  flex: 0 0 auto;
-  place-items: center;
-
-  min-height: 50px;
   margin: 0;
-  padding: 6px 12px;
-
-  color: #c044e5;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(55, 8, 77, 0.7),
-      rgba(26, 3, 38, 0.68)
-    );
-
-  border-bottom: 2px solid var(--display-line);
-
-  font-size: clamp(23px, 2vw, 38px);
+  color: #cf51ed;
+  font-size: clamp(21px, 1.75vw, 34px);
   font-weight: 950;
   letter-spacing: 0.02em;
   line-height: 1;
-  text-align: center;
   text-transform: uppercase;
+  text-shadow: 0 0 13px rgba(192, 38, 211, 0.34);
+  white-space: nowrap;
+}
 
-  text-shadow:
-    0 0 13px rgba(192, 38, 211, 0.35);
+.display-group-sponsor {
+  display: flex;
+  min-width: 105px;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  line-height: 1.05;
+  text-align: right;
+}
+
+.display-group-sponsor-label {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: clamp(8px, 0.6vw, 11px);
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.display-group-sponsor-name {
+  display: block;
+  min-height: 14px;
+  max-width: 155px;
+  overflow: hidden;
+  color: #fff;
+  font-size: clamp(10px, 0.75vw, 14px);
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .display-group-table {
   width: 100%;
+  height: 100%;
   min-height: 0;
   flex: 1 1 auto;
-
   border-collapse: collapse;
   table-layout: fixed;
 }
 
-.display-group-table tbody {
-  height: 100%;
+.display-group-table .display-team-column {
+  width: 47%;
 }
 
-.display-group-table tr {
+.display-group-table .display-stat-column {
+  width: 8.833%;
+}
+
+.display-group-table thead {
+  height: 22px;
+}
+
+.display-group-table tbody {
+  height: calc(100% - 22px);
+}
+
+.display-group-table tbody tr {
   height: 25%;
 }
 
+.display-group-table th,
 .display-group-table td {
-  padding: 4px 11px;
-
-  color: #ffffff;
-
-  border-right: 1px solid var(--display-line);
-  border-bottom: 1px solid var(--display-line);
-
-  font-size: clamp(15px, 1.35vw, 25px);
-  font-weight: 760;
-  line-height: 1;
+  padding: 3px 4px;
+  color: #fff;
+  border-right: 1px solid rgba(255, 255, 255, 0.38);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.38);
+  text-align: center;
   vertical-align: middle;
 }
 
-.display-group-table tr:last-child td {
-  border-bottom: 0;
-}
-
+.display-group-table th:last-child,
 .display-group-table td:last-child {
   border-right: 0;
 }
 
-.display-position-cell {
-  width: 55px;
-
-  font-size: clamp(17px, 1.35vw, 25px) !important;
-  font-weight: 900 !important;
-  text-align: center;
+.display-group-table tbody tr:last-child td {
+  border-bottom: 0;
 }
 
-.display-team-cell {
-  width: auto;
+.display-group-table th {
+  color: rgba(255, 255, 255, 0.72);
+  background: rgba(0, 0, 0, 0.2);
+  font-size: clamp(8px, 0.63vw, 11px);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.display-group-table td {
+  font-size: clamp(10px, 0.78vw, 15px);
+  font-weight: 800;
+}
+
+.display-group-table .display-team-heading,
+.display-group-table .display-team-cell {
+  padding-left: 8px;
+  text-align: left;
 }
 
 .display-table-team {
   display: flex;
-  align-items: center;
-  gap: 9px;
-
   min-width: 0;
+  align-items: center;
+  gap: 7px;
 }
 
 .display-team-logo {
-  width: 28px;
-  height: 28px;
-  flex: 0 0 28px;
-
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
   object-fit: contain;
 }
 
 .display-team-name {
   min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.display-team-stats {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-
-  color: rgba(255, 255, 255, 0.78);
-
-  font-size: 0.68em;
-  font-weight: 800;
+  overflow: hidden;
+  color: #fff;
+  font-size: clamp(10px, 0.84vw, 16px);
+  font-weight: 850;
+  line-height: 1.05;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.display-team-stats strong {
-  color: #ffffff;
+.display-points-cell {
+  color: #f4b9ff !important;
+  font-weight: 950 !important;
 }
 
+.display-group-table tr.top-team td {
+  background: rgba(34, 197, 94, 0.11);
+}
+
+.display-group-table tr.bottom-team td {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.display-empty-group {
+  color: var(--display-muted) !important;
+  text-align: center !important;
+}
 
 /* ==================================================
-   Main Sponsor Footer
+   Tournament + main sponsor branding
 ================================================== */
 
 .display-brand-footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 100px;
-
+  flex: 0 0 86px;
   min-height: 0;
-  padding: 8px 28px 0;
+  padding: 7px 20px 0;
 }
 
 .main-sponsor-brand {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-
-  min-width: 340px;
+  width: 100%;
+  min-width: 0;
 }
 
+.display-brand-lockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.tournament-brand-block,
+.main-sponsor-block {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.tournament-brand-logo,
 .main-sponsor-logo {
-  width: 84px;
-  height: 84px;
-  flex: 0 0 84px;
-
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
   object-fit: contain;
-
   filter:
-    drop-shadow(0 0 10px rgba(192, 38, 211, 0.52))
-    drop-shadow(0 0 20px rgba(192, 38, 211, 0.2));
+    drop-shadow(0 0 10px rgba(192, 38, 211, 0.45))
+    drop-shadow(0 0 20px rgba(192, 38, 211, 0.18));
 }
 
+.tournament-brand-copy,
 .main-sponsor-copy {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
+.display-brand-eyebrow {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: clamp(8px, 0.65vw, 11px);
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tournament-brand-name,
 .main-sponsor-name {
-  color: #d946ef;
-
-  font-size: clamp(20px, 1.8vw, 31px);
-  font-weight: 950;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.main-sponsor-subtitle {
-  color: #ffffff;
-
-  font-size: clamp(14px, 1.15vw, 21px);
-  font-weight: 850;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.main-sponsor-tournament {
-  color: #ffffff;
-
-  font-size: clamp(20px, 1.85vw, 32px);
+  color: #fff;
+  font-size: clamp(18px, 1.55vw, 29px);
   font-weight: 950;
   line-height: 1;
   text-transform: uppercase;
 }
 
+.main-sponsor-name {
+  color: #dc5af0;
+}
+
+.main-sponsor-subtitle {
+  color: #fff;
+  font-size: clamp(10px, 0.85vw, 15px);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.display-brand-divider {
+  width: 1px;
+  height: 54px;
+  background: rgba(255, 255, 255, 0.28);
+}
 
 /* ==================================================
-   Knockout Display
+   Mirrored knockout bracket
 ================================================== */
 
 .display-knockout-view {
   position: relative;
-
   height: 100%;
   min-height: 0;
   overflow: hidden;
-
-  padding: 8px 2.4vw 16px;
+  padding: 7px 2.2vw 14px;
 }
 
 .display-knockout-heading {
@@ -578,38 +541,30 @@ body {
 }
 
 .display-knockout-heading h1 {
-  margin: 0 0 8px;
-
+  margin: 0 0 7px;
   color: #d518ea;
-
-  font-size: clamp(36px, 4.8vw, 78px);
+  font-size: clamp(34px, 4.4vw, 72px);
   font-weight: 950;
   letter-spacing: 0.015em;
   line-height: 1;
   text-transform: uppercase;
-
-  text-shadow:
-    0 0 17px rgba(213, 24, 234, 0.32);
+  text-shadow: 0 0 17px rgba(213, 24, 234, 0.32);
 }
 
 .display-knockout-bracket {
   position: relative;
-
   display: grid;
-
   grid-template-columns:
-    minmax(225px, 1.3fr)
+    minmax(220px, 1.3fr)
+    minmax(130px, 0.72fr)
     minmax(135px, 0.72fr)
-    minmax(140px, 0.72fr)
-    minmax(235px, 1.12fr)
-    minmax(140px, 0.72fr)
+    minmax(225px, 1.08fr)
     minmax(135px, 0.72fr)
-    minmax(225px, 1.3fr);
-
-  gap: clamp(8px, 1vw, 18px);
-
+    minmax(130px, 0.72fr)
+    minmax(220px, 1.3fr);
+  gap: clamp(8px, 0.95vw, 17px);
   width: 100%;
-  height: calc(100% - 76px);
+  height: calc(100% - 70px);
   min-height: 0;
 }
 
@@ -619,15 +574,13 @@ body {
   min-height: 0;
   flex-direction: column;
   justify-content: space-around;
-  gap: 10px;
+  gap: 9px;
 }
 
 .display-bracket-column-title {
-  margin: 0 0 4px;
-
+  margin: 0 0 3px;
   color: var(--display-muted);
-
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.09em;
   text-align: center;
@@ -636,31 +589,20 @@ body {
 
 .display-bracket-match {
   position: relative;
-
   overflow: visible;
-
   background:
-    linear-gradient(
-      180deg,
-      rgba(38, 4, 54, 0.96),
-      rgba(16, 1, 25, 0.96)
-    );
-
+    linear-gradient(180deg, rgba(38, 4, 54, 0.97), rgba(16, 1, 25, 0.97));
   border: 2px solid rgba(255, 255, 255, 0.82);
-
   box-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.32),
-    inset 0 0 18px rgba(192, 38, 211, 0.06);
+    0 9px 22px rgba(0, 0, 0, 0.32),
+    inset 0 0 16px rgba(192, 38, 211, 0.06);
 }
 
 .display-bracket-match-label {
-  padding: 4px 8px;
-
-  color: rgba(255, 255, 255, 0.72);
-
-  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-
-  font-size: 9px;
+  padding: 4px 7px;
+  color: rgba(255, 255, 255, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.38);
+  font-size: 8px;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -669,12 +611,10 @@ body {
 .display-bracket-team {
   display: flex;
   align-items: center;
-  gap: 7px;
-
-  min-height: 35px;
-  padding: 4px 7px;
-
-  border-bottom: 1px solid rgba(255, 255, 255, 0.46);
+  gap: 6px;
+  min-height: 34px;
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.43);
 }
 
 .display-bracket-team:last-child {
@@ -682,26 +622,22 @@ body {
 }
 
 .display-bracket-team.is-winner {
-  background: rgba(192, 38, 211, 0.15);
+  background: rgba(192, 38, 211, 0.16);
 }
 
 .display-bracket-team-logo {
-  width: 22px;
-  height: 22px;
-  flex: 0 0 22px;
-
+  width: 21px;
+  height: 21px;
+  flex: 0 0 21px;
   object-fit: contain;
 }
 
 .display-bracket-team-name {
   min-width: 0;
   flex: 1;
-
   overflow: hidden;
-
-  color: #ffffff;
-
-  font-size: clamp(11px, 0.95vw, 17px);
+  color: #fff;
+  font-size: clamp(10px, 0.9vw, 16px);
   font-weight: 850;
   line-height: 1.05;
   text-overflow: ellipsis;
@@ -710,18 +646,14 @@ body {
 
 .display-bracket-score {
   display: grid;
-
-  width: 27px;
-  height: 27px;
-  flex: 0 0 27px;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
   place-items: center;
-
-  color: #ffffff;
-
+  color: #fff;
   background: rgba(255, 255, 255, 0.08);
-  border-left: 1px solid rgba(255, 255, 255, 0.42);
-
-  font-size: 15px;
+  border-left: 1px solid rgba(255, 255, 255, 0.4);
+  font-size: 14px;
   font-weight: 950;
 }
 
@@ -737,131 +669,109 @@ body {
 .display-final-column .display-bracket-match {
   box-shadow:
     0 0 20px rgba(192, 38, 211, 0.22),
-    0 14px 32px rgba(0, 0, 0, 0.42);
+    0 13px 30px rgba(0, 0, 0, 0.42);
 }
 
 .knockout-main-sponsor {
   position: absolute;
   left: 50%;
-  bottom: 12px;
+  bottom: 8px;
   z-index: 4;
-
-  width: min(410px, 30vw);
+  width: min(420px, 30vw);
   min-width: 0;
-
   transform: translateX(-50%);
 }
 
+.knockout-main-sponsor .display-brand-lockup {
+  gap: 11px;
+}
+
+.knockout-main-sponsor .tournament-brand-logo,
 .knockout-main-sponsor .main-sponsor-logo {
-  width: 74px;
-  height: 74px;
-  flex-basis: 74px;
+  width: 48px;
+  height: 48px;
+  flex-basis: 48px;
 }
 
+.knockout-main-sponsor .display-brand-divider {
+  height: 42px;
+}
+
+.knockout-main-sponsor .tournament-brand-name,
 .knockout-main-sponsor .main-sponsor-name {
-  font-size: clamp(15px, 1.3vw, 24px);
+  font-size: clamp(12px, 1vw, 18px);
 }
 
-.knockout-main-sponsor .main-sponsor-subtitle {
-  font-size: clamp(11px, 0.9vw, 16px);
+.knockout-main-sponsor .main-sponsor-subtitle,
+.knockout-main-sponsor .display-brand-eyebrow {
+  font-size: clamp(7px, 0.55vw, 10px);
 }
-
-.knockout-main-sponsor .main-sponsor-tournament {
-  font-size: clamp(16px, 1.4vw, 26px);
-}
-
 
 /* ==================================================
-   Crowd Silhouette Effect
-================================================== */
-
-.display-groups-view::after,
-.display-knockout-view::after {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: -1;
-
-  height: 100px;
-
-  pointer-events: none;
-
-  background:
-    linear-gradient(
-      to top,
-      rgba(0, 0, 0, 0.94),
-      rgba(0, 0, 0, 0.58),
-      transparent
-    );
-
-  content: "";
-}
-
-
-/* ==================================================
-   Laptop Height Adjustments
+   Laptop height tuning
 ================================================== */
 
 @media (min-width: 1101px) and (max-height: 850px) {
   :root {
-    --ticker-height: 64px;
-    --status-height: 36px;
+    --ticker-height: 60px;
+    --status-height: 34px;
   }
 
   .sponsor-ticker-item {
-    height: 48px;
+    height: 45px;
   }
 
   .sponsor-ticker-logo {
-    width: 34px;
-    height: 34px;
-    flex-basis: 34px;
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
   }
 
   .sponsor-ticker-name {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .display-groups-view {
-    padding-top: 12px;
+    padding-top: 9px;
+  }
+
+  .display-groups-grid {
+    gap: 8px;
+  }
+
+  .display-group-heading {
+    min-height: 46px;
+    flex-basis: 46px;
   }
 
   .display-group-title {
-    min-height: 42px;
-    font-size: clamp(21px, 1.7vw, 32px);
-  }
-
-  .display-group-table td {
-    padding-top: 3px;
-    padding-bottom: 3px;
-    font-size: clamp(14px, 1.15vw, 21px);
-  }
-
-  .display-position-cell {
-    width: 48px;
+    font-size: clamp(19px, 1.55vw, 29px);
   }
 
   .display-team-logo {
-    width: 24px;
-    height: 24px;
-    flex-basis: 24px;
+    width: 21px;
+    height: 21px;
+    flex-basis: 21px;
   }
 
   .display-brand-footer {
-    flex-basis: 80px;
+    flex-basis: 72px;
   }
 
+  .tournament-brand-logo,
   .main-sponsor-logo {
-    width: 68px;
-    height: 68px;
-    flex-basis: 68px;
+    width: 52px;
+    height: 52px;
+    flex-basis: 52px;
+  }
+
+  .display-brand-divider {
+    height: 44px;
   }
 }
 
-
 /* ==================================================
-   Responsive Fallback
+   Smaller screens / testing fallbacks
 ================================================== */
 
 @media (max-width: 1100px) {
@@ -871,12 +781,7 @@ body {
 
   .display-stage {
     height: auto;
-    min-height:
-      calc(
-        100vh -
-        var(--ticker-height) -
-        var(--status-height)
-      );
+    min-height: calc(100vh - var(--ticker-height) - var(--status-height));
   }
 
   .display-groups-view {
@@ -884,28 +789,20 @@ body {
   }
 
   .display-groups-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-
-    grid-template-rows:
-      repeat(3, minmax(245px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(245px, 1fr));
   }
 
   .display-group-card {
     min-height: 245px;
   }
 
-  .display-group-title {
-    font-size: 28px;
-  }
-
   .display-group-table td {
-    font-size: 18px;
+    font-size: 12px;
   }
 
-  .display-knockout-bracket {
-    width: 1180px;
-    height: 720px;
+  .display-team-name {
+    font-size: 13px;
   }
 
   .display-knockout-view {
@@ -913,28 +810,29 @@ body {
     min-height: 800px;
     overflow-x: auto;
   }
+
+  .display-knockout-bracket {
+    width: 1180px;
+    height: 700px;
+  }
 }
 
 @media (max-width: 720px) {
   :root {
-    --ticker-height: 64px;
+    --ticker-height: 62px;
   }
 
   .sponsor-ticker-item {
-    min-width: 225px;
+    min-width: 220px;
     margin-right: 24px;
   }
 
-  .sponsor-ticker-name {
-    font-size: 16px;
-  }
-
   .display-status-bar {
-    padding-inline: 14px;
+    padding-inline: 13px;
   }
 
   .display-groups-view {
-    padding: 14px;
+    padding: 12px;
   }
 
   .display-groups-grid {
@@ -943,23 +841,29 @@ body {
   }
 
   .display-group-card {
-    min-height: 280px;
+    min-height: 270px;
   }
 
   .display-brand-footer {
-    min-height: 130px;
+    min-height: 110px;
     flex-basis: auto;
   }
 
-  .main-sponsor-brand {
-    min-width: 0;
+  .display-brand-lockup {
+    gap: 9px;
+  }
+
+  .display-brand-divider {
+    height: 42px;
+  }
+
+  .tournament-brand-logo,
+  .main-sponsor-logo {
+    width: 46px;
+    height: 46px;
+    flex-basis: 46px;
   }
 }
-
-
-/* ==================================================
-   Reduced Motion
-================================================== */
 
 @media (prefers-reduced-motion: reduce) {
   .sponsor-ticker-track {
