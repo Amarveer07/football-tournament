@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Football Tournament – Standings</title>
 
@@ -48,17 +52,24 @@
         <div class="section-heading">
           <div>
             <h2>Standings</h2>
-            <p>Select a group to view its current table.</p>
+
+            <p>
+              Select a group to view its current table.
+            </p>
           </div>
 
           <div class="group-selector">
-            <label for="publicGroupSelect">Group</label>
+            <label for="publicGroupSelect">
+              Group
+            </label>
 
             <select
               id="publicGroupSelect"
               onchange="renderPublicGroup()"
             >
-              <option value="">Loading groups…</option>
+              <option value="">
+                Loading groups…
+              </option>
             </select>
           </div>
         </div>
@@ -72,8 +83,18 @@
         </div>
       </section>
 
-      <!-- Third-place leaderboard -->
-      <section class="section third-place-section">
+      <!--
+        Third-place leaderboard is deliberately hidden from
+        the public page.
+
+        The table and its ID remain here so app.js can continue
+        calculating and rendering the third-place rankings for
+        knockout qualification.
+      -->
+      <section
+        class="section third-place-section"
+        hidden
+      >
         <div class="section-heading">
           <div>
             <h2>Third-Place Ranking</h2>
@@ -144,7 +165,9 @@
       </section>
 
       <footer class="public-footer">
-        <a href="admin.html">Admin login</a>
+        <a href="admin.html">
+          Admin login
+        </a>
       </footer>
 
     </div>
