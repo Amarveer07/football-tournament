@@ -2721,7 +2721,179 @@ document.addEventListener("DOMContentLoaded", () => {
   listenToTournamentFromFirebase();
   listenToConnectionStatus();
 });
+/* ==================================================
+   Venue Display Controls
+================================================== */
 
+function normalizeVenueDisplayMode(value) {
+  return value === "knockout"
+    ? "knockout"
+    : "groups";
+}
+
+function renderVenueDisplayMode(mode) {
+  const normalizedMode =
+    normalizeVenueDisplayMode(mode);
+
+  const groupsButton =
+    byId("showGroupsDisplayBtn");
+
+  const knockoutButton =
+    byId("showKnockoutDisplayBtn");
+
+  const status =
+    byId("displayModeStatus");
+
+  if (groupsButton) {
+    const groupsAreShowing =
+      normalizedMode === "groups";
+
+    groupsButton.disabled = groupsAreShowing;
+
+    groupsButton.setAttribute(
+      "aria-pressed",
+      String(groupsAreShowing)
+    );
+  }
+
+  if (knockoutButton) {
+    const knockoutIsShowing =
+      normalizedMode === "knockout";
+
+    knockoutButton.disabled =
+      knockoutIsShowing;
+
+    knockoutButton.setAttribute(
+      "aria-pressed",
+      String(knockoutIsShowing)
+    );
+  }
+
+  if (status) {
+    status.textContent =
+      normalizedMode === "knockout"
+        ? "Current display: Knockout Bracket"
+        : "Current display: Group Tables";
+  }
+}
+
+async function setVenueDisplayMode(mode) {
+  const normalizedMode =
+    normalizeVenueDisplayMode(mode);
+
+  if (!requireAdmin()) return;
+
+  if (!databaseIsReady()) {
+    alert(
+      "The database is not connected yet. Try again in a moment."
+    );
+
+    return;
+  }
+
+  const status =
+    byId("displayModeStatus");
+
+  if (status) {
+    status.textContent =
+      normalizedMode === "knockout"
+        ? "Changing display to Knockout Bracket…"
+        : "Changing display to Group Tables…";
+  }
+
+  try {
+    await window.db
+      .ref("tournament/displaySettings")
+      .update({
+        mode: normalizedMode
+      });
+  } catch (error) {
+    console.error(
+      "The venue display mode could not be changed.",
+      error
+    );
+
+    alert(
+      `The venue display could not be changed: ${error.message}`
+    );
+  }
+}
+
+function startVenueDisplayControls() {
+  const groupsButton =
+    byId("showGroupsDisplayBtn");
+
+  const knockoutButton =
+    byId("showKnockoutDisplayBtn");
+
+  const status =
+    byId("displayModeStatus");
+
+  if (
+    !groupsButton &&
+    !knockoutButton &&
+    !status
+  ) {
+    return;
+  }
+
+  if (groupsButton) {
+    groupsButton.addEventListener(
+      "click",
+      () => {
+        setVenueDisplayMode("groups");
+      }
+    );
+  }
+
+  if (knockoutButton) {
+    knockoutButton.addEventListener(
+      "click",
+      () => {
+        setVenueDisplayMode("knockout");
+      }
+    );
+  }
+
+  if (!databaseIsReady()) {
+    if (status) {
+      status.textContent =
+        "Waiting for the display connection…";
+    }
+
+    return;
+  }
+
+  window.db
+    .ref("tournament/displaySettings")
+    .on(
+      "value",
+      (snapshot) => {
+        const settings =
+          snapshot.val() || {};
+
+        renderVenueDisplayMode(
+          settings.mode
+        );
+      },
+      (error) => {
+        console.error(
+          "The venue display setting could not be loaded.",
+          error
+        );
+
+        if (status) {
+          status.textContent =
+            "Display setting could not be loaded.";
+        }
+      }
+    );
+}
+
+document.addEventListener(
+  "DOMContentLoaded",
+  startVenueDisplayControls
+);
 /* ==================================================
    Functions Used by HTML onclick Attributes
 ================================================== */
