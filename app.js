@@ -625,7 +625,81 @@ function renderStandingsTable(table, groupKey) {
     <tbody>${rows}</tbody>
   `;
 }
+function getThirdPlacedTeams() {
+  return getGroupKeys()
+    .map((groupKey) => {
+      const sortedGroup = getSortedGroup(groupKey);
+      const thirdPlacedTeam = sortedGroup[2];
 
+      if (!thirdPlacedTeam) return null;
+
+      return {
+        ...thirdPlacedTeam,
+        groupKey
+      };
+    })
+    .filter(Boolean)
+    .sort((first, second) => {
+      if (second.points !== first.points) {
+        return second.points - first.points;
+      }
+
+      if (second.gd !== first.gd) {
+        return second.gd - first.gd;
+      }
+
+      return first.name.localeCompare(second.name);
+    });
+}
+
+function renderThirdPlaceTable() {
+  const table = byId("thirdPlaceTable");
+  if (!table) return;
+
+  const thirdPlacedTeams = getThirdPlacedTeams();
+
+  if (thirdPlacedTeams.length === 0) {
+    table.innerHTML = `
+      <tr>
+        <th>No third-placed teams are available yet.</th>
+      </tr>
+    `;
+    return;
+  }
+
+  const rows = thirdPlacedTeams
+    .map((team, index) => {
+      const qualifiedClass =
+        index < 4 ? "third-place-qualified" : "";
+
+      return `
+        <tr class="${qualifiedClass}">
+          <td>${index + 1}</td>
+          <td>${renderTeamName(team)}</td>
+          <td>${escapeHtml(team.groupKey)}</td>
+          <td>${team.points}</td>
+          <td>${team.gd}</td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Team</th>
+        <th>Group</th>
+        <th>Pts</th>
+        <th>GD</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      ${rows}
+    </tbody>
+  `;
+}
 /* ==================================================
    Dynamic Group Interface
 ================================================== */
@@ -997,6 +1071,7 @@ function renderEverything() {
   fillMatchTeamDropdowns();
   renderAdminMatches();
   renderPublicGroup();
+renderThirdPlaceTable();
 }
 
 /* ==================================================
