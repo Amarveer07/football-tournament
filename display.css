@@ -3,6 +3,7 @@
    Designed for a 16:9 television or projector.
 ================================================== */
 
+
 /* ==================================================
    Variables
 ================================================== */
@@ -148,6 +149,7 @@ body {
     );
 
   border-bottom: 2px solid rgba(192, 38, 211, 0.62);
+
   box-shadow:
     0 4px 28px rgba(0, 0, 0, 0.55),
     0 0 22px rgba(192, 38, 211, 0.16);
@@ -161,9 +163,11 @@ body {
 .sponsor-ticker-track {
   display: flex;
   align-items: center;
+
   width: max-content;
 
   animation: sponsorTicker 34s linear infinite;
+
   will-change: transform;
 }
 
@@ -243,6 +247,7 @@ body {
   gap: 9px;
 
   color: var(--display-muted);
+
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -260,7 +265,9 @@ body {
 
 .display-live-dot.is-live {
   background: var(--display-success);
-  box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+
+  box-shadow:
+    0 0 12px rgba(34, 197, 94, 0.8);
 }
 
 .display-mode-label {
@@ -278,22 +285,20 @@ body {
 ================================================== */
 
 .display-stage {
-  min-height:
+  height:
     calc(
       100vh -
       var(--ticker-height) -
       var(--status-height)
     );
+
+  min-height: 0;
 }
 
 .display-view {
   width: 100%;
-  min-height:
-    calc(
-      100vh -
-      var(--ticker-height) -
-      var(--status-height)
-    );
+  height: 100%;
+  min-height: 0;
 }
 
 .display-view[hidden] {
@@ -306,6 +311,7 @@ body {
   margin: auto;
 
   color: var(--display-muted);
+
   font-size: 24px;
   font-weight: 700;
   text-align: center;
@@ -320,22 +326,32 @@ body {
   display: flex;
   flex-direction: column;
 
-  padding: 22px 5vw 14px;
+  height: 100%;
+  min-height: 0;
+
+  padding: 18px 5vw 10px;
 }
 
 .display-groups-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  grid-template-rows:
+    repeat(2, minmax(0, 1fr));
+
   gap: 12px;
 
   width: 100%;
-  flex: 1;
+  min-height: 0;
+  flex: 1 1 auto;
 }
 
 .display-group-card {
   display: flex;
   min-width: 0;
+  min-height: 0;
   overflow: hidden;
   flex-direction: column;
 
@@ -347,6 +363,7 @@ body {
     );
 
   border: 2px solid var(--display-line);
+
   box-shadow:
     0 10px 32px rgba(0, 0, 0, 0.35),
     inset 0 0 25px rgba(192, 38, 211, 0.05);
@@ -354,11 +371,12 @@ body {
 
 .display-group-title {
   display: grid;
-  min-height: 58px;
+  flex: 0 0 auto;
   place-items: center;
 
+  min-height: 50px;
   margin: 0;
-  padding: 7px 12px;
+  padding: 6px 12px;
 
   color: #c044e5;
 
@@ -371,7 +389,7 @@ body {
 
   border-bottom: 2px solid var(--display-line);
 
-  font-size: clamp(25px, 2.35vw, 43px);
+  font-size: clamp(23px, 2vw, 38px);
   font-weight: 950;
   letter-spacing: 0.02em;
   line-height: 1;
@@ -384,7 +402,9 @@ body {
 
 .display-group-table {
   width: 100%;
-  height: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -398,16 +418,17 @@ body {
 }
 
 .display-group-table td {
-  padding: 6px 13px;
+  padding: 4px 11px;
 
   color: #ffffff;
 
   border-right: 1px solid var(--display-line);
   border-bottom: 1px solid var(--display-line);
 
-  font-size: clamp(17px, 1.55vw, 28px);
+  font-size: clamp(15px, 1.35vw, 25px);
   font-weight: 760;
-  line-height: 1.05;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 .display-group-table tr:last-child td {
@@ -419,9 +440,9 @@ body {
 }
 
 .display-position-cell {
-  width: 64px;
+  width: 55px;
 
-  font-size: clamp(18px, 1.5vw, 28px) !important;
+  font-size: clamp(17px, 1.35vw, 25px) !important;
   font-weight: 900 !important;
   text-align: center;
 }
@@ -433,14 +454,15 @@ body {
 .display-table-team {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
+
   min-width: 0;
 }
 
 .display-team-logo {
-  width: 32px;
-  height: 32px;
-  flex: 0 0 32px;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
 
   object-fit: contain;
 }
@@ -454,9 +476,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 10px;
 
   color: rgba(255, 255, 255, 0.78);
+
   font-size: 0.68em;
   font-weight: 800;
   white-space: nowrap;
@@ -475,24 +498,25 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 100px;
 
-  min-height: 124px;
-  padding: 12px 28px 0;
+  min-height: 0;
+  padding: 8px 28px 0;
 }
 
 .main-sponsor-brand {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 22px;
+  gap: 20px;
 
-  min-width: 360px;
+  min-width: 340px;
 }
 
 .main-sponsor-logo {
-  width: 105px;
-  height: 105px;
-  flex: 0 0 105px;
+  width: 84px;
+  height: 84px;
+  flex: 0 0 84px;
 
   object-fit: contain;
 
@@ -510,7 +534,7 @@ body {
 .main-sponsor-name {
   color: #d946ef;
 
-  font-size: clamp(22px, 2vw, 35px);
+  font-size: clamp(20px, 1.8vw, 31px);
   font-weight: 950;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -519,7 +543,7 @@ body {
 .main-sponsor-subtitle {
   color: #ffffff;
 
-  font-size: clamp(16px, 1.4vw, 25px);
+  font-size: clamp(14px, 1.15vw, 21px);
   font-weight: 850;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -528,7 +552,7 @@ body {
 .main-sponsor-tournament {
   color: #ffffff;
 
-  font-size: clamp(22px, 2.1vw, 38px);
+  font-size: clamp(20px, 1.85vw, 32px);
   font-weight: 950;
   line-height: 1;
   text-transform: uppercase;
@@ -542,7 +566,11 @@ body {
 .display-knockout-view {
   position: relative;
 
-  padding: 10px 2.4vw 20px;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+
+  padding: 8px 2.4vw 16px;
 }
 
 .display-knockout-heading {
@@ -554,7 +582,7 @@ body {
 
   color: #d518ea;
 
-  font-size: clamp(40px, 5.5vw, 92px);
+  font-size: clamp(36px, 4.8vw, 78px);
   font-weight: 950;
   letter-spacing: 0.015em;
   line-height: 1;
@@ -568,27 +596,30 @@ body {
   position: relative;
 
   display: grid;
-  grid-template-columns:
-    minmax(250px, 1.3fr)
-    minmax(145px, 0.72fr)
-    minmax(150px, 0.72fr)
-    minmax(260px, 1.12fr)
-    minmax(150px, 0.72fr)
-    minmax(145px, 0.72fr)
-    minmax(250px, 1.3fr);
 
-  gap: clamp(10px, 1.15vw, 22px);
+  grid-template-columns:
+    minmax(225px, 1.3fr)
+    minmax(135px, 0.72fr)
+    minmax(140px, 0.72fr)
+    minmax(235px, 1.12fr)
+    minmax(140px, 0.72fr)
+    minmax(135px, 0.72fr)
+    minmax(225px, 1.3fr);
+
+  gap: clamp(8px, 1vw, 18px);
 
   width: 100%;
-  min-height: calc(100vh - 250px);
+  height: calc(100% - 76px);
+  min-height: 0;
 }
 
 .display-bracket-column {
   display: flex;
   min-width: 0;
+  min-height: 0;
   flex-direction: column;
   justify-content: space-around;
-  gap: 13px;
+  gap: 10px;
 }
 
 .display-bracket-column-title {
@@ -616,19 +647,20 @@ body {
     );
 
   border: 2px solid rgba(255, 255, 255, 0.82);
+
   box-shadow:
     0 10px 24px rgba(0, 0, 0, 0.32),
     inset 0 0 18px rgba(192, 38, 211, 0.06);
 }
 
 .display-bracket-match-label {
-  padding: 5px 9px;
+  padding: 4px 8px;
 
   color: rgba(255, 255, 255, 0.72);
 
   border-bottom: 1px solid rgba(255, 255, 255, 0.4);
 
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -639,8 +671,8 @@ body {
   align-items: center;
   gap: 7px;
 
-  min-height: 41px;
-  padding: 5px 8px;
+  min-height: 35px;
+  padding: 4px 7px;
 
   border-bottom: 1px solid rgba(255, 255, 255, 0.46);
 }
@@ -654,9 +686,9 @@ body {
 }
 
 .display-bracket-team-logo {
-  width: 24px;
-  height: 24px;
-  flex: 0 0 24px;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
 
   object-fit: contain;
 }
@@ -669,7 +701,7 @@ body {
 
   color: #ffffff;
 
-  font-size: clamp(12px, 1.05vw, 19px);
+  font-size: clamp(11px, 0.95vw, 17px);
   font-weight: 850;
   line-height: 1.05;
   text-overflow: ellipsis;
@@ -678,9 +710,10 @@ body {
 
 .display-bracket-score {
   display: grid;
-  width: 29px;
-  height: 29px;
-  flex: 0 0 29px;
+
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
   place-items: center;
 
   color: #ffffff;
@@ -688,7 +721,7 @@ body {
   background: rgba(255, 255, 255, 0.08);
   border-left: 1px solid rgba(255, 255, 255, 0.42);
 
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 950;
 }
 
@@ -710,31 +743,31 @@ body {
 .knockout-main-sponsor {
   position: absolute;
   left: 50%;
-  bottom: 18px;
+  bottom: 12px;
   z-index: 4;
 
-  width: min(430px, 31vw);
+  width: min(410px, 30vw);
   min-width: 0;
 
   transform: translateX(-50%);
 }
 
 .knockout-main-sponsor .main-sponsor-logo {
-  width: 90px;
-  height: 90px;
-  flex-basis: 90px;
+  width: 74px;
+  height: 74px;
+  flex-basis: 74px;
 }
 
 .knockout-main-sponsor .main-sponsor-name {
-  font-size: clamp(16px, 1.45vw, 27px);
+  font-size: clamp(15px, 1.3vw, 24px);
 }
 
 .knockout-main-sponsor .main-sponsor-subtitle {
-  font-size: clamp(12px, 1vw, 18px);
+  font-size: clamp(11px, 0.9vw, 16px);
 }
 
 .knockout-main-sponsor .main-sponsor-tournament {
-  font-size: clamp(17px, 1.55vw, 29px);
+  font-size: clamp(16px, 1.4vw, 26px);
 }
 
 
@@ -750,7 +783,7 @@ body {
   left: 0;
   z-index: -1;
 
-  height: 110px;
+  height: 100px;
 
   pointer-events: none;
 
@@ -767,13 +800,99 @@ body {
 
 
 /* ==================================================
+   Laptop Height Adjustments
+================================================== */
+
+@media (min-width: 1101px) and (max-height: 850px) {
+  :root {
+    --ticker-height: 64px;
+    --status-height: 36px;
+  }
+
+  .sponsor-ticker-item {
+    height: 48px;
+  }
+
+  .sponsor-ticker-logo {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .sponsor-ticker-name {
+    font-size: 17px;
+  }
+
+  .display-groups-view {
+    padding-top: 12px;
+  }
+
+  .display-group-title {
+    min-height: 42px;
+    font-size: clamp(21px, 1.7vw, 32px);
+  }
+
+  .display-group-table td {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: clamp(14px, 1.15vw, 21px);
+  }
+
+  .display-position-cell {
+    width: 48px;
+  }
+
+  .display-team-logo {
+    width: 24px;
+    height: 24px;
+    flex-basis: 24px;
+  }
+
+  .display-brand-footer {
+    flex-basis: 80px;
+  }
+
+  .main-sponsor-logo {
+    width: 68px;
+    height: 68px;
+    flex-basis: 68px;
+  }
+}
+
+
+/* ==================================================
    Responsive Fallback
 ================================================== */
 
 @media (max-width: 1100px) {
+  .display-shell {
+    overflow: visible;
+  }
+
+  .display-stage {
+    height: auto;
+    min-height:
+      calc(
+        100vh -
+        var(--ticker-height) -
+        var(--status-height)
+      );
+  }
+
+  .display-groups-view {
+    height: auto;
+  }
+
   .display-groups-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(3, minmax(210px, 1fr));
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    grid-template-rows:
+      repeat(3, minmax(245px, 1fr));
+  }
+
+  .display-group-card {
+    min-height: 245px;
   }
 
   .display-group-title {
@@ -785,10 +904,13 @@ body {
   }
 
   .display-knockout-bracket {
-    min-width: 1180px;
+    width: 1180px;
+    height: 720px;
   }
 
   .display-knockout-view {
+    height: auto;
+    min-height: 800px;
     overflow-x: auto;
   }
 }
@@ -821,11 +943,12 @@ body {
   }
 
   .display-group-card {
-    min-height: 310px;
+    min-height: 280px;
   }
 
   .display-brand-footer {
-    min-height: 150px;
+    min-height: 130px;
+    flex-basis: auto;
   }
 
   .main-sponsor-brand {
