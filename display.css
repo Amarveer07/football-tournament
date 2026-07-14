@@ -959,3 +959,116 @@ body {
     font-size: 11px;
   }
 }
+/* ==================================================
+   Knockout centring and readability improvements
+================================================== */
+
+@media (min-width: 1101px) {
+  .display-knockout-view {
+    padding-right: 1.5vw;
+    padding-left: 1.5vw;
+  }
+
+  .display-knockout-bracket {
+    grid-template-columns:
+      minmax(175px, 1.05fr)
+      minmax(165px, 0.98fr)
+      minmax(160px, 0.94fr)
+      minmax(185px, 1fr)
+      minmax(160px, 0.94fr)
+      minmax(165px, 0.98fr)
+      minmax(175px, 1.05fr);
+
+    column-gap: clamp(7px, 0.75vw, 13px);
+
+    width: min(100%, 1600px);
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  /* Quarter-finals, semi-finals and final */
+  .display-bracket-column:nth-child(n + 2):nth-child(-n + 6)
+    .display-bracket-match {
+    border-width: 2px;
+  }
+
+  .display-bracket-column:nth-child(n + 2):nth-child(-n + 6)
+    .display-bracket-match-label {
+    padding: 5px 8px;
+
+    font-size: 10px;
+  }
+
+  .display-bracket-column:nth-child(n + 2):nth-child(-n + 6)
+    .display-bracket-team {
+    min-height: 41px;
+    padding: 5px 8px;
+    gap: 7px;
+  }
+
+  .display-bracket-column:nth-child(n + 2):nth-child(-n + 6)
+    .display-bracket-team-logo {
+    width: 25px;
+    height: 25px;
+    flex-basis: 25px;
+  }
+
+  .display-bracket-column:nth-child(n + 2):nth-child(-n + 6)
+    .display-bracket-team-name {
+    font-size: clamp(12px, 1vw, 18px);
+  }
+
+  .display-bracket-column:nth-child(n + 2):nth-child(-n + 6)
+    .display-bracket-score {
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
+
+    font-size: 16px;
+  }
+
+  .display-bracket-column:nth-child(n + 2):nth-child(-n + 6)
+    .display-bracket-column-title {
+    font-size: 11px;
+  }
+
+  /* Make the final slightly more prominent */
+  .display-final-column .display-bracket-team {
+    min-height: 46px;
+  }
+
+  .display-final-column .display-bracket-team-name {
+    font-size: clamp(13px, 1.08vw, 19px);
+  }
+
+  .display-final-column .display-bracket-score {
+    width: 33px;
+    height: 33px;
+    flex-basis: 33px;
+
+    font-size: 18px;
+  }
+}
+
+
+/* Prevent clipping on narrower laptop screens */
+
+@media (min-width: 1101px) and (max-width: 1300px) {
+  .display-knockout-bracket {
+    grid-template-columns:
+      minmax(155px, 1.05fr)
+      minmax(145px, 0.98fr)
+      minmax(140px, 0.94fr)
+      minmax(165px, 1fr)
+      minmax(140px, 0.94fr)
+      minmax(145px, 0.98fr)
+      minmax(155px, 1.05fr);
+
+    column-gap: 7px;
+  }
+
+  .display-bracket-column:nth-child(n + 2):nth-child(-n + 6)
+    .display-bracket-team-name {
+    font-size: 12px;
+  }
+}
