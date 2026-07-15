@@ -8,10 +8,10 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Football Tournament – Standings</title>
+  <title>Sikh Football Tournament – Live Updates</title>
 
   <!-- Public styling -->
-  <link rel="stylesheet" href="style.css?v=9">
+  <link rel="stylesheet" href="style.css?v=10">
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
@@ -19,21 +19,60 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Tournament application -->
-  <script src="app.js?v=19" defer></script>
+  <script src="app.js?v=23" defer></script>
 </head>
 
 <body>
   <main class="public-page">
-    <div class="card" id="publicView">
 
-      <header class="public-header">
-        <h1>Football Tournament</h1>
+    <!-- ==========================================
+         HERO HEADER
+    =========================================== -->
 
-        <p class="page-subtitle">
-          Live standings, fixtures and results
+    <section class="tournament-hero">
+      <picture class="hero-picture">
+        <source
+          media="(max-width: 700px)"
+          srcset="public-hero-mobile.png"
+        >
+
+        <img
+          class="hero-image"
+          src="public-hero.png"
+          alt="Sikh Football Tournament promotional artwork"
+        >
+      </picture>
+
+      <div class="hero-shade" aria-hidden="true"></div>
+
+      <div class="hero-content">
+        <p class="hero-eyebrow">
+          Live Tournament Centre
         </p>
 
-        <p id="liveStatus" class="live-status">
+        <h1>
+          Sikh Football Tournament
+        </h1>
+
+        <p class="hero-description">
+          Live standings, fixtures, results and knockout updates.
+        </p>
+
+        <div class="hero-stat-row">
+          <span class="hero-stat">
+            6 Groups
+          </span>
+
+          <span class="hero-stat">
+            24 Teams
+          </span>
+
+          <span class="hero-stat">
+            Live Updates
+          </span>
+        </div>
+
+        <p id="liveStatus" class="live-status hero-live-status">
           <span
             id="liveDot"
             class="live-dot"
@@ -45,13 +84,77 @@
             <span id="lastUpdated">—</span>
           </span>
         </p>
-      </header>
+      </div>
+    </section>
 
-      <!-- Group standings -->
-      <section class="section standings-section">
-        <div class="section-heading">
+
+    <!-- ==========================================
+         PAGE NAVIGATION
+    =========================================== -->
+
+    <nav class="public-navigation" aria-label="Tournament sections">
+      <a href="#standings">
+        Standings
+      </a>
+
+      <a href="#knockouts">
+        Knockouts
+      </a>
+
+      <a href="#matches">
+        Matches
+      </a>
+    </nav>
+
+
+    <!-- ==========================================
+         MAIN SPONSOR AREA
+    =========================================== -->
+
+    <section class="featured-sponsor-section">
+      <div class="featured-sponsor-copy">
+        <p class="sponsor-eyebrow">
+          Main Sponsor
+        </p>
+
+        <h2>
+          Tournament Partner
+        </h2>
+
+        <p>
+          Main sponsor branding will appear here.
+        </p>
+      </div>
+
+      <div class="featured-sponsor-placeholder">
+        Sponsor logo coming soon
+      </div>
+    </section>
+
+
+    <!-- ==========================================
+         MAIN PUBLIC CONTENT
+    =========================================== -->
+
+    <div class="public-content">
+
+      <!-- ========================================
+           GROUP STANDINGS
+      ========================================= -->
+
+      <section
+        id="standings"
+        class="public-section standings-section"
+      >
+        <div class="public-section-heading">
           <div>
-            <h2>Standings</h2>
+            <p class="section-eyebrow">
+              Group Stage
+            </p>
+
+            <h2>
+              Live Standings
+            </h2>
 
             <p>
               Select a group to view its current table.
@@ -60,7 +163,7 @@
 
           <div class="group-selector">
             <label for="publicGroupSelect">
-              Group
+              Select group
             </label>
 
             <select
@@ -74,38 +177,26 @@
           </div>
         </div>
 
-        <div class="table-wrap">
-          <table id="publicTable">
-            <caption class="visually-hidden">
-              Current football tournament standings
-            </caption>
-          </table>
+        <div class="public-panel standings-panel">
+          <div class="table-wrap">
+            <table id="publicTable">
+              <caption class="visually-hidden">
+                Current football tournament standings
+              </caption>
+            </table>
+          </div>
         </div>
       </section>
 
-      <!--
-        Third-place leaderboard is deliberately hidden from
-        the public page.
 
-        The table and its ID remain here so app.js can continue
-        calculating and rendering the third-place rankings for
-        knockout qualification.
-      -->
+      <!-- ========================================
+           HIDDEN THIRD-PLACE RANKING
+      ========================================= -->
+
       <section
-        class="section third-place-section"
+        class="public-section third-place-section"
         hidden
       >
-        <div class="section-heading">
-          <div>
-            <h2>Third-Place Ranking</h2>
-
-            <p>
-              The third-placed team from each group,
-              ranked across the tournament.
-            </p>
-          </div>
-        </div>
-
         <div class="table-wrap">
           <table id="thirdPlaceTable">
             <caption class="visually-hidden">
@@ -115,33 +206,84 @@
         </div>
       </section>
 
-      <!-- Knockout stage -->
-      <section class="section knockout-section">
-        <div class="section-heading">
+
+      <!-- ========================================
+           KNOCKOUT STAGE
+      ========================================= -->
+
+      <section
+        id="knockouts"
+        class="public-section knockout-section"
+      >
+        <div class="public-section-heading">
           <div>
-            <h2>Knockout Stage</h2>
+            <p class="section-eyebrow">
+              Road to the Final
+            </p>
+
+            <h2>
+              Knockout Stage
+            </h2>
 
             <p>
-              Round of 16 through to the tournament final.
+              Follow every match from the Round of 16 through
+              to the tournament final.
             </p>
           </div>
         </div>
 
-        <div
-          id="publicKnockoutBracket"
-          aria-live="polite"
-        >
-          Knockout matches have not been confirmed yet.
+        <div class="public-panel knockout-panel">
+          <div
+            id="publicKnockoutBracket"
+            aria-live="polite"
+          >
+            Knockout matches have not been confirmed yet.
+          </div>
         </div>
       </section>
 
-      <!-- Group fixtures and results -->
-      <section class="section matches-section">
-        <h2>Matches</h2>
+
+      <!-- ========================================
+           FIXTURES AND RESULTS
+      ========================================= -->
+
+      <section
+        id="matches"
+        class="public-section matches-section"
+      >
+        <div class="public-section-heading">
+          <div>
+            <p class="section-eyebrow">
+              Match Centre
+            </p>
+
+            <h2>
+              Fixtures and Results
+            </h2>
+
+            <p>
+              View upcoming fixtures and the latest completed matches.
+            </p>
+          </div>
+        </div>
 
         <div class="match-columns">
           <div class="match-panel">
-            <h3>Upcoming fixtures</h3>
+            <div class="match-panel-heading">
+              <span class="match-panel-icon" aria-hidden="true">
+                ◷
+              </span>
+
+              <div>
+                <p class="match-panel-label">
+                  Coming Up
+                </p>
+
+                <h3>
+                  Upcoming Fixtures
+                </h3>
+              </div>
+            </div>
 
             <div
               id="publicUpcoming"
@@ -152,7 +294,21 @@
           </div>
 
           <div class="match-panel">
-            <h3>Results</h3>
+            <div class="match-panel-heading">
+              <span class="match-panel-icon" aria-hidden="true">
+                ✓
+              </span>
+
+              <div>
+                <p class="match-panel-label">
+                  Completed
+                </p>
+
+                <h3>
+                  Latest Results
+                </h3>
+              </div>
+            </div>
 
             <div
               id="publicResults"
@@ -163,12 +319,68 @@
           </div>
         </div>
       </section>
-<footer class="public-footer" hidden>
-  <a href="admin.html">
-    Admin login
-  </a>
-</footer>
+
+
+      <!-- ========================================
+           SUPPORTING SPONSORS
+      ========================================= -->
+
+      <section class="supporting-sponsors-section">
+        <div class="supporting-sponsors-heading">
+          <p class="section-eyebrow">
+            Supported By
+          </p>
+
+          <h2>
+            Tournament Sponsors
+          </h2>
+        </div>
+
+        <div class="supporting-sponsor-grid">
+          <div class="supporting-sponsor-slot">
+            Sponsor logo
+          </div>
+
+          <div class="supporting-sponsor-slot">
+            Sponsor logo
+          </div>
+
+          <div class="supporting-sponsor-slot">
+            Sponsor logo
+          </div>
+
+          <div class="supporting-sponsor-slot">
+            Sponsor logo
+          </div>
+        </div>
+      </section>
+
     </div>
+
+
+    <!-- ==========================================
+         FOOTER
+    =========================================== -->
+
+    <footer class="public-footer">
+      <p>
+        Sikh Football Tournament
+      </p>
+
+      <p>
+        Live tournament information powered by the official
+        tournament administration team.
+      </p>
+    </footer>
+
+
+    <!-- Admin link retained but hidden -->
+    <div hidden>
+      <a href="admin.html">
+        Admin login
+      </a>
+    </div>
+
   </main>
 </body>
 </html>
