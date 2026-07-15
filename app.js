@@ -31,12 +31,47 @@ function createTeam(name) {
 
 function defaultGroups() {
   return {
-    A: [createTeam("A"), createTeam("B"), createTeam("C"), createTeam("D")],
-    B: [createTeam("E"), createTeam("F"), createTeam("G"), createTeam("H")],
-    C: [createTeam("I"), createTeam("J"), createTeam("K"), createTeam("L")],
-    D: [createTeam("M"), createTeam("N"), createTeam("O"), createTeam("P")],
-    E: [createTeam("Q"), createTeam("R"), createTeam("S"), createTeam("T")],
-    F: [createTeam("U"), createTeam("V"), createTeam("W"), createTeam("X")]
+    A: [
+      createTeam("Real Punjab FC"),
+      createTeam("Sunderland AFC"),
+      createTeam("Manchester Youth"),
+      createTeam("Sikh Gurdwara Darlington")
+    ],
+
+    B: [
+      createTeam("Kisan FC"),
+      createTeam("Huddersfield FC"),
+      createTeam("Akaal FC Paris"),
+      createTeam("Chardi Kala FC")
+    ],
+
+    C: [
+      createTeam("Newcastle Punjab FC A"),
+      createTeam("Glasgow Gurdwara"),
+      createTeam("We Start Now"),
+      createTeam("TBC")
+    ],
+
+    D: [
+      createTeam("Singh Brothers"),
+      createTeam("Slow & Steady Leeds"),
+      createTeam("Soorma FC Paris"),
+      createTeam("FC Italy")
+    ],
+
+    E: [
+      createTeam("FC Punjabi Lions Belgium"),
+      createTeam("Doncaster FC A"),
+      createTeam("GNG Thornaby"),
+      createTeam("Newcastle Punjab FC C")
+    ],
+
+    F: [
+      createTeam("Punjab United FC Gravesend"),
+      createTeam("Singh Sabha Slough"),
+      createTeam("Newcastle Punjab FC B"),
+      createTeam("Punjabi Mags")
+    ]
   };
 }
 function clone(value) {
