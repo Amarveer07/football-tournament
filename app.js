@@ -46,7 +46,7 @@ function defaultGroups() {
     ],
 
     C: [
-      createTeam("Newcastle Punjab FC A"),
+      createTeam("Newcastle Panjab FC A"),
       createTeam("Glasgow Gurdwara"),
       createTeam("We Start Now"),
       createTeam("TBC")
@@ -63,13 +63,13 @@ function defaultGroups() {
       createTeam("FC Punjabi Lions Belgium"),
       createTeam("Doncaster FC A"),
       createTeam("GNG Thornaby"),
-      createTeam("Newcastle Punjab FC C")
+      createTeam("Newcastle Panjab FC C")
     ],
 
     F: [
       createTeam("Punjab United FC Gravesend"),
       createTeam("Singh Sabha Slough"),
-      createTeam("Newcastle Punjab FC B"),
+      createTeam("Newcastle Panjab FC B"),
       createTeam("Punjabi Mags")
     ]
   };
