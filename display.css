@@ -1,5 +1,5 @@
 /* ==================================================
-   FOOTBALL TOURNAMENT â€” LIVE VENUE DISPLAY
+   FOOTBALL TOURNAMENT Ã¢â‚¬â€ LIVE VENUE DISPLAY
    Built for a widescreen TV/projector, with laptop
    fallbacks for testing.
 ================================================== */
@@ -75,7 +75,7 @@ body {
 }
 
 /* ==================================================
-   Sponsor ticker â€” visible in both modes
+   Sponsor ticker Ã¢â‚¬â€ visible in both modes
 ================================================== */
 
 .sponsor-strip {
@@ -397,14 +397,20 @@ body {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 7px;
+  gap: 9px;
 }
 
 .display-team-logo {
-  width: 25px;
-  height: 25px;
-  flex: 0 0 25px;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+
+  padding: 2px;
+
   object-fit: contain;
+
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 7px;
 }
 
 .display-team-name {
@@ -611,9 +617,9 @@ body {
 .display-bracket-team {
   display: flex;
   align-items: center;
-  gap: 6px;
-  min-height: 34px;
-  padding: 4px 6px;
+  gap: 7px;
+  min-height: 40px;
+  padding: 5px 7px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.43);
 }
 
@@ -626,10 +632,16 @@ body {
 }
 
 .display-bracket-team-logo {
-  width: 21px;
-  height: 21px;
-  flex: 0 0 21px;
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+
+  padding: 1px;
+
   object-fit: contain;
+
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 6px;
 }
 
 .display-bracket-team-name {
@@ -749,9 +761,9 @@ body {
   }
 
   .display-team-logo {
-    width: 21px;
-    height: 21px;
-    flex-basis: 21px;
+    width: 29px;
+    height: 29px;
+    flex-basis: 29px;
   }
 
   .display-brand-footer {
@@ -1008,9 +1020,9 @@ body {
 
   .display-bracket-column:nth-child(n + 2):nth-child(-n + 6)
     .display-bracket-team-logo {
-    width: 25px;
-    height: 25px;
-    flex-basis: 25px;
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
   }
 
   .display-bracket-column:nth-child(n + 2):nth-child(-n + 6)
