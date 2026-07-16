@@ -4452,9 +4452,35 @@ document.addEventListener("DOMContentLoaded", () => {
 ================================================== */
 
 function normalizeVenueDisplayMode(value) {
-  return value === "knockout"
-    ? "knockout"
-    : "groups";
+  if (value === "knockout") return "knockout";
+  if (value === "plate") return "plate";
+
+  return "groups";
+}
+
+function getVenueDisplayModeCopy(mode) {
+  const normalizedMode =
+    normalizeVenueDisplayMode(mode);
+
+  if (normalizedMode === "knockout") {
+    return {
+      label: "Knockout Bracket",
+      changing: "Changing display to Knockout Bracket…"
+    };
+  }
+
+  if (normalizedMode === "plate") {
+    return {
+      label: "NEST Plate Championship",
+      changing:
+        "Changing display to NEST Plate Championship…"
+    };
+  }
+
+  return {
+    label: "Group Tables",
+    changing: "Changing display to Group Tables…"
+  };
 }
 
 function renderVenueDisplayMode(mode) {
@@ -4467,39 +4493,41 @@ function renderVenueDisplayMode(mode) {
   const knockoutButton =
     byId("showKnockoutDisplayBtn");
 
+  const plateButton =
+    byId("showPlateDisplayBtn");
+
   const status =
     byId("displayModeStatus");
 
-  if (groupsButton) {
-    const groupsAreShowing =
-      normalizedMode === "groups";
+  const buttonModes = [
+    [groupsButton, "groups"],
+    [knockoutButton, "knockout"],
+    [plateButton, "plate"]
+  ];
 
-    groupsButton.disabled = groupsAreShowing;
+  buttonModes.forEach(
+    ([button, buttonMode]) => {
+      if (!button) return;
 
-    groupsButton.setAttribute(
-      "aria-pressed",
-      String(groupsAreShowing)
-    );
-  }
+      const isShowing =
+        normalizedMode === buttonMode;
 
-  if (knockoutButton) {
-    const knockoutIsShowing =
-      normalizedMode === "knockout";
+      button.disabled = isShowing;
 
-    knockoutButton.disabled =
-      knockoutIsShowing;
-
-    knockoutButton.setAttribute(
-      "aria-pressed",
-      String(knockoutIsShowing)
-    );
-  }
+      button.setAttribute(
+        "aria-pressed",
+        String(isShowing)
+      );
+    }
+  );
 
   if (status) {
     status.textContent =
-      normalizedMode === "knockout"
-        ? "Current display: Knockout Bracket"
-        : "Current display: Group Tables";
+      `Current display: ${
+        getVenueDisplayModeCopy(
+          normalizedMode
+        ).label
+      }`;
   }
 }
 
@@ -4522,9 +4550,9 @@ async function setVenueDisplayMode(mode) {
 
   if (status) {
     status.textContent =
-      normalizedMode === "knockout"
-        ? "Changing display to Knockout Bracket…"
-        : "Changing display to Group Tables…";
+      getVenueDisplayModeCopy(
+        normalizedMode
+      ).changing;
   }
 
   try {
@@ -4552,12 +4580,16 @@ function startVenueDisplayControls() {
   const knockoutButton =
     byId("showKnockoutDisplayBtn");
 
+  const plateButton =
+    byId("showPlateDisplayBtn");
+
   const status =
     byId("displayModeStatus");
 
   if (
     !groupsButton &&
     !knockoutButton &&
+    !plateButton &&
     !status
   ) {
     return;
@@ -4577,6 +4609,15 @@ function startVenueDisplayControls() {
       "click",
       () => {
         setVenueDisplayMode("knockout");
+      }
+    );
+  }
+
+  if (plateButton) {
+    plateButton.addEventListener(
+      "click",
+      () => {
+        setVenueDisplayMode("plate");
       }
     );
   }
