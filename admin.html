@@ -20,7 +20,7 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Tournament application -->
-  <script src="app.js?v=27" defer></script>
+  <script src="app.js?v=28" defer></script>
 </head>
 
 <body>
@@ -303,6 +303,101 @@
             </div>
           </section>
 
+        </div>
+      </details>
+
+
+      <!-- ==========================================
+           TOP GOALSCORERS
+      =========================================== -->
+
+      <details class="admin-accordion">
+        <summary>
+          <span class="accordion-summary-copy">
+            <span class="accordion-summary-title">
+              Top Goalscorers
+            </span>
+
+            <span class="accordion-summary-description">
+              Add player numbers and update their tournament goal totals.
+            </span>
+          </span>
+        </summary>
+
+        <div class="accordion-content">
+          <div class="section-heading">
+            <div>
+              <h2>Goalscorer Management</h2>
+
+              <p>
+                Add a player using their team and shirt number.
+                Only the leading five are shown on the public page.
+              </p>
+            </div>
+          </div>
+
+          <div class="form-panel">
+            <h3>Add a goalscorer</h3>
+
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="scorerTeamSelect">
+                  Team
+                </label>
+
+                <select id="scorerTeamSelect"></select>
+              </div>
+
+              <div class="form-field">
+                <label for="scorerNumberInput">
+                  Player number
+                </label>
+
+                <input
+                  type="number"
+                  id="scorerNumberInput"
+                  min="1"
+                  max="99"
+                  step="1"
+                  inputmode="numeric"
+                  placeholder="For example: 10"
+                >
+              </div>
+
+              <div class="form-field">
+                <label for="scorerStartingGoals">
+                  Starting goals
+                </label>
+
+                <input
+                  type="number"
+                  id="scorerStartingGoals"
+                  min="0"
+                  step="1"
+                  inputmode="numeric"
+                  value="0"
+                >
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onclick="addTopScorer()"
+            >
+              Add Goalscorer
+            </button>
+          </div>
+
+          <div class="subsection">
+            <h3>All recorded goalscorers</h3>
+
+            <div
+              id="adminTopScorersList"
+              aria-live="polite"
+            >
+              Loading goalscorers…
+            </div>
+          </div>
         </div>
       </details>
 
