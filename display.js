@@ -95,6 +95,8 @@ function getDisplayTeamLogo(teamName) {
 
 let displayGroups = {};
 let displayGroupKeys = [];
+let displayMatches = {};
+let displayPitchMapAssignments = {};
 let displayKnockoutSetup = {};
 let displayKnockoutResults = {};
 let displayPlateSetup = {};
@@ -794,6 +796,164 @@ function renderDisplayKnockoutBracket() {
 }
 
 /* ==================================================
+   Live Pitch Map
+================================================== */
+
+const DISPLAY_PITCH_ORDER = [6, 3, 4, 5, 1, 2];
+
+function normalizeDisplayPitchAssignments(
+  rawAssignments
+) {
+  const normalized = {};
+
+  for (
+    let pitchNumber = 1;
+    pitchNumber <= 6;
+    pitchNumber += 1
+  ) {
+    const assignment =
+      rawAssignments?.[pitchNumber];
+
+    const groupKey = String(
+      assignment?.groupKey || ""
+    ).trim();
+
+    const matchId = String(
+      assignment?.matchId || ""
+    ).trim();
+
+    normalized[pitchNumber] =
+      groupKey && matchId
+        ? { groupKey, matchId }
+        : null;
+  }
+
+  return normalized;
+}
+
+function getDisplayPitchMatch(
+  pitchNumber
+) {
+  const assignment =
+    displayPitchMapAssignments?.[pitchNumber];
+
+  if (!assignment) return null;
+
+  const match =
+    displayMatches?.[assignment.groupKey]?.[
+      assignment.matchId
+    ];
+
+  if (!match || typeof match !== "object") {
+    return null;
+  }
+
+  return {
+    ...match,
+    groupKey: assignment.groupKey,
+    matchId: assignment.matchId
+  };
+}
+
+function renderPitchMapTeam(
+  groupKey,
+  teamName
+) {
+  const team = findDisplayTeam({
+    groupKey,
+    teamName
+  });
+
+  if (!team) {
+    return `
+      <div class="pitch-map-team">
+        <span class="pitch-map-team-name">
+          Team TBC
+        </span>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="pitch-map-team">
+      ${renderOptionalImage(
+        team.logo,
+        "pitch-map-team-logo",
+        `${team.name} logo`
+      )}
+
+      <span class="pitch-map-team-name">
+        ${escapeDisplayHtml(team.name)}
+      </span>
+    </div>
+  `;
+}
+
+function renderPitchMapCard(
+  pitchNumber
+) {
+  const match =
+    getDisplayPitchMatch(pitchNumber);
+
+  if (!match) {
+    return `
+      <article
+        class="pitch-map-card pitch-map-card-empty"
+        data-pitch="${pitchNumber}"
+      >
+        <div class="pitch-map-card-title">
+          Pitch ${pitchNumber}
+        </div>
+
+        <div class="pitch-map-empty-message">
+          No match currently
+        </div>
+      </article>
+    `;
+  }
+
+  return `
+    <article
+      class="pitch-map-card"
+      data-pitch="${pitchNumber}"
+    >
+      <div class="pitch-map-card-title">
+        Pitch ${pitchNumber}
+      </div>
+
+      <div class="pitch-map-match">
+        ${renderPitchMapTeam(
+          match.groupKey,
+          match.teamA
+        )}
+
+        <span class="pitch-map-versus">
+          VS
+        </span>
+
+        ${renderPitchMapTeam(
+          match.groupKey,
+          match.teamB
+        )}
+      </div>
+    </article>
+  `;
+}
+
+function renderDisplayPitchMap() {
+  const grid = displayById(
+    "displayPitchMapGrid"
+  );
+
+  if (!grid) return;
+
+  grid.innerHTML = DISPLAY_PITCH_ORDER
+    .map(renderPitchMapCard)
+    .join("");
+}
+
+
+/* ==================================================
    NEST Plate Championship
 ================================================== */
 
@@ -1031,6 +1191,7 @@ function renderDisplayPlateBracket() {
 ================================================== */
 
 function normalizeDisplayMode(value) {
+  if (value === "pitchMap") return "pitchMap";
   if (value === "knockout") return "knockout";
   if (value === "plate") return "plate";
 
@@ -1040,6 +1201,9 @@ function normalizeDisplayMode(value) {
 function renderDisplayMode() {
   const groupsView =
     displayById("displayGroupsView");
+
+  const pitchMapView =
+    displayById("displayPitchMapView");
 
   const knockoutView =
     displayById("displayKnockoutView");
@@ -1060,6 +1224,11 @@ function renderDisplayMode() {
       mode !== "groups";
   }
 
+  if (pitchMapView) {
+    pitchMapView.hidden =
+      mode !== "pitchMap";
+  }
+
   if (knockoutView) {
     knockoutView.hidden =
       mode !== "knockout";
@@ -1071,7 +1240,10 @@ function renderDisplayMode() {
   }
 
   if (modeLabel) {
-    if (mode === "knockout") {
+    if (mode === "pitchMap") {
+      modeLabel.textContent =
+        "Live Pitch Map";
+    } else if (mode === "knockout") {
       modeLabel.textContent =
         "Main Knockout";
     } else if (mode === "plate") {
@@ -1088,6 +1260,7 @@ function renderCompleteDisplay() {
   renderSponsorTicker();
   renderMainSponsor();
   renderAllDisplayGroups();
+  renderDisplayPitchMap();
   renderDisplayKnockoutBracket();
   renderDisplayPlateBracket();
   renderDisplayMode();
@@ -1118,6 +1291,17 @@ function listenToDisplayTournament() {
         data.groups,
         displayGroupKeys
       );
+
+      displayMatches =
+        data.matches &&
+        typeof data.matches === "object"
+          ? data.matches
+          : {};
+
+      displayPitchMapAssignments =
+        normalizeDisplayPitchAssignments(
+          data.pitchMapAssignments
+        );
 
       displayKnockoutSetup =
         data.knockoutSetup && typeof data.knockoutSetup === "object"
