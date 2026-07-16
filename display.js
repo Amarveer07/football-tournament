@@ -43,6 +43,52 @@ const MAIN_SPONSOR = {
   logo: "assets/sponsors/ladhar-investments.png"
 };
 
+
+/*
+  Local fallback logo paths for the venue display.
+  Firebase logo values are still used first. These paths make the
+  display reliable even if a team's saved logo field is temporarily blank.
+*/
+const DISPLAY_TEAM_LOGOS = {
+  "real punjab fc": "logos/real-punjab-fc.png",
+  "sunderland afc": "logos/sunderland-afc.png",
+  "manchester youth": "logos/manchester-youth.png",
+  "sikh gurdwara darlington": "logos/sikh-gurdwara-darlington.png",
+
+  "kisan fc": "logos/kisan-fc.png",
+  "huddersfield fc": "logos/huddersfield-fc.png",
+  "chardi kala fc": "logos/chardi-kala-fc.png",
+
+  "newcastle panjab fc a": "logos/newcastle-punjab-fc-a.png",
+  "newcastle punjab fc a": "logos/newcastle-punjab-fc-a.png",
+  "glasgow gurdwara": "logos/glasgow-gurdwara.png",
+  "we start now": "logos/we-start-now.png",
+
+  "singh brothers": "logos/singh-brothers.png",
+  "slow & steady leeds": "logos/slow-and-steady-leeds.png",
+  "soorma fc paris": "logos/soorma-fc-paris.png",
+  "fc italy": "logos/fc-italy.png",
+
+  "fc punjabi lions belgium": "logos/fc-punjabi-lions-belgium.png",
+  "gng thornaby": "logos/gng-thornaby.png",
+  "newcastle panjab fc c": "logos/newcastle-punjab-fc-c.png",
+  "newcastle punjab fc c": "logos/newcastle-punjab-fc-c.png",
+
+  "punjab united fc gravesend": "logos/punjab-united-fc-gravesend.png",
+  "singh sabha slough": "logos/singh-sabha-slough.png",
+  "newcastle panjab fc b": "logos/newcastle-punjab-fc-b.png",
+  "newcastle punjab fc b": "logos/newcastle-punjab-fc-b.png",
+  "punjabi mags": "logos/punjabi-mags.png"
+};
+
+function getDisplayTeamLogo(teamName) {
+  const normalizedName = String(teamName || "")
+    .trim()
+    .toLowerCase();
+
+  return DISPLAY_TEAM_LOGOS[normalizedName] || "";
+}
+
 /* ==================================================
    Local Display State
 ================================================== */
@@ -131,9 +177,15 @@ function displayToArray(value) {
 }
 
 function normalizeDisplayTeam(rawTeam) {
+  const name = String(rawTeam?.name || "Team TBC").trim();
+
   return {
-    name: String(rawTeam?.name || "Team TBC").trim(),
-    logo: String(rawTeam?.logo || "").trim(),
+    name,
+    logo: String(
+      rawTeam?.logo ||
+      getDisplayTeamLogo(name) ||
+      ""
+    ).trim(),
     p: displayToNumber(rawTeam?.p),
     w: displayToNumber(rawTeam?.w),
     d: displayToNumber(rawTeam?.d),
@@ -552,7 +604,10 @@ function findDisplayTeam(reference) {
   return {
     name: reference.teamName,
     groupKey: reference.groupKey,
-    logo: team?.logo || ""
+    logo:
+      team?.logo ||
+      getDisplayTeamLogo(reference.teamName) ||
+      ""
   };
 }
 
