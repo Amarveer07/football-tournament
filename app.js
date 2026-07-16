@@ -8,10 +8,45 @@
    Default Data and Normalisation
 ================================================== */
 
-function createTeam(name) {
+const DEFAULT_TEAM_LOGOS = {
+  "Real Punjab FC": "logos/real-punjab-fc.png",
+  "Sunderland AFC": "logos/sunderland-afc.png",
+  "Manchester Youth": "logos/manchester-youth.png",
+  "Sikh Gurdwara Darlington": "logos/sikh-gurdwara-darlington.png",
+
+  "Kisan FC": "logos/kisan-fc.png",
+  "Huddersfield FC": "logos/huddersfield-fc.png",
+  "Chardi Kala FC": "logos/chardi-kala-fc.png",
+
+  "Newcastle Panjab FC A": "logos/newcastle-punjab-fc-a.png",
+  "Glasgow Gurdwara": "logos/glasgow-gurdwara.png",
+  "We Start Now": "logos/we-start-now.png",
+
+  "Singh Brothers": "logos/singh-brothers.png",
+  "Slow & Steady Leeds": "logos/slow-and-steady-leeds.png",
+  "Soorma FC Paris": "logos/soorma-fc-paris.png",
+  "FC Italy": "logos/fc-italy.png",
+
+  "FC Punjabi Lions Belgium": "logos/fc-punjabi-lions-belgium.png",
+  "GNG Thornaby": "logos/gng-thornaby.png",
+  "Newcastle Panjab FC C": "logos/newcastle-punjab-fc-c.png",
+
+  "Punjab United FC Gravesend": "logos/punjab-united-fc-gravesend.png",
+  "Singh Sabha Slough": "logos/singh-sabha-slough.png",
+  "Newcastle Panjab FC B": "logos/newcastle-punjab-fc-b.png",
+  "Punjabi Mags": "logos/punjabi-mags.png"
+};
+
+function getDefaultTeamLogo(teamName) {
+  return DEFAULT_TEAM_LOGOS[
+    String(teamName || "").trim()
+  ] || "";
+}
+
+function createTeam(name, logo = getDefaultTeamLogo(name)) {
   return {
     name,
-    logo: "",
+    logo,
     p: 0,
     w: 0,
     d: 0,
@@ -118,9 +153,19 @@ function normalizeAdjustments(raw) {
 }
 
 function normalizeTeam(raw) {
+  const name = String(
+    raw?.name || "Unnamed team"
+  ).trim();
+
+  const savedLogo = String(
+    raw?.logo || ""
+  ).trim();
+
   return {
-    name: String(raw?.name || "Unnamed team").trim(),
-    logo: String(raw?.logo || "").trim(),
+    name,
+    logo:
+      savedLogo ||
+      getDefaultTeamLogo(name),
     p: toNumber(raw?.p),
     w: toNumber(raw?.w),
     d: toNumber(raw?.d),
@@ -2664,6 +2709,89 @@ async function resetTournament() {
   });
 }
 
+
+/* ==================================================
+   One-Time Team Logo Sync
+================================================== */
+
+let teamLogoSyncRunning = false;
+
+async function syncAvailableTeamLogosToFirebase() {
+  if (
+    teamLogoSyncRunning ||
+    !databaseIsReady() ||
+    !adminIsAuthenticated()
+  ) {
+    return;
+  }
+
+  teamLogoSyncRunning = true;
+
+  try {
+    const snapshot = await window.db
+      .ref("tournament/groups")
+      .once("value");
+
+    const rawGroups = snapshot.val();
+
+    if (
+      !rawGroups ||
+      typeof rawGroups !== "object"
+    ) {
+      return;
+    }
+
+    const updates = {};
+
+    Object.entries(rawGroups).forEach(
+      ([groupKey, rawGroup]) => {
+        if (
+          !rawGroup ||
+          typeof rawGroup !== "object"
+        ) {
+          return;
+        }
+
+        Object.entries(rawGroup).forEach(
+          ([teamKey, rawTeam]) => {
+            const teamName = String(
+              rawTeam?.name || ""
+            ).trim();
+
+            const savedLogo = String(
+              rawTeam?.logo || ""
+            ).trim();
+
+            const defaultLogo =
+              getDefaultTeamLogo(teamName);
+
+            if (defaultLogo && !savedLogo) {
+              updates[
+                `tournament/groups/${groupKey}/${teamKey}/logo`
+              ] = defaultLogo;
+            }
+          }
+        );
+      }
+    );
+
+    if (Object.keys(updates).length > 0) {
+      await window.db.ref().update(updates);
+
+      console.info(
+        `Added ${Object.keys(updates).length} available team logos.`
+      );
+    }
+  } catch (error) {
+    console.error(
+      "The available team logos could not be synced.",
+      error
+    );
+  } finally {
+    teamLogoSyncRunning = false;
+  }
+}
+
 /* ==================================================
    Firebase Authentication
 ================================================== */
@@ -2741,6 +2869,13 @@ function startAuthenticationListener() {
     if (user) {
       setAdminStatus(`Signed in as ${user.email}`);
       setAdminPanelVisibility(true);
+
+      /*
+        Fill any currently blank Firebase logo fields with the
+        available default paths. Existing custom logos are never
+        overwritten.
+      */
+      syncAvailableTeamLogosToFirebase();
     } else {
       setAdminStatus("Not signed in");
       setAdminPanelVisibility(false);
@@ -2959,3 +3094,5 @@ window.saveKnockoutSetup = saveKnockoutSetup;
 window.adminLogin = adminLogin;
 window.adminLogout = adminLogout;
 window.renderPublicGroup = renderPublicGroup;
+window.syncAvailableTeamLogosToFirebase =
+  syncAvailableTeamLogosToFirebase;
