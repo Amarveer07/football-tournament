@@ -1064,17 +1064,22 @@ function renderStandingsTable(table, groupKey) {
     return;
   }
 
-  const topPoints = group[0].points;
-  const bottomPoints = group[group.length - 1].points;
+  const groupHasStarted = group.some(
+    (team) => toNumber(team.p) > 0
+  );
 
   const rows = group
-    .map((team) => {
+    .map((team, index) => {
       let rowClass = "";
 
-      if (team.points === topPoints) {
-        rowClass = "top-team";
-      } else if (team.points === bottomPoints) {
-        rowClass = "bottom-team";
+      if (groupHasStarted) {
+        if (index < 2) {
+          rowClass = "group-position-top-two";
+        } else if (index === 2) {
+          rowClass = "group-position-third";
+        } else if (index === group.length - 1) {
+          rowClass = "group-position-last";
+        }
       }
 
       return `
