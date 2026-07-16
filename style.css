@@ -1139,6 +1139,32 @@ tbody tr:hover td {
 }
 
 
+/* Penalty shootout result */
+
+.knockout-team-row + .knockout-team-row {
+  border-bottom: 0;
+}
+
+.knockout-penalty-note {
+  padding: 6px 8px 7px;
+
+  color: #f5d0fe;
+
+  background:
+    rgba(192, 38, 211, 0.13);
+
+  border-top:
+    1px solid rgba(232, 167, 246, 0.18);
+
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.045em;
+  line-height: 1.25;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+
 /* Simple visual connectors */
 
 .knockout-side-left
