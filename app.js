@@ -440,6 +440,127 @@ let knockoutResults = normalizeKnockoutResults(
   localState?.knockoutResults
 );
 
+
+const bottomEightPlan = [
+  {
+    matchNumber: 1,
+    teamOneSource: "Last place in Group A",
+    teamTwoSource: "Last place in Group E"
+  },
+  {
+    matchNumber: 2,
+    teamOneSource: "Last place in Group C",
+    teamTwoSource: "Third-place ranking 5 or 6"
+  },
+  {
+    matchNumber: 3,
+    teamOneSource: "Last place in Group B",
+    teamTwoSource: "Last place in Group F"
+  },
+  {
+    matchNumber: 4,
+    teamOneSource: "Last place in Group D",
+    teamTwoSource: "Third-place ranking 6 or 5"
+  }
+];
+
+const bottomEightRoundConfig = {
+  quarterFinals: {
+    label: "Quarter-finals",
+    shortLabel: "QF",
+    matchCount: 4
+  },
+  semiFinals: {
+    label: "Semi-finals",
+    shortLabel: "SF",
+    matchCount: 2
+  },
+  final: {
+    label: "Final",
+    shortLabel: "Final",
+    matchCount: 1
+  }
+};
+
+let bottomEightSetup =
+  localState?.bottomEightSetup &&
+  typeof localState.bottomEightSetup === "object"
+    ? clone(localState.bottomEightSetup)
+    : {};
+
+function createEmptyBottomEightResults() {
+  const results = {};
+
+  Object.entries(bottomEightRoundConfig).forEach(
+    ([roundKey, round]) => {
+      results[roundKey] = {};
+
+      for (
+        let matchNumber = 1;
+        matchNumber <= round.matchCount;
+        matchNumber += 1
+      ) {
+        results[roundKey][matchNumber] =
+          createEmptyKnockoutMatchResult();
+      }
+    }
+  );
+
+  return results;
+}
+
+function normalizeBottomEightResults(rawResults) {
+  const normalized = createEmptyBottomEightResults();
+
+  Object.entries(bottomEightRoundConfig).forEach(
+    ([roundKey, round]) => {
+      for (
+        let matchNumber = 1;
+        matchNumber <= round.matchCount;
+        matchNumber += 1
+      ) {
+        const rawMatch = rawResults?.[roundKey]?.[matchNumber];
+
+        if (!rawMatch || typeof rawMatch !== "object") continue;
+
+        const scoreOne =
+          rawMatch.scoreOne === null ||
+          rawMatch.scoreOne === undefined ||
+          rawMatch.scoreOne === ""
+            ? null
+            : toNumber(rawMatch.scoreOne, null);
+
+        const scoreTwo =
+          rawMatch.scoreTwo === null ||
+          rawMatch.scoreTwo === undefined ||
+          rawMatch.scoreTwo === ""
+            ? null
+            : toNumber(rawMatch.scoreTwo, null);
+
+        normalized[roundKey][matchNumber] = {
+          scoreOne:
+            Number.isInteger(scoreOne) && scoreOne >= 0
+              ? scoreOne
+              : null,
+          scoreTwo:
+            Number.isInteger(scoreTwo) && scoreTwo >= 0
+              ? scoreTwo
+              : null,
+          winner: normalizeKnockoutTeamReference(
+            rawMatch.winner
+          )
+        };
+      }
+    }
+  );
+
+  return normalized;
+}
+
+let bottomEightResults = normalizeBottomEightResults(
+  localState?.bottomEightResults
+);
+
 function getGroupKeys() {
   return [...groupKeys].sort((a, b) => a.localeCompare(b));
 }
@@ -463,6 +584,8 @@ function createStateSnapshot() {
     matches,
     knockoutSetup,
     knockoutResults,
+    bottomEightSetup,
+    bottomEightResults,
     currentGroup
   });
 }
@@ -474,6 +597,10 @@ function restoreState(snapshot) {
   knockoutSetup = clone(snapshot.knockoutSetup || {});
   knockoutResults = normalizeKnockoutResults(
     snapshot.knockoutResults
+  );
+  bottomEightSetup = clone(snapshot.bottomEightSetup || {});
+  bottomEightResults = normalizeBottomEightResults(
+    snapshot.bottomEightResults
   );
   currentGroup = snapshot.currentGroup || groupKeys[0] || "";
 }
@@ -487,7 +614,9 @@ function saveLocalState() {
         groups,
         matches,
         knockoutSetup,
-        knockoutResults
+        knockoutResults,
+        bottomEightSetup,
+        bottomEightResults
       })
     );
   } catch (error) {
@@ -666,7 +795,9 @@ async function writeTournamentState() {
     groups,
     matches,
     knockoutSetup,
-    knockoutResults
+    knockoutResults,
+    bottomEightSetup,
+    bottomEightResults
   });
 }
 
@@ -727,6 +858,16 @@ function listenToTournamentFromFirebase() {
 
           knockoutResults = normalizeKnockoutResults(
             data.knockoutResults
+          );
+
+          bottomEightSetup =
+            data.bottomEightSetup &&
+            typeof data.bottomEightSetup === "object"
+              ? clone(data.bottomEightSetup)
+              : {};
+
+          bottomEightResults = normalizeBottomEightResults(
+            data.bottomEightResults
           );
 
           if (!groupKeys.includes(currentGroup)) {
@@ -1824,6 +1965,891 @@ async function clearKnockoutMatchResult(
 }
 
 /* ==================================================
+   Bottom 8 Knockout
+================================================== */
+
+function bottomEightSetupIsComplete() {
+  return bottomEightPlan.every((match) => {
+    const savedMatch = bottomEightSetup?.[match.matchNumber];
+
+    return Boolean(savedMatch?.teamOne && savedMatch?.teamTwo);
+  });
+}
+
+function getBottomEightResult(roundKey, matchNumber) {
+  return (
+    bottomEightResults?.[roundKey]?.[matchNumber] ||
+    createEmptyKnockoutMatchResult()
+  );
+}
+
+function getBottomEightWinner(roundKey, matchNumber) {
+  return normalizeKnockoutTeamReference(
+    getBottomEightResult(roundKey, matchNumber).winner
+  );
+}
+
+function getBottomEightMatchTeams(roundKey, matchNumber) {
+  if (roundKey === "quarterFinals") {
+    const savedMatch = bottomEightSetup?.[matchNumber];
+
+    return {
+      teamOne: normalizeKnockoutTeamReference(
+        savedMatch?.teamOne
+      ),
+      teamTwo: normalizeKnockoutTeamReference(
+        savedMatch?.teamTwo
+      )
+    };
+  }
+
+  const previousRoundKey =
+    roundKey === "semiFinals"
+      ? "quarterFinals"
+      : roundKey === "final"
+        ? "semiFinals"
+        : null;
+
+  if (!previousRoundKey) {
+    return {
+      teamOne: null,
+      teamTwo: null
+    };
+  }
+
+  return {
+    teamOne: getBottomEightWinner(
+      previousRoundKey,
+      matchNumber * 2 - 1
+    ),
+    teamTwo: getBottomEightWinner(
+      previousRoundKey,
+      matchNumber * 2
+    )
+  };
+}
+
+function getNextBottomEightMatch(roundKey, matchNumber) {
+  if (roundKey === "quarterFinals") {
+    return {
+      roundKey: "semiFinals",
+      matchNumber: Math.ceil(matchNumber / 2)
+    };
+  }
+
+  if (roundKey === "semiFinals") {
+    return {
+      roundKey: "final",
+      matchNumber: 1
+    };
+  }
+
+  return null;
+}
+
+function clearBottomEightResultAndDependents(
+  roundKey,
+  matchNumber,
+  includeCurrent = true
+) {
+  if (
+    includeCurrent &&
+    bottomEightResults?.[roundKey]
+  ) {
+    bottomEightResults[roundKey][matchNumber] =
+      createEmptyKnockoutMatchResult();
+  }
+
+  const nextMatch = getNextBottomEightMatch(
+    roundKey,
+    matchNumber
+  );
+
+  if (!nextMatch) return;
+
+  clearBottomEightResultAndDependents(
+    nextMatch.roundKey,
+    nextMatch.matchNumber,
+    true
+  );
+}
+
+function bottomEightHasAnyResults() {
+  return Object.entries(bottomEightRoundConfig).some(
+    ([roundKey, round]) => {
+      for (
+        let matchNumber = 1;
+        matchNumber <= round.matchCount;
+        matchNumber += 1
+      ) {
+        const result = getBottomEightResult(
+          roundKey,
+          matchNumber
+        );
+
+        if (
+          result.scoreOne !== null ||
+          result.scoreTwo !== null ||
+          result.winner
+        ) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+  );
+}
+
+function renderBottomEightSetup() {
+  const container = byId("bottomEightSetup");
+  if (!container) return;
+
+  const allTeams = getAllKnockoutTeamOptions();
+
+  const teamOptions = allTeams
+    .map((team) => {
+      const value = encodeTeamReference(team);
+
+      return `
+        <option value="${value}">
+          ${escapeHtml(team.teamName)} — Group ${escapeHtml(team.groupKey)}
+        </option>
+      `;
+    })
+    .join("");
+
+  const setupHtml = bottomEightPlan
+    .map(
+      (match) => `
+        <div class="form-panel knockout-match-panel">
+          <h3>Bottom 8 — Quarter-final ${match.matchNumber}</h3>
+
+          <p class="helper-text">
+            ${escapeHtml(match.teamOneSource)}
+            vs
+            ${escapeHtml(match.teamTwoSource)}
+          </p>
+
+          <div class="form-field">
+            <label for="bottomEightTeamOne_${match.matchNumber}">
+              Team 1
+            </label>
+
+            <select id="bottomEightTeamOne_${match.matchNumber}">
+              <option value="">Select team</option>
+              ${teamOptions}
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="bottomEightTeamTwo_${match.matchNumber}">
+              Team 2
+            </label>
+
+            <select id="bottomEightTeamTwo_${match.matchNumber}">
+              <option value="">Select team</option>
+              ${teamOptions}
+            </select>
+          </div>
+        </div>
+      `
+    )
+    .join("");
+
+  container.innerHTML = `
+    <div class="form-grid">
+      ${setupHtml}
+    </div>
+
+    <div class="subsection knockout-results-admin">
+      <div class="section-heading">
+        <div>
+          <h3>Bottom 8 Results</h3>
+          <p>
+            Enter scores for every round. If a match is tied,
+            choose the winner after penalties.
+          </p>
+        </div>
+      </div>
+
+      ${renderAllAdminBottomEightRounds()}
+    </div>
+  `;
+
+  bottomEightPlan.forEach((match) => {
+    const savedMatch =
+      bottomEightSetup?.[match.matchNumber];
+
+    if (!savedMatch) return;
+
+    const teamOneSelect = byId(
+      `bottomEightTeamOne_${match.matchNumber}`
+    );
+
+    const teamTwoSelect = byId(
+      `bottomEightTeamTwo_${match.matchNumber}`
+    );
+
+    if (teamOneSelect && savedMatch.teamOne) {
+      teamOneSelect.value = encodeTeamReference(
+        savedMatch.teamOne
+      );
+    }
+
+    if (teamTwoSelect && savedMatch.teamTwo) {
+      teamTwoSelect.value = encodeTeamReference(
+        savedMatch.teamTwo
+      );
+    }
+  });
+}
+
+function renderAllAdminBottomEightRounds() {
+  return Object.entries(bottomEightRoundConfig)
+    .map(([roundKey, round]) => {
+      const matchCards = [];
+
+      for (
+        let matchNumber = 1;
+        matchNumber <= round.matchCount;
+        matchNumber += 1
+      ) {
+        matchCards.push(
+          renderAdminBottomEightMatch(
+            roundKey,
+            matchNumber
+          )
+        );
+      }
+
+      return `
+        <section class="knockout-admin-round">
+          <h4>${escapeHtml(round.label)}</h4>
+
+          <div class="form-grid">
+            ${matchCards.join("")}
+          </div>
+        </section>
+      `;
+    })
+    .join("");
+}
+
+function renderAdminBottomEightMatch(
+  roundKey,
+  matchNumber
+) {
+  const round = bottomEightRoundConfig[roundKey];
+
+  const teams = getBottomEightMatchTeams(
+    roundKey,
+    matchNumber
+  );
+
+  const result = getBottomEightResult(
+    roundKey,
+    matchNumber
+  );
+
+  const teamOne = getKnockoutDisplayTeam(
+    teams.teamOne
+  );
+
+  const teamTwo = getKnockoutDisplayTeam(
+    teams.teamTwo
+  );
+
+  const teamsReady = Boolean(
+    teams.teamOne && teams.teamTwo
+  );
+
+  const winnerOneSelected = teamReferencesMatch(
+    result.winner,
+    teams.teamOne
+  )
+    ? "selected"
+    : "";
+
+  const winnerTwoSelected = teamReferencesMatch(
+    result.winner,
+    teams.teamTwo
+  )
+    ? "selected"
+    : "";
+
+  const encodedRoundKey = encodeURIComponent(roundKey);
+
+  return `
+    <div class="form-panel knockout-result-panel">
+      <h3>
+        Bottom 8 ${escapeHtml(round.shortLabel)} ${matchNumber}
+      </h3>
+
+      <div class="knockout-admin-team">
+        ${renderTeamName(teamOne)}
+      </div>
+
+      <div class="form-field">
+        <label for="b8ScoreOne_${roundKey}_${matchNumber}">
+          ${escapeHtml(teamOne.name)} score
+        </label>
+
+        <input
+          type="number"
+          min="0"
+          step="1"
+          inputmode="numeric"
+          id="b8ScoreOne_${roundKey}_${matchNumber}"
+          value="${
+            result.scoreOne === null
+              ? ""
+              : result.scoreOne
+          }"
+          ${teamsReady ? "" : "disabled"}
+        >
+      </div>
+
+      <div class="knockout-admin-team">
+        ${renderTeamName(teamTwo)}
+      </div>
+
+      <div class="form-field">
+        <label for="b8ScoreTwo_${roundKey}_${matchNumber}">
+          ${escapeHtml(teamTwo.name)} score
+        </label>
+
+        <input
+          type="number"
+          min="0"
+          step="1"
+          inputmode="numeric"
+          id="b8ScoreTwo_${roundKey}_${matchNumber}"
+          value="${
+            result.scoreTwo === null
+              ? ""
+              : result.scoreTwo
+          }"
+          ${teamsReady ? "" : "disabled"}
+        >
+      </div>
+
+      <div class="form-field">
+        <label for="b8Winner_${roundKey}_${matchNumber}">
+          Winner if tied
+        </label>
+
+        <select
+          id="b8Winner_${roundKey}_${matchNumber}"
+          ${teamsReady ? "" : "disabled"}
+        >
+          <option value="">Choose after penalties</option>
+
+          <option value="one" ${winnerOneSelected}>
+            ${escapeHtml(teamOne.name)}
+          </option>
+
+          <option value="two" ${winnerTwoSelected}>
+            ${escapeHtml(teamTwo.name)}
+          </option>
+        </select>
+      </div>
+
+      <div class="button-row">
+        <button
+          type="button"
+          onclick="saveBottomEightMatchResult(
+            decodeURIComponent('${encodedRoundKey}'),
+            ${matchNumber}
+          )"
+          ${teamsReady ? "" : "disabled"}
+        >
+          Save Result
+        </button>
+
+        <button
+          type="button"
+          class="secondary-button"
+          onclick="clearBottomEightMatchResult(
+            decodeURIComponent('${encodedRoundKey}'),
+            ${matchNumber}
+          )"
+          ${
+            result.scoreOne === null &&
+            result.scoreTwo === null &&
+            !result.winner
+              ? "disabled"
+              : ""
+          }
+        >
+          Clear
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function autoFillBottomEightSetup() {
+  const group = (groupKey) => getSortedGroup(groupKey);
+
+  const makeTeam = (groupKey, team) => {
+    if (!team) return null;
+
+    return {
+      groupKey,
+      teamName: team.name
+    };
+  };
+
+  const lastPlaced = (groupKey) => {
+    const sortedGroup = group(groupKey);
+
+    return makeTeam(
+      groupKey,
+      sortedGroup[sortedGroup.length - 1]
+    );
+  };
+
+  const thirdPlaced = getThirdPlacedTeams();
+
+  if (thirdPlaced.length < 6) {
+    alert(
+      "All six third-placed teams are required before the Bottom 8 can be selected."
+    );
+    return;
+  }
+
+  const rank5 = makeTeam(
+    thirdPlaced[4].groupKey,
+    thirdPlaced[4]
+  );
+
+  const rank6 = makeTeam(
+    thirdPlaced[5].groupKey,
+    thirdPlaced[5]
+  );
+
+  let matchTwoOpponent = rank5;
+  let matchFourOpponent = rank6;
+
+  const preferredOrderWorks =
+    rank5.groupKey !== "C" &&
+    rank6.groupKey !== "D";
+
+  const swappedOrderWorks =
+    rank6.groupKey !== "C" &&
+    rank5.groupKey !== "D";
+
+  if (!preferredOrderWorks && swappedOrderWorks) {
+    matchTwoOpponent = rank6;
+    matchFourOpponent = rank5;
+  }
+
+  const suggestedMatches = {
+    1: [
+      lastPlaced("A"),
+      lastPlaced("E")
+    ],
+    2: [
+      lastPlaced("C"),
+      matchTwoOpponent
+    ],
+    3: [
+      lastPlaced("B"),
+      lastPlaced("F")
+    ],
+    4: [
+      lastPlaced("D"),
+      matchFourOpponent
+    ]
+  };
+
+  for (const [matchNumber, teams] of Object.entries(
+    suggestedMatches
+  )) {
+    if (!teams[0] || !teams[1]) {
+      alert(
+        "Every group needs its full set of teams before the Bottom 8 can be selected."
+      );
+      return;
+    }
+
+    const teamOneSelect = byId(
+      `bottomEightTeamOne_${matchNumber}`
+    );
+
+    const teamTwoSelect = byId(
+      `bottomEightTeamTwo_${matchNumber}`
+    );
+
+    if (teamOneSelect) {
+      teamOneSelect.value = encodeTeamReference(
+        teams[0]
+      );
+    }
+
+    if (teamTwoSelect) {
+      teamTwoSelect.value = encodeTeamReference(
+        teams[1]
+      );
+    }
+  }
+}
+
+async function saveBottomEightSetup() {
+  const newSetup = {};
+  const selectedTeams = new Set();
+
+  for (const match of bottomEightPlan) {
+    const teamOne = decodeTeamReference(
+      byId(
+        `bottomEightTeamOne_${match.matchNumber}`
+      )?.value
+    );
+
+    const teamTwo = decodeTeamReference(
+      byId(
+        `bottomEightTeamTwo_${match.matchNumber}`
+      )?.value
+    );
+
+    if (!teamOne || !teamTwo) {
+      alert(
+        `Select both teams for Bottom 8 Match ${match.matchNumber}.`
+      );
+      return;
+    }
+
+    const teamOneKey =
+      `${teamOne.groupKey}:${teamOne.teamName}`;
+
+    const teamTwoKey =
+      `${teamTwo.groupKey}:${teamTwo.teamName}`;
+
+    if (
+      selectedTeams.has(teamOneKey) ||
+      selectedTeams.has(teamTwoKey) ||
+      teamOneKey === teamTwoKey
+    ) {
+      alert(
+        `A team has been selected more than once. Check Bottom 8 Match ${match.matchNumber}.`
+      );
+      return;
+    }
+
+    selectedTeams.add(teamOneKey);
+    selectedTeams.add(teamTwoKey);
+
+    newSetup[match.matchNumber] = {
+      teamOne,
+      teamTwo
+    };
+  }
+
+  const setupChanged =
+    JSON.stringify(newSetup) !==
+    JSON.stringify(bottomEightSetup);
+
+  if (
+    setupChanged &&
+    bottomEightHasAnyResults() &&
+    !confirm(
+      "Changing the Bottom 8 setup will clear every Bottom 8 result. Continue?"
+    )
+  ) {
+    return;
+  }
+
+  const saved = await commitStateChange(() => {
+    bottomEightSetup = newSetup;
+
+    if (setupChanged) {
+      bottomEightResults =
+        createEmptyBottomEightResults();
+    }
+  });
+
+  if (saved) {
+    alert("Bottom 8 setup saved.");
+  }
+}
+
+async function saveBottomEightMatchResult(
+  roundKey,
+  matchNumber
+) {
+  const round = bottomEightRoundConfig[roundKey];
+
+  if (
+    !round ||
+    !Number.isInteger(matchNumber) ||
+    matchNumber < 1 ||
+    matchNumber > round.matchCount
+  ) {
+    return;
+  }
+
+  const teams = getBottomEightMatchTeams(
+    roundKey,
+    matchNumber
+  );
+
+  if (!teams.teamOne || !teams.teamTwo) {
+    alert(
+      "Both teams must be confirmed before saving this Bottom 8 result."
+    );
+    return;
+  }
+
+  const scoreOneValue = byId(
+    `b8ScoreOne_${roundKey}_${matchNumber}`
+  )?.value;
+
+  const scoreTwoValue = byId(
+    `b8ScoreTwo_${roundKey}_${matchNumber}`
+  )?.value;
+
+  if (
+    scoreOneValue === "" ||
+    scoreTwoValue === ""
+  ) {
+    alert("Enter both scores.");
+    return;
+  }
+
+  const scoreOne = Number(scoreOneValue);
+  const scoreTwo = Number(scoreTwoValue);
+
+  if (
+    !Number.isInteger(scoreOne) ||
+    !Number.isInteger(scoreTwo) ||
+    scoreOne < 0 ||
+    scoreTwo < 0
+  ) {
+    alert(
+      "Bottom 8 scores must be whole numbers of 0 or more."
+    );
+    return;
+  }
+
+  let winner;
+
+  if (scoreOne > scoreTwo) {
+    winner = teams.teamOne;
+  } else if (scoreTwo > scoreOne) {
+    winner = teams.teamTwo;
+  } else {
+    const winnerChoice = byId(
+      `b8Winner_${roundKey}_${matchNumber}`
+    )?.value;
+
+    if (winnerChoice === "one") {
+      winner = teams.teamOne;
+    } else if (winnerChoice === "two") {
+      winner = teams.teamTwo;
+    } else {
+      alert(
+        "The score is tied. Choose the winner after penalties."
+      );
+      return;
+    }
+  }
+
+  const previousWinner = getBottomEightWinner(
+    roundKey,
+    matchNumber
+  );
+
+  await commitStateChange(() => {
+    bottomEightResults[roundKey][matchNumber] = {
+      scoreOne,
+      scoreTwo,
+      winner: clone(winner)
+    };
+
+    if (
+      previousWinner &&
+      !teamReferencesMatch(
+        previousWinner,
+        winner
+      )
+    ) {
+      clearBottomEightResultAndDependents(
+        roundKey,
+        matchNumber,
+        false
+      );
+    }
+  });
+}
+
+async function clearBottomEightMatchResult(
+  roundKey,
+  matchNumber
+) {
+  const round = bottomEightRoundConfig[roundKey];
+
+  if (
+    !round ||
+    !Number.isInteger(matchNumber) ||
+    matchNumber < 1 ||
+    matchNumber > round.matchCount
+  ) {
+    return;
+  }
+
+  if (
+    !confirm(
+      "Clear this Bottom 8 result and any later results that depend on it?"
+    )
+  ) {
+    return;
+  }
+
+  await commitStateChange(() => {
+    clearBottomEightResultAndDependents(
+      roundKey,
+      matchNumber,
+      true
+    );
+  });
+}
+
+function renderPublicTournamentLockup() {
+  return `
+    <div class="public-knockout-lockup">
+      <img
+        src="logos/tournament-logo-full.png"
+        alt="Ladhar Investments North East Sikh Tournament 2026"
+      >
+    </div>
+  `;
+}
+
+function renderPublicBottomEightMatch(
+  roundKey,
+  matchNumber
+) {
+  const round = bottomEightRoundConfig[roundKey];
+
+  const teams = getBottomEightMatchTeams(
+    roundKey,
+    matchNumber
+  );
+
+  const result = getBottomEightResult(
+    roundKey,
+    matchNumber
+  );
+
+  return `
+    <article
+      class="knockout-match-card"
+      data-round="bottomEight-${escapeHtml(roundKey)}"
+      data-match="${matchNumber}"
+    >
+      <div class="knockout-match-number">
+        Bottom 8 ${escapeHtml(round.shortLabel)} ${matchNumber}
+      </div>
+
+      ${renderPublicKnockoutTeamRow(
+        teams.teamOne,
+        result.scoreOne,
+        result.winner
+      )}
+
+      ${renderPublicKnockoutTeamRow(
+        teams.teamTwo,
+        result.scoreTwo,
+        result.winner
+      )}
+    </article>
+  `;
+}
+
+function renderPublicBottomEightRound(
+  roundKey,
+  matchNumbers,
+  extraClass = ""
+) {
+  const round = bottomEightRoundConfig[roundKey];
+
+  return `
+    <section class="knockout-column ${extraClass}">
+      <h3>${escapeHtml(round.label)}</h3>
+
+      <div class="knockout-column-matches">
+        ${matchNumbers
+          .map((matchNumber) =>
+            renderPublicBottomEightMatch(
+              roundKey,
+              matchNumber
+            )
+          )
+          .join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderPublicBottomEightBracket() {
+  const container = byId("publicBottomEightBracket");
+  if (!container) return;
+
+  if (!bottomEightSetupIsComplete()) {
+    container.innerHTML = `
+      <p class="empty-state">
+        Bottom 8 matches have not been confirmed yet.
+      </p>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="bottom-eight-bracket">
+      <div class="bottom-eight-side bottom-eight-side-left">
+        ${renderPublicBottomEightRound(
+          "quarterFinals",
+          [1, 2],
+          "bottom-eight-quarter-finals"
+        )}
+
+        ${renderPublicBottomEightRound(
+          "semiFinals",
+          [1],
+          "bottom-eight-semi-finals"
+        )}
+      </div>
+
+      <div class="bottom-eight-centre">
+        ${renderPublicBottomEightRound(
+          "final",
+          [1],
+          "bottom-eight-final"
+        )}
+      </div>
+
+      <div class="bottom-eight-side bottom-eight-side-right">
+        ${renderPublicBottomEightRound(
+          "semiFinals",
+          [2],
+          "bottom-eight-semi-finals"
+        )}
+
+        ${renderPublicBottomEightRound(
+          "quarterFinals",
+          [3, 4],
+          "bottom-eight-quarter-finals"
+        )}
+      </div>
+    </div>
+
+    ${renderPublicTournamentLockup()}
+  `;
+}
+
+
+/* ==================================================
    Dynamic Group Interface
 ================================================== */
 
@@ -2160,13 +3186,6 @@ function renderPublicKnockoutBracket() {
       </div>
 
       <div class="knockout-centre">
-        <div class="public-knockout-brand">
-          <img
-            src="logos/tournament-logo.png"
-            alt="Ladhar Investments North East Sikh Tournament"
-          >
-        </div>
-
         ${renderPublicKnockoutRound(
           "final",
           [1],
@@ -2194,8 +3213,11 @@ function renderPublicKnockoutBracket() {
         )}
       </div>
     </div>
+
+    ${renderPublicTournamentLockup()}
   `;
 }
+
 /* ==================================================
    Admin Page Rendering
 ================================================== */
@@ -2353,7 +3375,9 @@ function renderEverything() {
   renderPublicGroup();
   renderThirdPlaceTable();
   renderKnockoutSetup();
+  renderBottomEightSetup();
   renderPublicKnockoutBracket();
+  renderPublicBottomEightBracket();
 }
 
 function updateKnockoutTeamName(
@@ -2361,50 +3385,69 @@ function updateKnockoutTeamName(
   oldName,
   newName
 ) {
-  Object.values(knockoutSetup || {}).forEach(
-    (match) => {
-      ["teamOne", "teamTwo"].forEach((slot) => {
-        const team = match?.[slot];
+  [knockoutSetup, bottomEightSetup].forEach(
+    (setup) => {
+      Object.values(setup || {}).forEach(
+        (match) => {
+          ["teamOne", "teamTwo"].forEach((slot) => {
+            const team = match?.[slot];
 
-        if (
-          team?.groupKey === groupKey &&
-          team.teamName === oldName
-        ) {
-          team.teamName = newName;
+            if (
+              team?.groupKey === groupKey &&
+              team.teamName === oldName
+            ) {
+              team.teamName = newName;
+            }
+          });
         }
-      });
+      );
     }
   );
 
-  Object.entries(knockoutRoundConfig).forEach(
-    ([roundKey, round]) => {
-      for (
-        let matchNumber = 1;
-        matchNumber <= round.matchCount;
-        matchNumber += 1
-      ) {
-        const winner =
-          knockoutResults?.[roundKey]?.[matchNumber]
-            ?.winner;
-
-        if (
-          winner?.groupKey === groupKey &&
-          winner.teamName === oldName
+  [
+    [knockoutRoundConfig, knockoutResults],
+    [bottomEightRoundConfig, bottomEightResults]
+  ].forEach(([roundConfig, results]) => {
+    Object.entries(roundConfig).forEach(
+      ([roundKey, round]) => {
+        for (
+          let matchNumber = 1;
+          matchNumber <= round.matchCount;
+          matchNumber += 1
         ) {
-          winner.teamName = newName;
+          const winner =
+            results?.[roundKey]?.[matchNumber]
+              ?.winner;
+
+          if (
+            winner?.groupKey === groupKey &&
+            winner.teamName === oldName
+          ) {
+            winner.teamName = newName;
+          }
         }
       }
-    }
-  );
+    );
+  });
 }
 
 function teamIsInKnockoutSetup(groupKey, teamName) {
-  return Object.values(knockoutSetup || {}).some((match) => {
-    return [match?.teamOne, match?.teamTwo].some((team) => {
-      return team?.groupKey === groupKey && team.teamName === teamName;
-    });
-  });
+  return [knockoutSetup, bottomEightSetup].some(
+    (setup) => {
+      return Object.values(setup || {}).some((match) => {
+        return [match?.teamOne, match?.teamTwo].some(
+          (team) => {
+            return (
+              team?.groupKey === groupKey &&
+              team.teamName === teamName
+            );
+          }
+        );
+      });
+    }
+  );
 }
+
 
 /* ==================================================
    Team Management
@@ -2712,6 +3755,8 @@ async function resetTournament() {
     matches = normalizeMatches({}, groupKeys);
     knockoutSetup = {};
     knockoutResults = createEmptyKnockoutResults();
+    bottomEightSetup = {};
+    bottomEightResults = createEmptyBottomEightResults();
     currentGroup = groupKeys[0] || "";
   });
 }
@@ -3095,6 +4140,10 @@ window.deleteMatch = deleteMatch;
 window.autoFillKnockoutSetup = autoFillKnockoutSetup;
 window.saveKnockoutMatchResult = saveKnockoutMatchResult;
 window.clearKnockoutMatchResult = clearKnockoutMatchResult;
+window.autoFillBottomEightSetup = autoFillBottomEightSetup;
+window.saveBottomEightSetup = saveBottomEightSetup;
+window.saveBottomEightMatchResult = saveBottomEightMatchResult;
+window.clearBottomEightMatchResult = clearBottomEightMatchResult;
 window.undoLastAction = undoLastAction;
 window.resetTournament = resetTournament;
 window.saveKnockoutSetup = saveKnockoutSetup;
