@@ -561,6 +561,66 @@ let bottomEightResults = normalizeBottomEightResults(
   localState?.bottomEightResults
 );
 
+
+function normalizeTopScorers(rawScorers) {
+  const normalized = {};
+
+  if (!rawScorers || typeof rawScorers !== "object") {
+    return normalized;
+  }
+
+  Object.entries(rawScorers).forEach(
+    ([savedId, rawScorer]) => {
+      if (!rawScorer || typeof rawScorer !== "object") {
+        return;
+      }
+
+      const id = String(
+        rawScorer.id || savedId || ""
+      ).trim();
+
+      const groupKey = String(
+        rawScorer.groupKey || ""
+      ).trim();
+
+      const teamName = String(
+        rawScorer.teamName || ""
+      ).trim();
+
+      const playerNumber = String(
+        rawScorer.playerNumber || ""
+      ).trim();
+
+      const goals = toNumber(rawScorer.goals);
+
+      if (
+        !id ||
+        !teamName ||
+        !/^\d{1,2}$/.test(playerNumber)
+      ) {
+        return;
+      }
+
+      normalized[id] = {
+        id,
+        groupKey,
+        teamName,
+        playerNumber,
+        goals:
+          Number.isInteger(goals) && goals >= 0
+            ? goals
+            : 0
+      };
+    }
+  );
+
+  return normalized;
+}
+
+let topScorers = normalizeTopScorers(
+  localState?.topScorers
+);
+
 function getGroupKeys() {
   return [...groupKeys].sort((a, b) => a.localeCompare(b));
 }
@@ -586,6 +646,7 @@ function createStateSnapshot() {
     knockoutResults,
     bottomEightSetup,
     bottomEightResults,
+    topScorers,
     currentGroup
   });
 }
@@ -602,6 +663,9 @@ function restoreState(snapshot) {
   bottomEightResults = normalizeBottomEightResults(
     snapshot.bottomEightResults
   );
+  topScorers = normalizeTopScorers(
+    snapshot.topScorers
+  );
   currentGroup = snapshot.currentGroup || groupKeys[0] || "";
 }
 
@@ -616,7 +680,8 @@ function saveLocalState() {
         knockoutSetup,
         knockoutResults,
         bottomEightSetup,
-        bottomEightResults
+        bottomEightResults,
+        topScorers
       })
     );
   } catch (error) {
@@ -797,7 +862,8 @@ async function writeTournamentState() {
     knockoutSetup,
     knockoutResults,
     bottomEightSetup,
-    bottomEightResults
+    bottomEightResults,
+    topScorers
   });
 }
 
@@ -868,6 +934,10 @@ function listenToTournamentFromFirebase() {
 
           bottomEightResults = normalizeBottomEightResults(
             data.bottomEightResults
+          );
+
+          topScorers = normalizeTopScorers(
+            data.topScorers
           );
 
           if (!groupKeys.includes(currentGroup)) {
@@ -2850,6 +2920,420 @@ function renderPublicBottomEightBracket() {
 
 
 /* ==================================================
+   Top Goalscorers
+================================================== */
+
+function getSortedTopScorers() {
+  return Object.values(topScorers || {}).sort(
+    (first, second) => {
+      if (second.goals !== first.goals) {
+        return second.goals - first.goals;
+      }
+
+      if (first.teamName !== second.teamName) {
+        return first.teamName.localeCompare(
+          second.teamName
+        );
+      }
+
+      return (
+        Number(first.playerNumber) -
+        Number(second.playerNumber)
+      );
+    }
+  );
+}
+
+function getTopScorerRank(sortedScorers, index) {
+  if (index === 0) return 1;
+
+  if (
+    sortedScorers[index].goals ===
+    sortedScorers[index - 1].goals
+  ) {
+    return getTopScorerRank(
+      sortedScorers,
+      index - 1
+    );
+  }
+
+  return index + 1;
+}
+
+function getTopScorerTeam(scorer) {
+  return getKnockoutDisplayTeam({
+    groupKey: scorer.groupKey,
+    teamName: scorer.teamName
+  });
+}
+
+function renderTopScorerTeamOptions() {
+  const select = byId("scorerTeamSelect");
+  if (!select) return;
+
+  const previousValue = select.value;
+
+  const options = getAllKnockoutTeamOptions()
+    .map((team) => {
+      const value = encodeTeamReference(team);
+
+      return `
+        <option value="${value}">
+          ${escapeHtml(team.teamName)}
+          — Group ${escapeHtml(team.groupKey)}
+        </option>
+      `;
+    })
+    .join("");
+
+  select.innerHTML = options;
+
+  if (
+    previousValue &&
+    [...select.options].some(
+      (option) => option.value === previousValue
+    )
+  ) {
+    select.value = previousValue;
+  }
+}
+
+function renderAdminTopScorers() {
+  renderTopScorerTeamOptions();
+
+  const container = byId("adminTopScorersList");
+  if (!container) return;
+
+  const scorers = getSortedTopScorers();
+
+  if (scorers.length === 0) {
+    container.innerHTML = `
+      <p class="empty-state">
+        No goalscorers have been added yet.
+      </p>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="form-grid">
+      ${scorers
+        .map((scorer, index) => {
+          const team = getTopScorerTeam(scorer);
+          const encodedId = encodeURIComponent(scorer.id);
+
+          return `
+            <div class="form-panel">
+              <h3>
+                ${getTopScorerRank(scorers, index)}.
+                Player #${escapeHtml(scorer.playerNumber)}
+              </h3>
+
+              <div class="knockout-admin-team">
+                ${renderTeamName(team)}
+              </div>
+
+              <p class="helper-text">
+                Current goals:
+                <strong>${scorer.goals}</strong>
+              </p>
+
+              <div class="button-row">
+                <button
+                  type="button"
+                  onclick="changeTopScorerGoals(
+                    decodeURIComponent('${encodedId}'),
+                    1
+                  )"
+                >
+                  +1 Goal
+                </button>
+
+                <button
+                  type="button"
+                  class="secondary-button"
+                  onclick="changeTopScorerGoals(
+                    decodeURIComponent('${encodedId}'),
+                    -1
+                  )"
+                  ${scorer.goals === 0 ? "disabled" : ""}
+                >
+                  −1 Goal
+                </button>
+              </div>
+
+              <div class="form-field">
+                <label for="scorerGoals_${escapeHtml(scorer.id)}">
+                  Set exact goal total
+                </label>
+
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  inputmode="numeric"
+                  id="scorerGoals_${escapeHtml(scorer.id)}"
+                  value="${scorer.goals}"
+                >
+              </div>
+
+              <div class="button-row">
+                <button
+                  type="button"
+                  onclick="setTopScorerGoals(
+                    decodeURIComponent('${encodedId}')
+                  )"
+                >
+                  Save Total
+                </button>
+
+                <button
+                  type="button"
+                  class="danger-button"
+                  onclick="removeTopScorer(
+                    decodeURIComponent('${encodedId}')
+                  )"
+                >
+                  Remove Player
+                </button>
+              </div>
+            </div>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
+function renderPublicTopScorers() {
+  const table = byId("publicTopScorersTable");
+  if (!table) return;
+
+  const scorers = getSortedTopScorers().slice(0, 5);
+
+  if (scorers.length === 0) {
+    table.innerHTML = `
+      <tbody>
+        <tr>
+          <td colspan="4">
+            Top goalscorers will appear here once goals are recorded.
+          </td>
+        </tr>
+      </tbody>
+    `;
+    return;
+  }
+
+  const rows = scorers
+    .map((scorer, index) => {
+      const team = getTopScorerTeam(scorer);
+      const rank = getTopScorerRank(scorers, index);
+
+      return `
+        <tr class="${rank === 1 ? "top-scorer-leader" : ""}">
+          <td class="top-scorer-rank">
+            ${rank}
+          </td>
+
+          <td class="top-scorer-player">
+            #${escapeHtml(scorer.playerNumber)}
+          </td>
+
+          <td>
+            ${renderTeamName(team)}
+          </td>
+
+          <td>
+            <span class="top-scorer-goals">
+              ${scorer.goals}
+            </span>
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Player</th>
+        <th>Team</th>
+        <th>Goals</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      ${rows}
+    </tbody>
+  `;
+}
+
+async function addTopScorer() {
+  const teamReference = decodeTeamReference(
+    byId("scorerTeamSelect")?.value
+  );
+
+  const playerNumber = String(
+    byId("scorerNumberInput")?.value || ""
+  ).trim();
+
+  const goalsValue = String(
+    byId("scorerStartingGoals")?.value || "0"
+  ).trim();
+
+  if (!teamReference) {
+    alert("Choose a team.");
+    return;
+  }
+
+  if (
+    !/^\\d{1,2}$/.test(playerNumber) ||
+    Number(playerNumber) < 1 ||
+    Number(playerNumber) > 99
+  ) {
+    alert("Enter a player number from 1 to 99.");
+    return;
+  }
+
+  const goals = Number(goalsValue);
+
+  if (
+    !Number.isInteger(goals) ||
+    goals < 0
+  ) {
+    alert("Goals must be a whole number of 0 or more.");
+    return;
+  }
+
+  const duplicateExists = Object.values(
+    topScorers
+  ).some((scorer) => {
+    return (
+      scorer.groupKey === teamReference.groupKey &&
+      scorer.teamName === teamReference.teamName &&
+      Number(scorer.playerNumber) === Number(playerNumber)
+    );
+  });
+
+  if (duplicateExists) {
+    alert(
+      "That player number has already been added for this team."
+    );
+    return;
+  }
+
+  const scorerId =
+    `scorer_${Date.now()}_${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+
+  const saved = await commitStateChange(() => {
+    topScorers[scorerId] = {
+      id: scorerId,
+      groupKey: teamReference.groupKey,
+      teamName: teamReference.teamName,
+      playerNumber,
+      goals
+    };
+  });
+
+  if (saved) {
+    if (byId("scorerNumberInput")) {
+      byId("scorerNumberInput").value = "";
+    }
+
+    if (byId("scorerStartingGoals")) {
+      byId("scorerStartingGoals").value = "0";
+    }
+  }
+}
+
+async function changeTopScorerGoals(
+  scorerId,
+  amount
+) {
+  const scorer = topScorers?.[scorerId];
+  if (!scorer) return;
+
+  await commitStateChange(() => {
+    scorer.goals = Math.max(
+      0,
+      toNumber(scorer.goals) + amount
+    );
+  });
+}
+
+async function setTopScorerGoals(scorerId) {
+  const scorer = topScorers?.[scorerId];
+  if (!scorer) return;
+
+  const value = byId(
+    `scorerGoals_${scorerId}`
+  )?.value;
+
+  const goals = Number(value);
+
+  if (
+    !Number.isInteger(goals) ||
+    goals < 0
+  ) {
+    alert("Goals must be a whole number of 0 or more.");
+    return;
+  }
+
+  await commitStateChange(() => {
+    scorer.goals = goals;
+  });
+}
+
+async function removeTopScorer(scorerId) {
+  const scorer = topScorers?.[scorerId];
+  if (!scorer) return;
+
+  if (
+    !confirm(
+      `Remove Player #${scorer.playerNumber} from the goalscorer list?`
+    )
+  ) {
+    return;
+  }
+
+  await commitStateChange(() => {
+    delete topScorers[scorerId];
+  });
+}
+
+function updateTopScorerTeamName(
+  groupKey,
+  oldName,
+  newName
+) {
+  Object.values(topScorers || {}).forEach(
+    (scorer) => {
+      if (
+        scorer.groupKey === groupKey &&
+        scorer.teamName === oldName
+      ) {
+        scorer.teamName = newName;
+      }
+    }
+  );
+}
+
+function teamHasTopScorers(groupKey, teamName) {
+  return Object.values(topScorers || {}).some(
+    (scorer) => {
+      return (
+        scorer.groupKey === groupKey &&
+        scorer.teamName === teamName
+      );
+    }
+  );
+}
+
+
+/* ==================================================
    Dynamic Group Interface
 ================================================== */
 
@@ -3372,7 +3856,9 @@ function renderEverything() {
   updateAdminTeamDropdowns();
   fillMatchTeamDropdowns();
   renderAdminMatches();
+  renderAdminTopScorers();
   renderPublicGroup();
+  renderPublicTopScorers();
   renderThirdPlaceTable();
   renderKnockoutSetup();
   renderBottomEightSetup();
@@ -3481,6 +3967,11 @@ async function renameTeam() {
     });
 
     updateKnockoutTeamName(currentGroup, oldName, newName);
+    updateTopScorerTeamName(
+      currentGroup,
+      oldName,
+      newName
+    );
   });
 
   if (saved) input.value = "";
@@ -3534,6 +4025,18 @@ async function removeTeam() {
   if (teamIsInKnockoutSetup(currentGroup, selection.team.name)) {
     alert(
       "Replace this team in the saved knockout setup before removing it."
+    );
+    return;
+  }
+
+  if (
+    teamHasTopScorers(
+      currentGroup,
+      selection.team.name
+    )
+  ) {
+    alert(
+      "Remove this team's goalscorers before removing the team."
     );
     return;
   }
@@ -3757,6 +4260,7 @@ async function resetTournament() {
     knockoutResults = createEmptyKnockoutResults();
     bottomEightSetup = {};
     bottomEightResults = createEmptyBottomEightResults();
+    topScorers = {};
     currentGroup = groupKeys[0] || "";
   });
 }
@@ -4144,6 +4648,10 @@ window.autoFillBottomEightSetup = autoFillBottomEightSetup;
 window.saveBottomEightSetup = saveBottomEightSetup;
 window.saveBottomEightMatchResult = saveBottomEightMatchResult;
 window.clearBottomEightMatchResult = clearBottomEightMatchResult;
+window.addTopScorer = addTopScorer;
+window.changeTopScorerGoals = changeTopScorerGoals;
+window.setTopScorerGoals = setTopScorerGoals;
+window.removeTopScorer = removeTopScorer;
 window.undoLastAction = undoLastAction;
 window.resetTournament = resetTournament;
 window.saveKnockoutSetup = saveKnockoutSetup;
