@@ -33,7 +33,7 @@ const GROUP_SPONSORS = {
 
 const TOURNAMENT_BRAND = {
   name: "Sikh Tournament",
-  logo: "assets/branding/tournament-logo.png"
+  logo: "logos/tournament-logo.png"
 };
 
 const MAIN_SPONSOR = {
