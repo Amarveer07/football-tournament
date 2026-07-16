@@ -11,7 +11,7 @@
   <title>Sikh Football Tournament – Live Updates</title>
 
   <!-- Public styling -->
-  <link rel="stylesheet" href="style.css?v=14">
+  <link rel="stylesheet" href="style.css?v=15">
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
@@ -19,7 +19,7 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Tournament application -->
-  <script src="app.js?v=26" defer></script>
+  <script src="app.js?v=27" defer></script>
 </head>
 
 <body>
@@ -97,12 +97,16 @@
         Standings
       </a>
 
-      <a href="#knockouts">
-        Knockouts
-      </a>
-
       <a href="#matches">
         Matches
+      </a>
+
+      <a href="#knockouts">
+        Main Knockout
+      </a>
+
+      <a href="#bottom-eight">
+        Bottom 8
       </a>
     </nav>
 
@@ -208,42 +212,6 @@
 
 
       <!-- ========================================
-           KNOCKOUT STAGE
-      ========================================= -->
-
-      <section
-        id="knockouts"
-        class="public-section knockout-section"
-      >
-        <div class="public-section-heading">
-          <div>
-            <p class="section-eyebrow">
-              Road to the Final
-            </p>
-
-            <h2>
-              Knockout Stage
-            </h2>
-
-            <p>
-              Follow every match from the Round of 16 through
-              to the tournament final.
-            </p>
-          </div>
-        </div>
-
-        <div class="public-panel knockout-panel">
-          <div
-            id="publicKnockoutBracket"
-            aria-live="polite"
-          >
-            Knockout matches have not been confirmed yet.
-          </div>
-        </div>
-      </section>
-
-
-      <!-- ========================================
            FIXTURES AND RESULTS
       ========================================= -->
 
@@ -316,6 +284,78 @@
             >
               Loading results…
             </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ========================================
+           MAIN KNOCKOUT STAGE
+      ========================================= -->
+
+      <section
+        id="knockouts"
+        class="public-section knockout-section"
+      >
+        <div class="public-section-heading">
+          <div>
+            <p class="section-eyebrow">
+              Road to the Final
+            </p>
+
+            <h2>
+              Main Knockout Stage
+            </h2>
+
+            <p>
+              Follow every match from the Round of 16 through
+              to the tournament final.
+            </p>
+          </div>
+        </div>
+
+        <div class="public-panel knockout-panel">
+          <div
+            id="publicKnockoutBracket"
+            aria-live="polite"
+          >
+            Knockout matches have not been confirmed yet.
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ========================================
+           BOTTOM 8 KNOCKOUT
+      ========================================= -->
+
+      <section
+        id="bottom-eight"
+        class="public-section knockout-section bottom-eight-section"
+      >
+        <div class="public-section-heading">
+          <div>
+            <p class="section-eyebrow">
+              Second Knockout Competition
+            </p>
+
+            <h2>
+              Bottom 8 Knockout
+            </h2>
+
+            <p>
+              The eight teams that miss the main knockout stage
+              compete in their own quarter-finals, semi-finals and final.
+            </p>
+          </div>
+        </div>
+
+        <div class="public-panel knockout-panel">
+          <div
+            id="publicBottomEightBracket"
+            aria-live="polite"
+          >
+            Bottom 8 matches have not been confirmed yet.
           </div>
         </div>
       </section>
