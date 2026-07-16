@@ -744,6 +744,122 @@ tbody tr:hover td {
 
 
 /* ==================================================
+   Top Goalscorers
+================================================== */
+
+.top-scorers-panel {
+  padding: 18px;
+}
+
+.top-scorers-table-wrap {
+  width: 100%;
+  overflow: hidden;
+
+  background:
+    rgba(3, 0, 6, 0.24);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.09);
+
+  border-radius: var(--radius-medium);
+}
+
+.top-scorers-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.top-scorers-table th:nth-child(1),
+.top-scorers-table td:nth-child(1) {
+  width: 12%;
+}
+
+.top-scorers-table th:nth-child(2),
+.top-scorers-table td:nth-child(2) {
+  width: 17%;
+}
+
+.top-scorers-table th:nth-child(3),
+.top-scorers-table td:nth-child(3) {
+  width: 53%;
+}
+
+.top-scorers-table th:nth-child(4),
+.top-scorers-table td:nth-child(4) {
+  width: 18%;
+}
+
+.top-scorers-table th,
+.top-scorers-table td {
+  padding: 14px 12px;
+}
+
+.top-scorers-table th:first-child,
+.top-scorers-table td:first-child {
+  padding-left: 12px;
+  text-align: center;
+}
+
+.top-scorers-table td:nth-child(2) {
+  color: var(--purple-300);
+
+  font-size: 17px;
+  font-weight: 950;
+}
+
+.top-scorer-rank {
+  color: rgba(255, 255, 255, 0.72);
+
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.top-scorer-goals {
+  display: inline-grid;
+
+  min-width: 42px;
+  height: 34px;
+  place-items: center;
+
+  padding: 0 10px;
+
+  color: #16071d;
+  background:
+    linear-gradient(
+      180deg,
+      #ffe89b,
+      var(--gold)
+    );
+
+  border:
+    1px solid rgba(255, 255, 255, 0.38);
+
+  border-radius: 999px;
+
+  box-shadow:
+    0 7px 18px rgba(246, 195, 91, 0.16);
+
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.top-scorer-leader td {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(246, 195, 91, 0.13),
+      rgba(181, 46, 214, 0.06)
+    );
+}
+
+.top-scorer-leader td:first-child {
+  border-left:
+    3px solid var(--gold);
+}
+
+
+/* ==================================================
    Knockout Bracket â€” Mirrored Desktop Layout
 ================================================== */
 
@@ -1617,7 +1733,8 @@ tbody tr:hover td {
     flex-basis: auto;
   }
 
-  .standings-panel {
+  .standings-panel,
+  .top-scorers-panel {
     padding: 12px;
   }
 
@@ -1861,6 +1978,61 @@ tbody tr:hover td {
   .standings-panel .team-name-cell span {
     font-size: 11px;
     line-height: 1.15;
+  }
+
+  .top-scorers-table th,
+  .top-scorers-table td {
+    padding: 11px 4px;
+
+    font-size: 10px;
+  }
+
+  .top-scorers-table th:nth-child(1),
+  .top-scorers-table td:nth-child(1) {
+    width: 12%;
+  }
+
+  .top-scorers-table th:nth-child(2),
+  .top-scorers-table td:nth-child(2) {
+    width: 18%;
+  }
+
+  .top-scorers-table th:nth-child(3),
+  .top-scorers-table td:nth-child(3) {
+    width: 52%;
+  }
+
+  .top-scorers-table th:nth-child(4),
+  .top-scorers-table td:nth-child(4) {
+    width: 18%;
+  }
+
+  .top-scorers-table .team-name-cell {
+    gap: 5px;
+  }
+
+  .top-scorers-table .team-logo {
+    width: 27px;
+    height: 27px;
+    flex-basis: 27px;
+  }
+
+  .top-scorers-table .team-name-cell span {
+    font-size: 10px;
+    line-height: 1.1;
+  }
+
+  .top-scorers-table td:nth-child(2) {
+    font-size: 13px;
+  }
+
+  .top-scorer-goals {
+    min-width: 32px;
+    height: 29px;
+
+    padding: 0 7px;
+
+    font-size: 13px;
   }
 
   .supporting-sponsor-grid {
