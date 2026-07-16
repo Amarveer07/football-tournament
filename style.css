@@ -207,19 +207,16 @@ a {
 
   width: min(
     calc(100% - 36px),
-    1540px
+    1536px
   );
 
-  height: clamp(
-    360px,
-    34vw,
-    455px
-  );
+  height: auto;
+  aspect-ratio: 12 / 5;
 
-  margin: 18px auto 0;
-  overflow: hidden;
+  margin: 18px auto 84px;
+  overflow: visible;
 
-  background: #120b0b;
+  background: #000000;
   border: 1px solid rgba(246, 195, 91, 0.25);
   border-radius: var(--radius-xl);
 
@@ -237,45 +234,56 @@ a {
 .hero-picture {
   position: absolute;
   inset: 0;
+
+  overflow: hidden;
+
+  background: #000000;
+  border-radius: inherit;
 }
 
 .hero-image {
-  object-fit: cover;
-  object-position: center 48%;
+  object-fit: contain;
+  object-position: center;
+  background: #000000;
 }
 
 .hero-shade {
   position: absolute;
   inset: 0;
 
+  pointer-events: none;
+
   background:
     linear-gradient(
       180deg,
-      rgba(0, 0, 0, 0.06) 0%,
-      rgba(5, 0, 8, 0.02) 48%,
-      rgba(5, 0, 8, 0.78) 100%
+      rgba(0, 0, 0, 0.02),
+      rgba(0, 0, 0, 0.08)
     ),
     linear-gradient(
       90deg,
-      rgba(8, 0, 12, 0.2),
-      transparent 42%,
-      rgba(8, 0, 12, 0.12)
+      rgba(8, 0, 12, 0.08),
+      transparent 18%,
+      transparent 82%,
+      rgba(8, 0, 12, 0.08)
     );
+
+  border-radius: inherit;
 }
 
 .hero-content {
   position: absolute;
-  right: 26px;
-  bottom: 24px;
-  left: 26px;
+  top: calc(100% + 12px);
+  right: 0;
+  bottom: auto;
+  left: 0;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 22px;
+  gap: 16px;
   flex-wrap: wrap;
 
-  padding: 14px 16px;
+  padding: 11px 14px;
 
   background: rgba(13, 1, 19, 0.67);
   border: 1px solid rgba(255, 255, 255, 0.17);
@@ -449,18 +457,18 @@ a {
 
   grid-template-columns:
     minmax(0, 1fr)
-    minmax(260px, 0.7fr);
+    minmax(220px, 0.55fr);
 
   align-items: center;
-  gap: 28px;
+  gap: 20px;
 
   width: min(
     calc(100% - 40px),
     var(--content-width)
   );
 
-  margin: 48px auto 0;
-  padding: 28px 32px;
+  margin: 30px auto 0;
+  padding: 18px 22px;
 
   background:
     radial-gradient(
@@ -512,6 +520,10 @@ a {
   line-height: 1.08;
 }
 
+.featured-sponsor-copy h2 {
+  font-size: clamp(23px, 2.2vw, 34px);
+}
+
 .featured-sponsor-copy p:last-child,
 .public-section-heading p:last-child {
   max-width: 720px;
@@ -524,10 +536,10 @@ a {
 .featured-sponsor-placeholder {
   display: grid;
 
-  min-height: 112px;
+  min-height: 78px;
   place-items: center;
 
-  padding: 20px;
+  padding: 14px;
 
   color: rgba(255, 255, 255, 0.55);
   background: rgba(255, 255, 255, 0.045);
@@ -815,8 +827,44 @@ tbody tr:hover td {
 }
 
 .knockout-centre {
-  display: grid;
+  display: flex;
   min-width: 0;
+
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+}
+
+.public-knockout-brand {
+  display: grid;
+
+  min-height: 145px;
+  place-items: center;
+
+  padding: 8px;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(181, 46, 214, 0.12),
+      transparent 68%
+    );
+
+  border-radius: 18px;
+}
+
+.public-knockout-brand img {
+  width: 100%;
+  max-width: 126px;
+  max-height: 142px;
+
+  object-fit: contain;
+
+  background: #000000;
+  border-radius: 13px;
+
+  filter:
+    drop-shadow(0 0 15px rgba(212, 91, 234, 0.28));
 }
 
 .knockout-column {
@@ -1169,7 +1217,7 @@ tbody tr:hover td {
 ================================================== */
 
 .supporting-sponsors-section {
-  padding: 32px;
+  padding: 22px;
 
   background:
     linear-gradient(
@@ -1205,10 +1253,10 @@ tbody tr:hover td {
 .supporting-sponsor-slot {
   display: grid;
 
-  min-height: 112px;
+  min-height: 78px;
   place-items: center;
 
-  padding: 16px;
+  padding: 12px;
 
   color:
     rgba(255, 255, 255, 0.47);
@@ -1323,59 +1371,67 @@ tbody tr:hover td {
 
   .tournament-hero {
     width: calc(100% - 20px);
-    height: 300px;
-    margin-top: 10px;
+    height: auto;
+    aspect-ratio: 12 / 5;
 
-    border-radius: 18px;
+    margin-top: 10px;
+    margin-bottom: 88px;
+
+    border-radius: 15px;
   }
 
   .hero-image {
-    object-position: center center;
+    object-fit: contain;
+    object-position: center;
   }
 
   .hero-shade {
     background:
       linear-gradient(
         180deg,
-        rgba(0, 0, 0, 0.02) 0%,
-        rgba(5, 0, 8, 0.03) 45%,
-        rgba(5, 0, 8, 0.88) 100%
+        rgba(0, 0, 0, 0.01),
+        rgba(0, 0, 0, 0.05)
       );
   }
 
   .hero-content {
-    right: 10px;
-    bottom: 10px;
-    left: 10px;
+    top: calc(100% + 8px);
+    right: 0;
+    bottom: auto;
+    left: 0;
 
-    gap: 10px;
+    gap: 7px;
 
-    padding: 11px 12px;
+    padding: 8px 9px;
 
-    border-radius: 13px;
+    border-radius: 12px;
   }
 
   .hero-eyebrow {
-    width: 100%;
-    font-size: 10px;
+    display: none;
   }
 
   .hero-stat-row {
+    justify-content: center;
     gap: 5px;
+    flex-wrap: nowrap;
   }
 
   .hero-stat {
-    padding: 5px 8px;
-    font-size: 10px;
+    padding: 5px 7px;
+
+    font-size: 9px;
+    white-space: nowrap;
   }
 
   .hero-live-status {
-    width: 100%;
+    width: auto;
+    flex: 0 0 auto;
     justify-content: center;
 
-    padding: 7px 8px;
+    padding: 6px 7px;
 
-    font-size: 10px;
+    font-size: 9px;
   }
 
   .public-navigation {
@@ -1397,25 +1453,27 @@ tbody tr:hover td {
 
   .featured-sponsor-section {
     width: calc(100% - 24px);
-    margin-top: 22px;
-    padding: 15px 14px;
-    gap: 10px;
+    margin-top: 18px;
+    padding: 12px;
+    gap: 8px;
   }
 
   .featured-sponsor-placeholder {
-    min-height: 62px;
-    padding: 12px;
-    font-size: 10px;
+    min-height: 50px;
+    padding: 9px;
+
+    font-size: 9px;
   }
 
   .featured-sponsor-copy h2 {
-    font-size: 22px;
+    font-size: 19px;
   }
 
   .featured-sponsor-copy p:last-child {
-    margin-top: 6px;
-    font-size: 12px;
-    line-height: 1.42;
+    margin-top: 4px;
+
+    font-size: 11px;
+    line-height: 1.35;
   }
 
   .public-content {
@@ -1460,15 +1518,15 @@ tbody tr:hover td {
   }
 
   .supporting-sponsors-section {
-    padding: 18px 12px;
+    padding: 14px 10px;
   }
 
   .supporting-sponsors-heading {
-    margin-bottom: 14px;
+    margin-bottom: 10px;
   }
 
   .supporting-sponsors-heading h2 {
-    font-size: 23px;
+    font-size: 20px;
   }
 
   /*
@@ -1533,6 +1591,16 @@ tbody tr:hover td {
     gap: 8px;
   }
 
+  .public-knockout-brand {
+    min-height: 112px;
+    padding: 5px;
+  }
+
+  .public-knockout-brand img {
+    max-width: 96px;
+    max-height: 108px;
+  }
+
   .knockout-column h3 {
     min-height: 36px;
     padding: 4px 4px 8px;
@@ -1566,7 +1634,8 @@ tbody tr:hover td {
 
 @media (max-width: 520px) {
   .tournament-hero {
-    height: 275px;
+    height: auto;
+    margin-bottom: 84px;
   }
 
   .hero-stat:nth-child(2) {
@@ -1586,37 +1655,36 @@ tbody tr:hover td {
   }
 
   /*
-    Keep the mobile group table large and readable.
-    It scrolls sideways rather than squeezing all seven columns.
+    Fit the complete standings table onto most phones.
+    Only very narrow screens need sideways scrolling.
   */
 
   .standings-panel .table-wrap {
     overflow-x: auto;
     overscroll-behavior-inline: contain;
-    scroll-snap-type: x proximity;
   }
 
   .standings-panel table {
-    width: 620px;
-    min-width: 620px;
+    width: 100%;
+    min-width: 0;
     table-layout: fixed;
   }
 
   .standings-panel th,
   .standings-panel td {
-    padding: 13px 7px;
-    font-size: 13px;
+    padding: 11px 2px;
+    font-size: 11px;
   }
 
   .standings-panel th {
-    font-size: 10px;
-    letter-spacing: 0.06em;
+    font-size: 9px;
+    letter-spacing: 0.04em;
   }
 
   .standings-panel th:first-child,
   .standings-panel td:first-child {
-    width: 250px;
-    padding-left: 10px;
+    width: 43%;
+    padding-left: 6px;
 
     white-space: normal;
     overflow-wrap: anywhere;
@@ -1624,26 +1692,26 @@ tbody tr:hover td {
 
   .standings-panel th:not(:first-child),
   .standings-panel td:not(:first-child) {
-    width: 61px;
+    width: 9.5%;
   }
 
   .standings-panel .team-name-cell {
-    gap: 9px;
+    gap: 6px;
   }
 
   .standings-panel .team-logo {
-    width: 34px;
-    height: 34px;
-    flex-basis: 34px;
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
 
-    padding: 2px;
+    padding: 1px;
 
-    border-radius: 7px;
+    border-radius: 6px;
   }
 
   .standings-panel .team-name-cell span {
-    font-size: 13px;
-    line-height: 1.2;
+    font-size: 11px;
+    line-height: 1.15;
   }
 
   .supporting-sponsor-grid {
@@ -1652,14 +1720,58 @@ tbody tr:hover td {
   }
 
   .supporting-sponsor-slot {
-    min-height: 64px;
-    padding: 8px;
+    min-height: 52px;
+    padding: 7px;
 
     font-size: 8px;
   }
 
   .public-footer {
     padding-inline: 16px;
+  }
+}
+
+
+
+@media (max-width: 350px) {
+  .standings-panel::before {
+    display: block;
+
+    margin: 0 0 8px;
+    padding: 7px 9px;
+
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.045);
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+
+    content: "Swipe left and right to see the full group table";
+
+    font-size: 9px;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  .standings-panel table {
+    width: 540px;
+    min-width: 540px;
+  }
+
+  .standings-panel th:first-child,
+  .standings-panel td:first-child {
+    width: 220px;
+  }
+
+  .standings-panel th:not(:first-child),
+  .standings-panel td:not(:first-child) {
+    width: 53px;
+  }
+
+  .standings-panel .team-logo {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
   }
 }
 
