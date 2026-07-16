@@ -2160,6 +2160,13 @@ function renderPublicKnockoutBracket() {
       </div>
 
       <div class="knockout-centre">
+        <div class="public-knockout-brand">
+          <img
+            src="logos/tournament-logo.png"
+            alt="Ladhar Investments North East Sikh Tournament"
+          >
+        </div>
+
         ${renderPublicKnockoutRound(
           "final",
           [1],
