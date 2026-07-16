@@ -101,6 +101,7 @@ body {
 .sponsor-strip-window {
   width: 100%;
   overflow: hidden;
+  padding-right: 205px;
 }
 
 .sponsor-ticker-track {
@@ -149,6 +150,78 @@ body {
   letter-spacing: 0.03em;
   white-space: nowrap;
 }
+
+.display-public-qr {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  z-index: 5;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  height: 62px;
+  padding: 5px 10px 5px 6px;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(46, 7, 64, 0.98),
+      rgba(13, 1, 21, 0.98)
+    );
+
+  border:
+    1px solid rgba(232, 121, 249, 0.48);
+
+  border-radius: 10px;
+
+  box-shadow:
+    0 5px 20px rgba(0, 0, 0, 0.48);
+}
+
+.display-public-qr img {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+
+  padding: 3px;
+
+  object-fit: contain;
+
+  background: #ffffff;
+  border-radius: 6px;
+}
+
+.display-public-qr-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+
+  min-width: 0;
+
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.display-public-qr-copy strong {
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.display-public-qr-copy small {
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
 
 @keyframes sponsorTicker {
   from {
@@ -674,6 +747,29 @@ body {
   font-style: italic;
 }
 
+.display-bracket-team + .display-bracket-team {
+  border-bottom: 0;
+}
+
+.display-penalty-note {
+  padding: 4px 6px 5px;
+
+  color: #f5d0fe;
+
+  background:
+    rgba(192, 38, 211, 0.17);
+
+  border-top:
+    1px solid rgba(232, 121, 249, 0.26);
+
+  font-size: clamp(7px, 0.58vw, 10px);
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  text-align: center;
+  text-transform: uppercase;
+}
+
 .display-final-column {
   justify-content: center;
 }
@@ -785,6 +881,23 @@ body {
 /* ==================================================
    Smaller screens / testing fallbacks
 ================================================== */
+
+@media (max-width: 800px) {
+  .sponsor-strip-window {
+    padding-right: 82px;
+  }
+
+  .display-public-qr {
+    right: 7px;
+
+    width: 62px;
+    padding: 5px;
+  }
+
+  .display-public-qr-copy {
+    display: none;
+  }
+}
 
 @media (max-width: 1100px) {
   .display-shell {
