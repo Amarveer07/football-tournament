@@ -1,5 +1,5 @@
 /* ==================================================
-   SIKH FOOTBALL TOURNAMENT — PUBLIC WEBSITE
+   SIKH FOOTBALL TOURNAMENT â€” PUBLIC WEBSITE
    Purple event design with desktop and mobile layouts.
 ================================================== */
 
@@ -711,9 +711,9 @@ tbody tr:hover td {
 }
 
 .team-logo {
-  width: 31px;
-  height: 31px;
-  flex: 0 0 31px;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
 
   padding: 2px;
 
@@ -732,7 +732,7 @@ tbody tr:hover td {
 
 
 /* ==================================================
-   Knockout Bracket — Mirrored Desktop Layout
+   Knockout Bracket â€” Mirrored Desktop Layout
 ================================================== */
 
 .knockout-panel {
@@ -921,9 +921,9 @@ tbody tr:hover td {
 }
 
 .knockout-team-row .team-logo {
-  width: 24px;
-  height: 24px;
-  flex-basis: 24px;
+  width: 30px;
+  height: 30px;
+  flex-basis: 30px;
   padding: 1px;
 }
 
@@ -1397,19 +1397,31 @@ tbody tr:hover td {
 
   .featured-sponsor-section {
     width: calc(100% - 24px);
-    margin-top: 30px;
-    padding: 22px 18px;
-    gap: 18px;
+    margin-top: 22px;
+    padding: 15px 14px;
+    gap: 10px;
   }
 
   .featured-sponsor-placeholder {
-    min-height: 92px;
+    min-height: 62px;
+    padding: 12px;
+    font-size: 10px;
+  }
+
+  .featured-sponsor-copy h2 {
+    font-size: 22px;
+  }
+
+  .featured-sponsor-copy p:last-child {
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 1.42;
   }
 
   .public-content {
     width: calc(100% - 24px);
-    padding: 48px 0 64px;
-    gap: 58px;
+    padding: 42px 0 52px;
+    gap: 48px;
   }
 
   .public-section-heading {
@@ -1431,7 +1443,10 @@ tbody tr:hover td {
     flex-basis: auto;
   }
 
-  .standings-panel,
+  .standings-panel {
+    padding: 12px;
+  }
+
   .knockout-panel {
     padding: 10px;
   }
@@ -1445,7 +1460,15 @@ tbody tr:hover td {
   }
 
   .supporting-sponsors-section {
-    padding: 24px 16px;
+    padding: 18px 12px;
+  }
+
+  .supporting-sponsors-heading {
+    margin-bottom: 14px;
+  }
+
+  .supporting-sponsors-heading h2 {
+    font-size: 23px;
   }
 
   /*
@@ -1573,14 +1596,19 @@ tbody tr:hover td {
 
   th,
   td {
-    padding: 9px 3px;
-    font-size: 10px;
+    padding: 11px 3px;
+    font-size: 11px;
+  }
+
+  th {
+    font-size: 9px;
+    letter-spacing: 0.05em;
   }
 
   th:first-child,
   td:first-child {
-    width: 38%;
-    padding-left: 6px;
+    width: 42%;
+    padding-left: 7px;
 
     white-space: normal;
     overflow-wrap: anywhere;
@@ -1588,33 +1616,33 @@ tbody tr:hover td {
 
   th:not(:first-child),
   td:not(:first-child) {
-    width: 10.33%;
+    width: 9.66%;
   }
 
   .team-name-cell {
-    gap: 5px;
+    gap: 7px;
   }
 
   .team-logo {
-    width: 20px;
-    height: 20px;
-    flex-basis: 20px;
+    width: 26px;
+    height: 26px;
+    flex-basis: 26px;
 
     padding: 1px;
 
-    border-radius: 4px;
+    border-radius: 5px;
   }
 
   .supporting-sponsor-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 9px;
+    gap: 7px;
   }
 
   .supporting-sponsor-slot {
-    min-height: 88px;
-    padding: 10px;
+    min-height: 64px;
+    padding: 8px;
 
-    font-size: 9px;
+    font-size: 8px;
   }
 
   .public-footer {
