@@ -422,18 +422,24 @@ function formatDisplayGoalDifference(value) {
 function renderDisplayGroupCard(groupKey) {
   const teams = getSortedDisplayGroup(groupKey);
   const groupSponsor = getDisplayGroupSponsor(groupKey);
-  const topPoints = teams[0]?.points;
-  const bottomPoints = teams[teams.length - 1]?.points;
+
+  const groupHasStarted = teams.some(
+    (team) => displayToNumber(team.p) > 0
+  );
 
   const teamRows = teams
     .slice(0, 4)
-    .map((team) => {
+    .map((team, index) => {
       let rowClass = "";
 
-      if (team.points === topPoints) {
-        rowClass = "top-team";
-      } else if (team.points === bottomPoints) {
-        rowClass = "bottom-team";
+      if (groupHasStarted) {
+        if (index < 2) {
+          rowClass = "group-position-top-two";
+        } else if (index === 2) {
+          rowClass = "group-position-third";
+        } else if (index === teams.length - 1) {
+          rowClass = "group-position-last";
+        }
       }
 
       return `
