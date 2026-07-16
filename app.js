@@ -271,6 +271,34 @@ if (groupKeys.length === 0) {
 
 let groups = normalizeGroups(initialGroups, groupKeys);
 let matches = normalizeMatches(localState?.matches, groupKeys);
+
+function normalizePitchMapAssignments(rawAssignments) {
+  const normalized = {};
+
+  for (let pitchNumber = 1; pitchNumber <= 6; pitchNumber += 1) {
+    const assignment = rawAssignments?.[pitchNumber];
+
+    const groupKey = String(
+      assignment?.groupKey || ""
+    ).trim();
+
+    const matchId = String(
+      assignment?.matchId || ""
+    ).trim();
+
+    normalized[pitchNumber] =
+      groupKey && matchId
+        ? { groupKey, matchId }
+        : null;
+  }
+
+  return normalized;
+}
+
+let pitchMapAssignments = normalizePitchMapAssignments(
+  localState?.pitchMapAssignments
+);
+
 let currentGroup = groupKeys[0] || "";
 let undoStack = [];
 
@@ -647,6 +675,7 @@ function createStateSnapshot() {
     bottomEightSetup,
     bottomEightResults,
     topScorers,
+    pitchMapAssignments,
     currentGroup
   });
 }
@@ -666,6 +695,9 @@ function restoreState(snapshot) {
   topScorers = normalizeTopScorers(
     snapshot.topScorers
   );
+  pitchMapAssignments = normalizePitchMapAssignments(
+    snapshot.pitchMapAssignments
+  );
   currentGroup = snapshot.currentGroup || groupKeys[0] || "";
 }
 
@@ -681,7 +713,8 @@ function saveLocalState() {
         knockoutResults,
         bottomEightSetup,
         bottomEightResults,
-        topScorers
+        topScorers,
+        pitchMapAssignments
       })
     );
   } catch (error) {
@@ -863,7 +896,8 @@ async function writeTournamentState() {
     knockoutResults,
     bottomEightSetup,
     bottomEightResults,
-    topScorers
+    topScorers,
+    pitchMapAssignments
   });
 }
 
@@ -939,6 +973,11 @@ function listenToTournamentFromFirebase() {
           topScorers = normalizeTopScorers(
             data.topScorers
           );
+
+          pitchMapAssignments =
+            normalizePitchMapAssignments(
+              data.pitchMapAssignments
+            );
 
           if (!groupKeys.includes(currentGroup)) {
             currentGroup = groupKeys[0] || "";
@@ -3341,6 +3380,302 @@ function teamHasTopScorers(groupKey, teamName) {
 
 
 /* ==================================================
+   Live Pitch Map
+================================================== */
+
+function getAllPitchMapFixtures() {
+  const fixtures = [];
+
+  groupKeys.forEach((groupKey) => {
+    Object.entries(matches[groupKey] || {}).forEach(
+      ([matchId, match]) => {
+        if (!match || typeof match !== "object") return;
+
+        fixtures.push({
+          groupKey,
+          matchId,
+          teamA: String(match.teamA || "Team A"),
+          teamB: String(match.teamB || "Team B"),
+          time: String(match.time || ""),
+          pitch: String(match.pitch || ""),
+          completed: matchIsResult(match)
+        });
+      }
+    );
+  });
+
+  return fixtures.sort((first, second) => {
+    const firstTime = new Date(first.time || "").getTime();
+    const secondTime = new Date(second.time || "").getTime();
+
+    const safeFirstTime = Number.isFinite(firstTime)
+      ? firstTime
+      : Number.MAX_SAFE_INTEGER;
+
+    const safeSecondTime = Number.isFinite(secondTime)
+      ? secondTime
+      : Number.MAX_SAFE_INTEGER;
+
+    if (safeFirstTime !== safeSecondTime) {
+      return safeFirstTime - safeSecondTime;
+    }
+
+    if (first.groupKey !== second.groupKey) {
+      return first.groupKey.localeCompare(second.groupKey);
+    }
+
+    return first.teamA.localeCompare(second.teamA);
+  });
+}
+
+function encodePitchMapFixture(groupKey, matchId) {
+  return encodeURIComponent(
+    JSON.stringify({ groupKey, matchId })
+  );
+}
+
+function decodePitchMapFixture(value) {
+  if (!value) return null;
+
+  try {
+    const parsed = JSON.parse(
+      decodeURIComponent(value)
+    );
+
+    const groupKey = String(
+      parsed?.groupKey || ""
+    ).trim();
+
+    const matchId = String(
+      parsed?.matchId || ""
+    ).trim();
+
+    return groupKey && matchId
+      ? { groupKey, matchId }
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function pitchMapAssignmentMatches(
+  assignment,
+  groupKey,
+  matchId
+) {
+  return Boolean(
+    assignment &&
+    assignment.groupKey === groupKey &&
+    assignment.matchId === matchId
+  );
+}
+
+function getPitchMapFixture(
+  assignment
+) {
+  if (!assignment) return null;
+
+  const match =
+    matches?.[assignment.groupKey]?.[
+      assignment.matchId
+    ];
+
+  if (!match) return null;
+
+  return {
+    ...match,
+    groupKey: assignment.groupKey,
+    matchId: assignment.matchId
+  };
+}
+
+function renderPitchMapAssignments() {
+  const container = byId(
+    "pitchMapAssignments"
+  );
+
+  if (!container) return;
+
+  const fixtures = getAllPitchMapFixtures();
+
+  const fixtureOptions = fixtures
+    .map((fixture) => {
+      const completedCopy = fixture.completed
+        ? " · completed"
+        : "";
+
+      const scheduledPitch = fixture.pitch
+        ? ` · ${fixture.pitch}`
+        : "";
+
+      return `
+        <option
+          value="${encodePitchMapFixture(
+            fixture.groupKey,
+            fixture.matchId
+          )}"
+        >
+          Group ${escapeHtml(fixture.groupKey)}:
+          ${escapeHtml(fixture.teamA)}
+          vs
+          ${escapeHtml(fixture.teamB)}
+          ${scheduledPitch}
+          ${completedCopy}
+        </option>
+      `;
+    })
+    .join("");
+
+  container.innerHTML = `
+    <div class="form-grid">
+      ${Array.from({ length: 6 }, (_, index) => {
+        const pitchNumber = index + 1;
+
+        return `
+          <div class="form-panel">
+            <h3>Pitch ${pitchNumber}</h3>
+
+            <div class="form-field">
+              <label for="pitchMapSelect_${pitchNumber}">
+                Match currently playing
+              </label>
+
+              <select id="pitchMapSelect_${pitchNumber}">
+                <option value="">
+                  No match currently
+                </option>
+
+                ${fixtureOptions}
+              </select>
+            </div>
+
+            <button
+              type="button"
+              onclick="savePitchMapAssignment(${pitchNumber})"
+            >
+              Save Pitch ${pitchNumber}
+            </button>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+
+  for (
+    let pitchNumber = 1;
+    pitchNumber <= 6;
+    pitchNumber += 1
+  ) {
+    const select = byId(
+      `pitchMapSelect_${pitchNumber}`
+    );
+
+    const assignment =
+      pitchMapAssignments[pitchNumber];
+
+    if (!select || !assignment) continue;
+
+    const encoded = encodePitchMapFixture(
+      assignment.groupKey,
+      assignment.matchId
+    );
+
+    const optionExists = [...select.options].some(
+      (option) => option.value === encoded
+    );
+
+    if (optionExists) {
+      select.value = encoded;
+    }
+  }
+}
+
+async function savePitchMapAssignment(
+  pitchNumber
+) {
+  if (
+    !Number.isInteger(pitchNumber) ||
+    pitchNumber < 1 ||
+    pitchNumber > 6
+  ) {
+    return;
+  }
+
+  const selection = decodePitchMapFixture(
+    byId(`pitchMapSelect_${pitchNumber}`)?.value
+  );
+
+  if (selection) {
+    const fixture = getPitchMapFixture(selection);
+
+    if (!fixture) {
+      alert(
+        "That fixture could not be found. Refresh the page and choose it again."
+      );
+      return;
+    }
+
+    const duplicatePitch = Object.entries(
+      pitchMapAssignments
+    ).find(([savedPitch, assignment]) => {
+      return (
+        Number(savedPitch) !== pitchNumber &&
+        pitchMapAssignmentMatches(
+          assignment,
+          selection.groupKey,
+          selection.matchId
+        )
+      );
+    });
+
+    if (duplicatePitch) {
+      alert(
+        `That fixture is already displayed on Pitch ${duplicatePitch[0]}.`
+      );
+      return;
+    }
+  }
+
+  const saved = await commitStateChange(() => {
+    pitchMapAssignments[pitchNumber] =
+      selection
+        ? clone(selection)
+        : null;
+  });
+
+  if (saved) {
+    alert(
+      selection
+        ? `Pitch ${pitchNumber} updated.`
+        : `Pitch ${pitchNumber} cleared.`
+    );
+  }
+}
+
+function clearDeletedPitchMapFixture(
+  groupKey,
+  matchId
+) {
+  Object.keys(pitchMapAssignments).forEach(
+    (pitchNumber) => {
+      const assignment =
+        pitchMapAssignments[pitchNumber];
+
+      if (
+        pitchMapAssignmentMatches(
+          assignment,
+          groupKey,
+          matchId
+        )
+      ) {
+        pitchMapAssignments[pitchNumber] = null;
+      }
+    }
+  );
+}
+
+
+/* ==================================================
    Dynamic Group Interface
 ================================================== */
 
@@ -3885,6 +4220,7 @@ function renderEverything() {
   updateAdminTeamDropdowns();
   fillMatchTeamDropdowns();
   renderAdminMatches();
+  renderPitchMapAssignments();
   renderAdminTopScorers();
   renderPublicGroup();
   renderPublicTopScorers();
@@ -4240,6 +4576,10 @@ async function deleteMatch(groupKey, matchId) {
 
   await commitStateChange(() => {
     delete matches[groupKey][matchId];
+    clearDeletedPitchMapFixture(
+      groupKey,
+      matchId
+    );
   });
 }
 
@@ -4290,6 +4630,8 @@ async function resetTournament() {
     bottomEightSetup = {};
     bottomEightResults = createEmptyBottomEightResults();
     topScorers = {};
+    pitchMapAssignments =
+      normalizePitchMapAssignments({});
     currentGroup = groupKeys[0] || "";
   });
 }
@@ -4481,6 +4823,7 @@ document.addEventListener("DOMContentLoaded", () => {
 ================================================== */
 
 function normalizeVenueDisplayMode(value) {
+  if (value === "pitchMap") return "pitchMap";
   if (value === "knockout") return "knockout";
   if (value === "plate") return "plate";
 
@@ -4490,6 +4833,13 @@ function normalizeVenueDisplayMode(value) {
 function getVenueDisplayModeCopy(mode) {
   const normalizedMode =
     normalizeVenueDisplayMode(mode);
+
+  if (normalizedMode === "pitchMap") {
+    return {
+      label: "Live Pitch Map",
+      changing: "Changing display to Live Pitch Map…"
+    };
+  }
 
   if (normalizedMode === "knockout") {
     return {
@@ -4519,6 +4869,9 @@ function renderVenueDisplayMode(mode) {
   const groupsButton =
     byId("showGroupsDisplayBtn");
 
+  const pitchMapButton =
+    byId("showPitchMapDisplayBtn");
+
   const knockoutButton =
     byId("showKnockoutDisplayBtn");
 
@@ -4530,6 +4883,7 @@ function renderVenueDisplayMode(mode) {
 
   const buttonModes = [
     [groupsButton, "groups"],
+    [pitchMapButton, "pitchMap"],
     [knockoutButton, "knockout"],
     [plateButton, "plate"]
   ];
@@ -4606,6 +4960,9 @@ function startVenueDisplayControls() {
   const groupsButton =
     byId("showGroupsDisplayBtn");
 
+  const pitchMapButton =
+    byId("showPitchMapDisplayBtn");
+
   const knockoutButton =
     byId("showKnockoutDisplayBtn");
 
@@ -4617,6 +4974,7 @@ function startVenueDisplayControls() {
 
   if (
     !groupsButton &&
+    !pitchMapButton &&
     !knockoutButton &&
     !plateButton &&
     !status
@@ -4629,6 +4987,15 @@ function startVenueDisplayControls() {
       "click",
       () => {
         setVenueDisplayMode("groups");
+      }
+    );
+  }
+
+  if (pitchMapButton) {
+    pitchMapButton.addEventListener(
+      "click",
+      () => {
+        setVenueDisplayMode("pitchMap");
       }
     );
   }
@@ -4722,6 +5089,7 @@ window.addTopScorer = addTopScorer;
 window.changeTopScorerGoals = changeTopScorerGoals;
 window.setTopScorerGoals = setTopScorerGoals;
 window.removeTopScorer = removeTopScorer;
+window.savePitchMapAssignment = savePitchMapAssignment;
 window.undoLastAction = undoLastAction;
 window.resetTournament = resetTournament;
 window.saveKnockoutSetup = saveKnockoutSetup;
