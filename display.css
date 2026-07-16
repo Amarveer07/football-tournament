@@ -1084,3 +1084,18 @@ body {
     font-size: 12px;
   }
 }
+
+/* ==================================================
+   Tournament emblem visibility
+================================================== */
+
+.tournament-brand-logo {
+  background: #000000;
+  border-radius: 10px;
+}
+
+.knockout-main-sponsor .tournament-brand-logo {
+  width: 58px;
+  height: 58px;
+  flex-basis: 58px;
+}
