@@ -650,6 +650,28 @@ function getDisplayKnockoutHeading() {
   return "Knockout Stages";
 }
 
+function renderDisplayPenaltyWinnerNote(result) {
+  const isPenaltyWin =
+    result?.scoreOne !== null &&
+    result?.scoreTwo !== null &&
+    result.scoreOne === result.scoreTwo &&
+    result.winner;
+
+  if (!isPenaltyWin) return "";
+
+  const winner = findDisplayTeam(
+    result.winner
+  );
+
+  return `
+    <div class="display-penalty-note">
+      ${escapeDisplayHtml(
+        winner?.name || "Winner"
+      )} won on penalties
+    </div>
+  `;
+}
+
 function renderDisplayBracketTeam(reference, score, winner) {
   const team = findDisplayTeam(reference);
   const isWinner = displayTeamReferencesMatch(reference, winner);
@@ -706,6 +728,8 @@ function renderDisplayBracketMatch(roundKey, matchNumber) {
         result.scoreTwo,
         result.winner
       )}
+
+      ${renderDisplayPenaltyWinnerNote(result)}
     </article>
   `;
 }
@@ -909,6 +933,8 @@ function renderDisplayPlateMatch(
         result.scoreTwo,
         result.winner
       )}
+
+      ${renderDisplayPenaltyWinnerNote(result)}
     </article>
   `;
 }
