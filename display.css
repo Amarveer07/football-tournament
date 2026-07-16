@@ -1,5 +1,5 @@
 /* ==================================================
-   FOOTBALL TOURNAMENT Ã¢â‚¬â€ LIVE VENUE DISPLAY
+   FOOTBALL TOURNAMENT ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â LIVE VENUE DISPLAY
    Built for a widescreen TV/projector, with laptop
    fallbacks for testing.
 ================================================== */
@@ -75,7 +75,7 @@ body {
 }
 
 /* ==================================================
-   Sponsor ticker Ã¢â‚¬â€ visible in both modes
+   Sponsor ticker ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â visible in both modes
 ================================================== */
 
 .sponsor-strip {
@@ -335,11 +335,11 @@ body {
 }
 
 .display-group-table .display-team-column {
-  width: 47%;
+  width: 43%;
 }
 
 .display-group-table .display-stat-column {
-  width: 8.833%;
+  width: 9.5%;
 }
 
 .display-group-table thead {
@@ -389,7 +389,7 @@ body {
 
 .display-group-table .display-team-heading,
 .display-group-table .display-team-cell {
-  padding-left: 8px;
+  padding-left: 6px;
   text-align: left;
 }
 
@@ -397,7 +397,7 @@ body {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 9px;
+  gap: 7px;
 }
 
 .display-team-logo {
