@@ -3188,7 +3188,7 @@ async function addTopScorer() {
   }
 
   if (
-    !/^\\d{1,2}$/.test(playerNumber) ||
+    !/^\d{1,2}$/.test(playerNumber) ||
     Number(playerNumber) < 1 ||
     Number(playerNumber) > 99
   ) {
