@@ -20,7 +20,34 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Tournament application -->
-  <script src="app.js?v=33" defer></script>
+  <script src="app.js?v=34" defer></script>
+
+  <style>
+    /* Group position colours appear only after a result exists. */
+    #groupTable .group-position-top-two td {
+      background: rgba(34, 197, 94, 0.085);
+    }
+
+    #groupTable .group-position-top-two td:first-child {
+      border-left: 3px solid rgba(74, 222, 128, 0.72);
+    }
+
+    #groupTable .group-position-third td {
+      background: rgba(250, 204, 21, 0.075);
+    }
+
+    #groupTable .group-position-third td:first-child {
+      border-left: 3px solid rgba(250, 204, 21, 0.68);
+    }
+
+    #groupTable .group-position-last td {
+      background: rgba(239, 68, 68, 0.075);
+    }
+
+    #groupTable .group-position-last td:first-child {
+      border-left: 3px solid rgba(248, 113, 113, 0.68);
+    }
+  </style>
 </head>
 
 <body>
