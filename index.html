@@ -11,7 +11,7 @@
   <title>Sikh Football Tournament – Live Updates</title>
 
   <!-- Public styling -->
-  <link rel="stylesheet" href="style.css?v=16">
+  <link rel="stylesheet" href="style.css?v=17">
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
@@ -19,7 +19,7 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Tournament application -->
-  <script src="app.js?v=27" defer></script>
+  <script src="app.js?v=28" defer></script>
 </head>
 
 <body>
@@ -99,6 +99,10 @@
 
       <a href="#matches">
         Matches
+      </a>
+
+      <a href="#top-scorers">
+        Top Scorers
       </a>
 
       <a href="#knockouts">
@@ -284,6 +288,54 @@
             >
               Loading results…
             </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ========================================
+           TOP GOALSCORERS
+      ========================================= -->
+
+      <section
+        id="top-scorers"
+        class="public-section top-scorers-section"
+      >
+        <div class="public-section-heading">
+          <div>
+            <p class="section-eyebrow">
+              Golden Boot Race
+            </p>
+
+            <h2>
+              Top Goalscorers
+            </h2>
+
+            <p>
+              The five leading goalscorers across the tournament.
+              Players are identified by their shirt number.
+            </p>
+          </div>
+        </div>
+
+        <div class="public-panel top-scorers-panel">
+          <div class="top-scorers-table-wrap">
+            <table
+              id="publicTopScorersTable"
+              class="top-scorers-table"
+            >
+              <caption class="visually-hidden">
+                Top five tournament goalscorers
+              </caption>
+
+              <tbody>
+                <tr>
+                  <td colspan="4">
+                    Loading top goalscorers…
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
