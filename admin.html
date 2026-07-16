@@ -20,7 +20,7 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Tournament application -->
-  <script src="app.js?v=34" defer></script>
+  <script src="app.js?v=35" defer></script>
 
   <style>
     /* Group position colours appear only after a result exists. */
@@ -169,7 +169,7 @@
             </span>
 
             <span class="accordion-summary-description">
-              Switch the live screen between groups, the main knockout and the NEST Plate.
+              Switch the live screen between groups, the pitch map, the main knockout and the NEST Plate.
             </span>
           </span>
         </summary>
@@ -186,6 +186,14 @@
               class="primary-button"
             >
               Show Group Tables
+            </button>
+
+            <button
+              id="showPitchMapDisplayBtn"
+              type="button"
+              class="secondary-button"
+            >
+              Show Pitch Map
             </button>
 
             <button
@@ -432,6 +440,42 @@
             >
               Loading goalscorers…
             </div>
+          </div>
+        </div>
+      </details>
+
+
+      <!-- ==========================================
+           LIVE PITCH MAP
+      =========================================== -->
+
+      <details class="admin-accordion">
+        <summary>
+          <span class="accordion-summary-copy">
+            <span class="accordion-summary-title">
+              Live Pitch Map
+            </span>
+
+            <span class="accordion-summary-description">
+              Choose the match currently playing on each of the six pitches.
+            </span>
+          </span>
+        </summary>
+
+        <div class="accordion-content">
+          <div class="section-heading">
+            <div>
+              <h2>Current Pitch Assignments</h2>
+
+              <p>
+                Manually select the fixture currently being played on each pitch.
+                Choose “No match currently” whenever a pitch is unused.
+              </p>
+            </div>
+          </div>
+
+          <div id="pitchMapAssignments">
+            Loading pitch assignments…
           </div>
         </div>
       </details>
