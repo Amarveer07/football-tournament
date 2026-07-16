@@ -1710,11 +1710,16 @@ tbody tr:hover td {
   }
 
   .public-knockout-lockup {
-    width: min(100%, 300px);
+    position: sticky;
+    left: 50%;
+
+    width: min(calc(100vw - 48px), 300px);
     min-height: 82px;
 
-    margin-top: 13px;
+    margin: 13px 0 2px;
     padding: 8px 12px;
+
+    transform: translateX(-50%);
   }
 
   .public-knockout-lockup img {
