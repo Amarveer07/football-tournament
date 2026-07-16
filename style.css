@@ -1586,51 +1586,64 @@ tbody tr:hover td {
   }
 
   /*
-    Fit the complete standings table onto a normal phone.
+    Keep the mobile group table large and readable.
+    It scrolls sideways rather than squeezing all seven columns.
   */
 
-  table {
-    min-width: 0;
+  .standings-panel .table-wrap {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: x proximity;
+  }
+
+  .standings-panel table {
+    width: 620px;
+    min-width: 620px;
     table-layout: fixed;
   }
 
-  th,
-  td {
-    padding: 11px 3px;
-    font-size: 11px;
+  .standings-panel th,
+  .standings-panel td {
+    padding: 13px 7px;
+    font-size: 13px;
   }
 
-  th {
-    font-size: 9px;
-    letter-spacing: 0.05em;
+  .standings-panel th {
+    font-size: 10px;
+    letter-spacing: 0.06em;
   }
 
-  th:first-child,
-  td:first-child {
-    width: 42%;
-    padding-left: 7px;
+  .standings-panel th:first-child,
+  .standings-panel td:first-child {
+    width: 250px;
+    padding-left: 10px;
 
     white-space: normal;
     overflow-wrap: anywhere;
   }
 
-  th:not(:first-child),
-  td:not(:first-child) {
-    width: 9.66%;
+  .standings-panel th:not(:first-child),
+  .standings-panel td:not(:first-child) {
+    width: 61px;
   }
 
-  .team-name-cell {
-    gap: 7px;
+  .standings-panel .team-name-cell {
+    gap: 9px;
   }
 
-  .team-logo {
-    width: 26px;
-    height: 26px;
-    flex-basis: 26px;
+  .standings-panel .team-logo {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
 
-    padding: 1px;
+    padding: 2px;
 
-    border-radius: 5px;
+    border-radius: 7px;
+  }
+
+  .standings-panel .team-name-cell span {
+    font-size: 13px;
+    line-height: 1.2;
   }
 
   .supporting-sponsor-grid {
