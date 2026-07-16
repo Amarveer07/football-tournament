@@ -20,7 +20,7 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Tournament application -->
-  <script src="app.js?v=29" defer></script>
+  <script src="app.js?v=31" defer></script>
 </head>
 
 <body>
@@ -142,7 +142,7 @@
             </span>
 
             <span class="accordion-summary-description">
-              Switch the live screen between groups and knockouts.
+              Switch the live screen between groups, the main knockout and the NEST Plate.
             </span>
           </span>
         </summary>
@@ -166,7 +166,15 @@
               type="button"
               class="secondary-button"
             >
-              Show Knockout Bracket
+              Show Main Knockout
+            </button>
+
+            <button
+              id="showPlateDisplayBtn"
+              type="button"
+              class="secondary-button"
+            >
+              Show NEST Plate
             </button>
           </div>
 
