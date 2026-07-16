@@ -7,7 +7,7 @@
   <title>Football Tournament – Live Display</title>
 
   <!-- Venue display styling -->
-  <link rel="stylesheet" href="display.css?v=7">
+  <link rel="stylesheet" href="display.css?v=2">
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
@@ -15,25 +15,22 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Venue display logic -->
-  <script src="display.js?v=8" defer></script>
+  <script src="display.js?v=2" defer></script>
 </head>
 
 <body>
   <div class="display-shell">
 
-    <!-- Sponsor strip shown in both display modes -->
+    <!-- Sponsor strip stays visible in both group and knockout modes -->
     <header class="sponsor-strip" aria-label="Tournament sponsors">
       <div class="sponsor-strip-window">
-        <div
-          id="sponsorTickerTrack"
-          class="sponsor-ticker-track"
-        >
+        <div id="sponsorTickerTrack" class="sponsor-ticker-track">
           Loading sponsors…
         </div>
       </div>
     </header>
 
-    <!-- Connection and current-mode indicator -->
+    <!-- Small connection and mode indicator -->
     <div class="display-status-bar">
       <div class="display-live-status">
         <span
@@ -42,34 +39,24 @@
           aria-hidden="true"
         ></span>
 
-        <span id="displayLiveText">
-          Connecting…
-        </span>
+        <span id="displayLiveText">Connecting…</span>
       </div>
 
-      <div
-        id="displayModeLabel"
-        class="display-mode-label"
-      >
+      <div id="displayModeLabel" class="display-mode-label">
         Group Stage
       </div>
     </div>
 
     <main class="display-stage">
 
-      <!-- Group-stage mode -->
+      <!-- GROUP MODE: six live tables in a 3 × 2 grid -->
       <section
         id="displayGroupsView"
         class="display-view display-groups-view"
         aria-label="Live group standings"
       >
-        <div
-          id="displayGroupsGrid"
-          class="display-groups-grid"
-        >
-          <p class="display-loading">
-            Loading all six groups…
-          </p>
+        <div id="displayGroupsGrid" class="display-groups-grid">
+          <p class="display-loading">Loading all six groups…</p>
         </div>
 
         <footer class="display-brand-footer">
@@ -83,7 +70,7 @@
         </footer>
       </section>
 
-      <!-- Knockout-stage mode -->
+      <!-- KNOCKOUT MODE: mirrored bracket -->
       <section
         id="displayKnockoutView"
         class="display-view display-knockout-view"
@@ -91,9 +78,7 @@
         hidden
       >
         <div class="display-knockout-heading">
-          <h1 id="displayKnockoutTitle">
-            Knockout Stage
-          </h1>
+          <h1 id="displayKnockoutTitle">Knockout Stage</h1>
         </div>
 
         <div
@@ -106,8 +91,39 @@
           </p>
         </div>
 
+        <!-- Positioned in the middle of the mirrored bracket by display.css -->
         <div
           id="knockoutMainSponsor"
+          class="main-sponsor-brand knockout-main-sponsor"
+          aria-label="Main tournament sponsor"
+        >
+          Loading main sponsor…
+        </div>
+      </section>
+
+      <!-- NEST PLATE MODE: mirrored eight-team bracket -->
+      <section
+        id="displayPlateView"
+        class="display-view display-knockout-view display-plate-view"
+        aria-label="Live NEST Plate Championship bracket"
+        hidden
+      >
+        <div class="display-knockout-heading">
+          <h1>NEST Plate Championship</h1>
+        </div>
+
+        <div
+          id="displayPlateBracket"
+          class="display-knockout-bracket display-plate-bracket"
+          aria-live="polite"
+        >
+          <p class="display-loading">
+            Loading NEST Plate Championship…
+          </p>
+        </div>
+
+        <div
+          id="plateMainSponsor"
           class="main-sponsor-brand knockout-main-sponsor"
           aria-label="Main tournament sponsor"
         >
