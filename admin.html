@@ -20,7 +20,7 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Tournament application -->
-  <script src="app.js?v=25" defer></script>
+  <script src="app.js?v=27" defer></script>
 </head>
 
 <body>
@@ -612,6 +612,62 @@
 
           <p class="helper-text">
             You can override every selected team manually before saving.
+          </p>
+        </div>
+      </details>
+
+
+      <!-- ==========================================
+           BOTTOM 8 KNOCKOUT
+      =========================================== -->
+
+      <details class="admin-accordion">
+        <summary>
+          <span class="accordion-summary-copy">
+            <span class="accordion-summary-title">
+              Bottom 8 Knockout
+            </span>
+
+            <span class="accordion-summary-description">
+              Select the eight non-qualifiers and manage their knockout results.
+            </span>
+          </span>
+        </summary>
+
+        <div class="accordion-content">
+          <div class="section-heading">
+            <div>
+              <h2>Bottom 8 Setup</h2>
+
+              <p>
+                Assign the eight teams to four quarter-finals.
+                The semi-finals and final progress automatically.
+              </p>
+            </div>
+          </div>
+
+          <div id="bottomEightSetup">
+            Loading Bottom 8 setup…
+          </div>
+
+          <div class="button-row">
+            <button
+              type="button"
+              onclick="autoFillBottomEightSetup()"
+            >
+              Auto-Fill Bottom 8 Teams
+            </button>
+
+            <button
+              type="button"
+              onclick="saveBottomEightSetup()"
+            >
+              Save Bottom 8 Setup
+            </button>
+          </div>
+
+          <p class="helper-text">
+            You can manually change every selected team before saving.
           </p>
         </div>
       </details>
