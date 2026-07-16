@@ -2833,6 +2833,8 @@ function renderPublicBottomEightMatch(
         result.scoreTwo,
         result.winner
       )}
+
+      ${renderPublicPenaltyWinnerNote(result)}
     </article>
   `;
 }
@@ -3548,6 +3550,26 @@ function renderPublicResult(match) {
     </article>
   `;
 }
+function renderPublicPenaltyWinnerNote(result) {
+  const isPenaltyWin =
+    result?.scoreOne !== null &&
+    result?.scoreTwo !== null &&
+    result.scoreOne === result.scoreTwo &&
+    result.winner;
+
+  if (!isPenaltyWin) return "";
+
+  const winner = getKnockoutDisplayTeam(
+    result.winner
+  );
+
+  return `
+    <div class="knockout-penalty-note">
+      ${escapeHtml(winner.name)} won on penalties
+    </div>
+  `;
+}
+
 function renderPublicKnockoutTeamRow(
   reference,
   score,
@@ -3606,6 +3628,8 @@ function renderPublicKnockoutMatch(
         result.scoreTwo,
         result.winner
       )}
+
+      ${renderPublicPenaltyWinnerNote(result)}
     </article>
   `;
 }
