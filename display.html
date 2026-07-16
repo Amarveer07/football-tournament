@@ -7,7 +7,7 @@
   <title>Football Tournament – Live Display</title>
 
   <!-- Venue display styling -->
-  <link rel="stylesheet" href="display.css?v=2">
+  <link rel="stylesheet" href="display.css?v=3">
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
@@ -15,7 +15,7 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Venue display logic -->
-  <script src="display.js?v=2" defer></script>
+  <script src="display.js?v=3" defer></script>
 </head>
 
 <body>
@@ -27,6 +27,21 @@
         <div id="sponsorTickerTrack" class="sponsor-ticker-track">
           Loading sponsors…
         </div>
+      </div>
+
+      <div
+        class="display-public-qr"
+        aria-label="Scan to open the public tournament website"
+      >
+        <img
+          src="football-tournament-public-qr.png"
+          alt="QR code for the public tournament website"
+        >
+
+        <span class="display-public-qr-copy">
+          <strong>Live scores</strong>
+          <small>Scan here</small>
+        </span>
       </div>
     </header>
 
