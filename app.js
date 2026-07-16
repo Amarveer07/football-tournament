@@ -2353,7 +2353,7 @@ function renderAdminBottomEightMatch(
   return `
     <div class="form-panel knockout-result-panel">
       <h3>
-        Bottom 8 ${escapeHtml(round.shortLabel)} ${matchNumber}
+        NEST Plate Championship ${escapeHtml(round.shortLabel)} ${matchNumber}
       </h3>
 
       <div class="knockout-admin-team">
@@ -2819,7 +2819,7 @@ function renderPublicBottomEightMatch(
       data-match="${matchNumber}"
     >
       <div class="knockout-match-number">
-        Bottom 8 ${escapeHtml(round.shortLabel)} ${matchNumber}
+        NEST Plate Championship ${escapeHtml(round.shortLabel)} ${matchNumber}
       </div>
 
       ${renderPublicKnockoutTeamRow(
@@ -2869,7 +2869,7 @@ function renderPublicBottomEightBracket() {
   if (!bottomEightSetupIsComplete()) {
     container.innerHTML = `
       <p class="empty-state">
-        Bottom 8 matches have not been confirmed yet.
+        NEST Plate Championship matches have not been confirmed yet.
       </p>
     `;
     return;
