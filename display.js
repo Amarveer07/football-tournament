@@ -97,6 +97,8 @@ let displayGroups = {};
 let displayGroupKeys = [];
 let displayKnockoutSetup = {};
 let displayKnockoutResults = {};
+let displayPlateSetup = {};
+let displayPlateResults = {};
 let displaySettings = {
   mode: "groups",
   sponsorTicker: true
@@ -108,6 +110,25 @@ const KNOCKOUT_ROUNDS = {
     shortLabel: "R16",
     matchCount: 8
   },
+  quarterFinals: {
+    label: "Quarter-finals",
+    shortLabel: "QF",
+    matchCount: 4
+  },
+  semiFinals: {
+    label: "Semi-finals",
+    shortLabel: "SF",
+    matchCount: 2
+  },
+  final: {
+    label: "Final",
+    shortLabel: "Final",
+    matchCount: 1
+  }
+};
+
+
+const PLATE_ROUNDS = {
   quarterFinals: {
     label: "Quarter-finals",
     shortLabel: "QF",
@@ -367,9 +388,11 @@ function renderMainSponsor() {
 
   const groupSponsor = displayById("groupMainSponsor");
   const knockoutSponsor = displayById("knockoutMainSponsor");
+  const plateSponsor = displayById("plateMainSponsor");
 
   if (groupSponsor) groupSponsor.innerHTML = brandingHtml;
   if (knockoutSponsor) knockoutSponsor.innerHTML = brandingHtml;
+  if (plateSponsor) plateSponsor.innerHTML = brandingHtml;
 }
 
 /* ==================================================
@@ -741,26 +764,291 @@ function renderDisplayKnockoutBracket() {
 }
 
 /* ==================================================
+   NEST Plate Championship
+================================================== */
+
+function getDisplayPlateResult(
+  roundKey,
+  matchNumber
+) {
+  const result =
+    displayPlateResults?.[roundKey]?.[matchNumber];
+
+  return {
+    scoreOne:
+      result?.scoreOne === null ||
+      result?.scoreOne === undefined
+        ? null
+        : displayToNumber(
+            result.scoreOne,
+            null
+          ),
+
+    scoreTwo:
+      result?.scoreTwo === null ||
+      result?.scoreTwo === undefined
+        ? null
+        : displayToNumber(
+            result.scoreTwo,
+            null
+          ),
+
+    winner: normalizeDisplayTeamReference(
+      result?.winner
+    )
+  };
+}
+
+function getDisplayPlateWinner(
+  roundKey,
+  matchNumber
+) {
+  return getDisplayPlateResult(
+    roundKey,
+    matchNumber
+  ).winner;
+}
+
+function getDisplayPlateMatchTeams(
+  roundKey,
+  matchNumber
+) {
+  if (roundKey === "quarterFinals") {
+    const setupMatch =
+      displayPlateSetup?.[matchNumber];
+
+    return {
+      teamOne: normalizeDisplayTeamReference(
+        setupMatch?.teamOne
+      ),
+
+      teamTwo: normalizeDisplayTeamReference(
+        setupMatch?.teamTwo
+      )
+    };
+  }
+
+  const previousRound =
+    roundKey === "semiFinals"
+      ? "quarterFinals"
+      : roundKey === "final"
+        ? "semiFinals"
+        : null;
+
+  if (!previousRound) {
+    return {
+      teamOne: null,
+      teamTwo: null
+    };
+  }
+
+  return {
+    teamOne: getDisplayPlateWinner(
+      previousRound,
+      matchNumber * 2 - 1
+    ),
+
+    teamTwo: getDisplayPlateWinner(
+      previousRound,
+      matchNumber * 2
+    )
+  };
+}
+
+function displayPlateSetupIsComplete() {
+  for (
+    let matchNumber = 1;
+    matchNumber <= 4;
+    matchNumber += 1
+  ) {
+    const setupMatch =
+      displayPlateSetup?.[matchNumber];
+
+    if (
+      !setupMatch?.teamOne ||
+      !setupMatch?.teamTwo
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function renderDisplayPlateMatch(
+  roundKey,
+  matchNumber
+) {
+  const round = PLATE_ROUNDS[roundKey];
+
+  const teams = getDisplayPlateMatchTeams(
+    roundKey,
+    matchNumber
+  );
+
+  const result = getDisplayPlateResult(
+    roundKey,
+    matchNumber
+  );
+
+  return `
+    <article class="display-bracket-match">
+      <div class="display-bracket-match-label">
+        ${escapeDisplayHtml(round.shortLabel)}
+        ${matchNumber}
+      </div>
+
+      ${renderDisplayBracketTeam(
+        teams.teamOne,
+        result.scoreOne,
+        result.winner
+      )}
+
+      ${renderDisplayBracketTeam(
+        teams.teamTwo,
+        result.scoreTwo,
+        result.winner
+      )}
+    </article>
+  `;
+}
+
+function renderDisplayPlateColumn(
+  roundKey,
+  matchNumbers,
+  extraClass = ""
+) {
+  const round = PLATE_ROUNDS[roundKey];
+
+  return `
+    <section
+      class="
+        display-bracket-column
+        ${extraClass}
+      "
+    >
+      <h2 class="display-bracket-column-title">
+        ${escapeDisplayHtml(round.label)}
+      </h2>
+
+      ${matchNumbers
+        .map((matchNumber) =>
+          renderDisplayPlateMatch(
+            roundKey,
+            matchNumber
+          )
+        )
+        .join("")}
+    </section>
+  `;
+}
+
+function renderDisplayPlateBracket() {
+  const bracket =
+    displayById("displayPlateBracket");
+
+  if (!bracket) return;
+
+  if (!displayPlateSetupIsComplete()) {
+    bracket.innerHTML = `
+      <p class="display-loading">
+        NEST Plate Championship matches
+        have not been confirmed yet.
+      </p>
+    `;
+
+    return;
+  }
+
+  bracket.innerHTML = `
+    ${renderDisplayPlateColumn(
+      "quarterFinals",
+      [1, 2],
+      "plate-quarter-final-column"
+    )}
+
+    ${renderDisplayPlateColumn(
+      "semiFinals",
+      [1],
+      "plate-semi-final-column"
+    )}
+
+    ${renderDisplayPlateColumn(
+      "final",
+      [1],
+      "display-final-column plate-final-column"
+    )}
+
+    ${renderDisplayPlateColumn(
+      "semiFinals",
+      [2],
+      "plate-semi-final-column"
+    )}
+
+    ${renderDisplayPlateColumn(
+      "quarterFinals",
+      [3, 4],
+      "plate-quarter-final-column"
+    )}
+  `;
+}
+
+
+/* ==================================================
    Display Mode
 ================================================== */
 
 function normalizeDisplayMode(value) {
-  return value === "knockout" ? "knockout" : "groups";
+  if (value === "knockout") return "knockout";
+  if (value === "plate") return "plate";
+
+  return "groups";
 }
 
 function renderDisplayMode() {
-  const groupsView = displayById("displayGroupsView");
-  const knockoutView = displayById("displayKnockoutView");
-  const modeLabel = displayById("displayModeLabel");
+  const groupsView =
+    displayById("displayGroupsView");
 
-  const mode = normalizeDisplayMode(displaySettings.mode);
+  const knockoutView =
+    displayById("displayKnockoutView");
 
-  if (groupsView) groupsView.hidden = mode !== "groups";
-  if (knockoutView) knockoutView.hidden = mode !== "knockout";
+  const plateView =
+    displayById("displayPlateView");
+
+  const modeLabel =
+    displayById("displayModeLabel");
+
+  const mode =
+    normalizeDisplayMode(
+      displaySettings.mode
+    );
+
+  if (groupsView) {
+    groupsView.hidden =
+      mode !== "groups";
+  }
+
+  if (knockoutView) {
+    knockoutView.hidden =
+      mode !== "knockout";
+  }
+
+  if (plateView) {
+    plateView.hidden =
+      mode !== "plate";
+  }
 
   if (modeLabel) {
-    modeLabel.textContent =
-      mode === "knockout" ? "Knockout Stage" : "Group Stage";
+    if (mode === "knockout") {
+      modeLabel.textContent =
+        "Main Knockout";
+    } else if (mode === "plate") {
+      modeLabel.textContent =
+        "NEST Plate Championship";
+    } else {
+      modeLabel.textContent =
+        "Group Stage";
+    }
   }
 }
 
@@ -769,6 +1057,7 @@ function renderCompleteDisplay() {
   renderMainSponsor();
   renderAllDisplayGroups();
   renderDisplayKnockoutBracket();
+  renderDisplayPlateBracket();
   renderDisplayMode();
 }
 
@@ -807,6 +1096,18 @@ function listenToDisplayTournament() {
         data.knockoutResults &&
         typeof data.knockoutResults === "object"
           ? data.knockoutResults
+          : {};
+
+      displayPlateSetup =
+        data.bottomEightSetup &&
+        typeof data.bottomEightSetup === "object"
+          ? data.bottomEightSetup
+          : {};
+
+      displayPlateResults =
+        data.bottomEightResults &&
+        typeof data.bottomEightResults === "object"
+          ? data.bottomEightResults
           : {};
 
       displaySettings = {
