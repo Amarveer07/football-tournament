@@ -2171,3 +2171,23 @@ tbody tr:hover td {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* Third-place ranking: fifth and sixth enter the NEST Plate */
+.third-place-plate td {
+  background: rgba(250, 204, 21, 0.1);
+}
+
+.third-place-plate td:first-child {
+  border-left: 3px solid #facc15;
+}
+
+.knockout-team-placeholder .team-name-cell span {
+  color: rgba(255, 255, 255, 0.58);
+  font-style: italic;
+  white-space: normal;
+}
+
+.plate-seed-heading {
+  margin-top: 22px;
+}
