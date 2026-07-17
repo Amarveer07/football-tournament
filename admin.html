@@ -20,7 +20,7 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Tournament application -->
-  <script src="app.js?v=38" defer></script>
+  <script src="app.js?v=40" defer></script>
 
   <style>
     /* Group position colours appear only after a result exists. */
@@ -46,6 +46,73 @@
 
     #groupTable .group-position-last td:first-child {
       border-left: 3px solid rgba(248, 113, 113, 0.68);
+    }
+
+    .display-rotation-panel {
+      margin-top: 18px;
+      padding: 16px;
+      background: rgba(107, 33, 168, 0.08);
+      border: 1px solid rgba(126, 34, 206, 0.24);
+      border-radius: 16px;
+    }
+
+    .display-rotation-panel h3 {
+      margin: 0 0 6px;
+    }
+
+    .display-rotation-panel p {
+      margin: 0 0 14px;
+      opacity: 0.82;
+    }
+
+    .display-rotation-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .display-rotation-option {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+
+      padding: 14px;
+
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(126, 34, 206, 0.18);
+      border-radius: 13px;
+    }
+
+    .display-rotation-option strong {
+      font-size: 1rem;
+    }
+
+    .display-rotation-option span {
+      min-height: 2.5em;
+      opacity: 0.78;
+    }
+
+    .display-rotation-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    @media (max-width: 760px) {
+      .display-rotation-options {
+        grid-template-columns: 1fr;
+      }
+
+      .display-rotation-option span {
+        min-height: 0;
+      }
+    }
+
+    .display-rotation-buttons button:disabled {
+      cursor: not-allowed;
+      opacity: 0.58;
     }
 
     .official-fixtures-panel {
@@ -270,6 +337,60 @@
             >
               Show NEST Plate
             </button>
+          </div>
+
+          <div class="display-rotation-panel">
+            <h3>Automatic display rotations</h3>
+
+            <p>
+              Each screen remains visible for 20 seconds.
+              Starting one rotation automatically replaces the other.
+            </p>
+
+            <div class="display-rotation-options">
+              <div class="display-rotation-option">
+                <strong>Group-stage rotation</strong>
+
+                <span>
+                  Group Tables → Pitch Map → Fixtures
+                </span>
+
+                <button
+                  id="startGroupRotationBtn"
+                  type="button"
+                  class="primary-button"
+                >
+                  Start Group Rotation
+                </button>
+              </div>
+
+              <div class="display-rotation-option">
+                <strong>Knockout rotation</strong>
+
+                <span>
+                  Main Knockout → NEST Plate
+                </span>
+
+                <button
+                  id="startKnockoutRotationBtn"
+                  type="button"
+                  class="primary-button"
+                >
+                  Start Knockout Rotation
+                </button>
+              </div>
+            </div>
+
+            <div class="display-rotation-buttons">
+              <button
+                id="stopDisplayRotationBtn"
+                type="button"
+                class="secondary-button"
+                disabled
+              >
+                Stop Rotation
+              </button>
+            </div>
           </div>
 
           <p
