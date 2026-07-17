@@ -11,7 +11,7 @@
 const DEFAULT_TEAM_LOGOS = {
   "Real Punjab FC": "logos/real-punjab-fc.png",
   "Sunderland AFC": "logos/sunderland-afc.png",
-  "Manchester Youth": "logos/manchester-youth.png",
+  "Manchester Youth FC": "logos/manchester-youth.png",
 
   "Kisan FC": "logos/kisan-fc.png",
   "Huddersfield FC": "logos/huddersfield-fc.png",
@@ -19,7 +19,7 @@ const DEFAULT_TEAM_LOGOS = {
   "Chardi Kala FC": "logos/chardi-kala-fc.png",
 
   "Newcastle Panjab FC A": "logos/newcastle-punjab-fc-a.png",
-  "Glasgow Gurdwara": "logos/glasgow-gurdwara.png",
+  "Glasgow Gurdwara FC": "logos/glasgow-gurdwara.png",
   "We Start Now": "logos/we-start-now.png",
 
   "Singh Brothers": "logos/singh-brothers.png",
@@ -70,7 +70,7 @@ function defaultGroups() {
     A: [
       createTeam("Real Punjab FC"),
       createTeam("Sunderland AFC"),
-      createTeam("Manchester Youth")
+      createTeam("Manchester Youth FC")
     ],
 
     B: [
@@ -82,7 +82,7 @@ function defaultGroups() {
 
     C: [
       createTeam("Newcastle Panjab FC A"),
-      createTeam("Glasgow Gurdwara"),
+      createTeam("Glasgow Gurdwara FC"),
       createTeam("We Start Now")
     ],
 
@@ -108,6 +108,122 @@ function defaultGroups() {
     ]
   };
 }
+
+const OFFICIAL_TEAM_NAME_ALIASES = {
+  "Manchester Youth": "Manchester Youth FC",
+  "Glasgow Gurdwara": "Glasgow Gurdwara FC",
+  "Chardikala FC": "Chardi Kala FC"
+};
+
+const OFFICIAL_FIXTURE_DATE = {
+  year: 2026,
+  monthIndex: 6,
+  day: 18
+};
+
+const OFFICIAL_GROUP_FIXTURES = {
+  A: [
+    [10, 0, "2", "Real Punjab FC", "Sunderland AFC"],
+    [10, 30, "2", "Sunderland AFC", "Manchester Youth FC"],
+    [11, 0, "2", "Manchester Youth FC", "Real Punjab FC"],
+    [11, 30, "2", "Sunderland AFC", "Real Punjab FC"],
+    [12, 0, "2", "Manchester Youth FC", "Sunderland AFC"],
+    [12, 30, "2", "Real Punjab FC", "Manchester Youth FC"]
+  ],
+
+  B: [
+    [10, 0, "3", "Kisan FC", "Huddersfield FC"],
+    [10, 0, "4", "Akaal FC Paris", "Chardi Kala FC"],
+    [11, 0, "3", "Kisan FC", "Akaal FC Paris"],
+    [11, 0, "4", "Chardi Kala FC", "Huddersfield FC"],
+    [12, 0, "3", "Kisan FC", "Chardi Kala FC"],
+    [12, 0, "4", "Huddersfield FC", "Akaal FC Paris"]
+  ],
+
+  C: [
+    [10, 0, "1", "Newcastle Panjab FC A", "Glasgow Gurdwara FC"],
+    [10, 30, "1", "Glasgow Gurdwara FC", "We Start Now"],
+    [11, 0, "1", "We Start Now", "Newcastle Panjab FC A"],
+    [11, 30, "1", "Glasgow Gurdwara FC", "Newcastle Panjab FC A"],
+    [12, 0, "1", "We Start Now", "Glasgow Gurdwara FC"],
+    [12, 30, "1", "Newcastle Panjab FC A", "We Start Now"]
+  ],
+
+  D: [
+    [10, 30, "3", "Singh Brothers", "Slow & Steady Leeds"],
+    [10, 30, "4", "Soorma FC Paris", "FC Italy"],
+    [11, 30, "3", "Singh Brothers", "Soorma FC Paris"],
+    [11, 30, "4", "FC Italy", "Slow & Steady Leeds"],
+    [12, 30, "3", "Singh Brothers", "FC Italy"],
+    [12, 30, "4", "Slow & Steady Leeds", "Soorma FC Paris"]
+  ],
+
+  E: [
+    [10, 30, "5", "FC Punjabi Lions Belgium", "Doncaster FC A"],
+    [10, 30, "6", "GNG Thornaby", "Newcastle Panjab FC C"],
+    [11, 30, "5", "FC Punjabi Lions Belgium", "GNG Thornaby"],
+    [11, 30, "6", "Newcastle Panjab FC C", "Doncaster FC A"],
+    [12, 30, "5", "FC Punjabi Lions Belgium", "Newcastle Panjab FC C"],
+    [12, 30, "6", "Doncaster FC A", "GNG Thornaby"]
+  ],
+
+  F: [
+    [10, 0, "5", "Punjab United FC Gravesend", "Singh Sabha Slough"],
+    [10, 0, "6", "Newcastle Panjab FC B", "Punjabi Mags"],
+    [11, 0, "5", "Punjab United FC Gravesend", "Newcastle Panjab FC B"],
+    [11, 0, "6", "Punjabi Mags", "Singh Sabha Slough"],
+    [12, 0, "5", "Punjab United FC Gravesend", "Punjabi Mags"],
+    [12, 0, "6", "Singh Sabha Slough", "Newcastle Panjab FC B"]
+  ]
+};
+
+function getOfficialTeamName(teamName) {
+  const currentName = String(teamName || "").trim();
+
+  return OFFICIAL_TEAM_NAME_ALIASES[currentName] || currentName;
+}
+
+function createOfficialFixtureTime(hour, minute) {
+  const { year, monthIndex, day } = OFFICIAL_FIXTURE_DATE;
+
+  return new Date(
+    year,
+    monthIndex,
+    day,
+    hour,
+    minute,
+    0,
+    0
+  ).toISOString();
+}
+
+function createOfficialMatches() {
+  const officialMatches = {};
+
+  Object.entries(OFFICIAL_GROUP_FIXTURES).forEach(
+    ([groupKey, fixtures]) => {
+      officialMatches[groupKey] = {};
+
+      fixtures.forEach((fixture, index) => {
+        const [hour, minute, pitch, teamA, teamB] = fixture;
+        const matchNumber = String(index + 1).padStart(2, "0");
+        const matchId = `official_${groupKey}_${matchNumber}`;
+
+        officialMatches[groupKey][matchId] = {
+          teamA,
+          teamB,
+          time: createOfficialFixtureTime(hour, minute),
+          pitch,
+          scoreA: null,
+          scoreB: null
+        };
+      });
+    }
+  );
+
+  return officialMatches;
+}
+
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
@@ -296,6 +412,10 @@ function normalizePitchMapAssignments(rawAssignments) {
 
 let pitchMapAssignments = normalizePitchMapAssignments(
   localState?.pitchMapAssignments
+);
+
+let officialFixturesLoaded = Boolean(
+  localState?.officialFixturesLoaded
 );
 
 let currentGroup = groupKeys[0] || "";
@@ -728,8 +848,93 @@ function setupContainsRemovedTeam(setup) {
   });
 }
 
-function removeUnavailableTeamsFromState() {
+function standardizeOfficialTeamNamesInState() {
   let changed = false;
+
+  getGroupKeys().forEach((groupKey) => {
+    (groups[groupKey] || []).forEach((team) => {
+      const officialName = getOfficialTeamName(team.name);
+
+      if (officialName !== team.name) {
+        team.name = officialName;
+
+        if (!String(team.logo || "").trim()) {
+          team.logo = getDefaultTeamLogo(officialName);
+        }
+
+        changed = true;
+      }
+    });
+
+    Object.values(matches[groupKey] || {}).forEach((match) => {
+      const officialTeamA = getOfficialTeamName(match?.teamA);
+      const officialTeamB = getOfficialTeamName(match?.teamB);
+
+      if (officialTeamA !== match.teamA) {
+        match.teamA = officialTeamA;
+        changed = true;
+      }
+
+      if (officialTeamB !== match.teamB) {
+        match.teamB = officialTeamB;
+        changed = true;
+      }
+    });
+  });
+
+  [knockoutSetup, bottomEightSetup].forEach((setup) => {
+    Object.values(setup || {}).forEach((match) => {
+      ["teamOne", "teamTwo"].forEach((slot) => {
+        const team = match?.[slot];
+        if (!team) return;
+
+        const officialName = getOfficialTeamName(team.teamName);
+
+        if (officialName !== team.teamName) {
+          team.teamName = officialName;
+          changed = true;
+        }
+      });
+    });
+  });
+
+  [
+    [knockoutRoundConfig, knockoutResults],
+    [bottomEightRoundConfig, bottomEightResults]
+  ].forEach(([roundConfig, results]) => {
+    Object.entries(roundConfig).forEach(([roundKey, round]) => {
+      for (
+        let matchNumber = 1;
+        matchNumber <= round.matchCount;
+        matchNumber += 1
+      ) {
+        const winner = results?.[roundKey]?.[matchNumber]?.winner;
+        if (!winner) continue;
+
+        const officialName = getOfficialTeamName(winner.teamName);
+
+        if (officialName !== winner.teamName) {
+          winner.teamName = officialName;
+          changed = true;
+        }
+      }
+    });
+  });
+
+  Object.values(topScorers || {}).forEach((scorer) => {
+    const officialName = getOfficialTeamName(scorer.teamName);
+
+    if (officialName !== scorer.teamName) {
+      scorer.teamName = officialName;
+      changed = true;
+    }
+  });
+
+  return changed;
+}
+
+function removeUnavailableTeamsFromState() {
+  let changed = standardizeOfficialTeamNamesInState();
   const deletedMatchKeys = new Set();
 
   getGroupKeys().forEach((groupKey) => {
@@ -859,6 +1064,7 @@ function createStateSnapshot() {
     bottomEightResults,
     topScorers,
     pitchMapAssignments,
+    officialFixturesLoaded,
     currentGroup
   });
 }
@@ -883,6 +1089,9 @@ function restoreState(snapshot) {
   pitchMapAssignments = normalizePitchMapAssignments(
     snapshot.pitchMapAssignments
   );
+  officialFixturesLoaded = Boolean(
+    snapshot.officialFixturesLoaded
+  );
   currentGroup = snapshot.currentGroup || groupKeys[0] || "";
 }
 
@@ -899,7 +1108,8 @@ function saveLocalState() {
         bottomEightSetup,
         bottomEightResults,
         topScorers,
-        pitchMapAssignments
+        pitchMapAssignments,
+        officialFixturesLoaded
       })
     );
   } catch (error) {
@@ -989,6 +1199,28 @@ function formatMatchTime(isoString) {
     hour: "2-digit",
     minute: "2-digit"
   });
+}
+
+function toDateTimeLocalInputValue(isoString) {
+  if (!isoString) return "";
+
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return "";
+
+  const localDate = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60000
+  );
+
+  return localDate.toISOString().slice(0, 16);
+}
+
+function formatPitchLabel(pitch) {
+  const value = String(pitch || "").trim();
+  if (!value) return "Pitch TBC";
+
+  return /^pitch\b/i.test(value)
+    ? value
+    : `Pitch ${value}`;
 }
 
 function matchIsResult(match) {
@@ -1082,7 +1314,8 @@ async function writeTournamentState() {
     bottomEightSetup,
     bottomEightResults,
     topScorers,
-    pitchMapAssignments
+    pitchMapAssignments,
+    officialFixturesLoaded
   });
 }
 
@@ -1161,6 +1394,10 @@ function listenToTournamentFromFirebase() {
             normalizePitchMapAssignments(
               data.pitchMapAssignments
             );
+
+          officialFixturesLoaded = Boolean(
+            data.officialFixturesLoaded
+          );
 
           if (!groupKeys.includes(currentGroup)) {
             currentGroup = groupKeys[0] || "";
@@ -4075,6 +4312,114 @@ function clearDeletedPitchMapFixture(
 
 
 /* ==================================================
+   Official Group Fixtures
+================================================== */
+
+function renderOfficialFixtureLoader() {
+  const button = byId("loadOfficialFixturesBtn");
+  const status = byId("officialFixturesStatus");
+
+  if (button) {
+    button.disabled = officialFixturesLoaded;
+    button.textContent = officialFixturesLoaded
+      ? "Official Fixtures Loaded"
+      : "Load Official Fixtures";
+  }
+
+  if (status) {
+    status.textContent = officialFixturesLoaded
+      ? "All 36 official fixtures are loaded. Every match can still be edited below."
+      : "Loads all 36 official group fixtures for Saturday 18 July 2026.";
+  }
+}
+
+function getMissingOfficialFixtureTeams() {
+  const missingTeams = [];
+
+  Object.entries(OFFICIAL_GROUP_FIXTURES).forEach(
+    ([groupKey, fixtures]) => {
+      const availableNames = new Set(
+        (groups[groupKey] || []).map((team) => team.name)
+      );
+
+      fixtures.forEach(([, , , teamA, teamB]) => {
+        [teamA, teamB].forEach((teamName) => {
+          if (!availableNames.has(teamName)) {
+            missingTeams.push(`Group ${groupKey}: ${teamName}`);
+          }
+        });
+      });
+    }
+  );
+
+  return [...new Set(missingTeams)];
+}
+
+function resetTeamTableAdjustments() {
+  getGroupKeys().forEach((groupKey) => {
+    (groups[groupKey] || []).forEach((team) => {
+      team.adjustments = {
+        p: 0,
+        w: 0,
+        d: 0,
+        l: 0,
+        points: 0,
+        gd: 0
+      };
+    });
+  });
+}
+
+async function loadOfficialFixtures() {
+  if (!requireAdmin()) return;
+
+  standardizeOfficialTeamNamesInState();
+
+  const missingTeams = getMissingOfficialFixtureTeams();
+
+  if (missingTeams.length > 0) {
+    alert(
+      `These official teams are missing from their groups:\n\n${missingTeams.join("\n")}\n\nRestore the teams before loading the fixture pack.`
+    );
+    return;
+  }
+
+  const confirmed = confirm(
+    "Load all 36 official group fixtures?\n\nThis replaces existing group matches and scores, clears test standings adjustments, goalscorers, pitch assignments and both knockout setups. Team names, logos and sponsor information are kept."
+  );
+
+  if (!confirmed) return;
+
+  const saved = await commitStateChange(() => {
+    standardizeOfficialTeamNamesInState();
+    matches = normalizeMatches(
+      createOfficialMatches(),
+      groupKeys
+    );
+
+    resetTeamTableAdjustments();
+
+    pitchMapAssignments =
+      normalizePitchMapAssignments({});
+
+    knockoutSetup = {};
+    knockoutResults = createEmptyKnockoutResults();
+    bottomEightSetup = {};
+    bottomEightResults = createEmptyBottomEightResults();
+    topScorers = {};
+    officialFixturesLoaded = true;
+    currentGroup = "A";
+  });
+
+  if (saved) {
+    alert(
+      "All 36 official fixtures have been loaded. They now appear in the normal Group Matches section and remain fully editable."
+    );
+  }
+}
+
+
+/* ==================================================
    Dynamic Group Interface
 ================================================== */
 
@@ -4268,7 +4613,7 @@ function renderPublicUpcomingMatch(match) {
       </div>
       <div class="match-meta">
         ${escapeHtml(formatMatchTime(match.time))}
-        · ${match.pitch ? `Pitch: ${escapeHtml(match.pitch)}` : "Pitch: TBC"}
+        · ${escapeHtml(formatPitchLabel(match.pitch))}
       </div>
     </article>
   `;
@@ -4284,7 +4629,7 @@ function renderPublicResult(match) {
       </div>
       <div class="match-meta">
         ${escapeHtml(formatMatchTime(match.time))}
-        · ${match.pitch ? `Pitch: ${escapeHtml(match.pitch)}` : "Pitch: TBC"}
+        · ${escapeHtml(formatPitchLabel(match.pitch))}
       </div>
     </article>
   `;
@@ -4557,6 +4902,22 @@ function renderAdminMatches() {
       const encodedGroupKey = encodeURIComponent(groupKey);
       const encodedMatchId = encodeURIComponent(match.id);
 
+      const teamOptions = (groups[groupKey] || [])
+        .map((team) => {
+          const teamName = team.name;
+
+          return `
+            <option
+              value="${escapeHtml(teamName)}"
+              ${teamName === match.teamA ? "data-selected-a=\"true\"" : ""}
+              ${teamName === match.teamB ? "data-selected-b=\"true\"" : ""}
+            >
+              ${escapeHtml(teamName)}
+            </option>
+          `;
+        })
+        .join("");
+
       return `
         <article class="admin-match-card">
           <div class="match-title">
@@ -4565,7 +4926,7 @@ function renderAdminMatches() {
 
           <div class="match-meta">
             ${escapeHtml(formatMatchTime(match.time))}
-            · ${match.pitch ? `Pitch: ${escapeHtml(match.pitch)}` : "Pitch: TBC"}
+            · ${escapeHtml(formatPitchLabel(match.pitch))}
           </div>
 
           <div class="match-actions">
@@ -4612,10 +4973,81 @@ function renderAdminMatches() {
               Delete
             </button>
           </div>
+
+          <details class="match-edit-panel">
+            <summary>Edit fixture</summary>
+
+            <div class="match-edit-grid">
+              <div class="form-field">
+                <label for="editTeamA_${match.id}">
+                  Team A
+                </label>
+
+                <select id="editTeamA_${match.id}">
+                  ${teamOptions}
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="editTeamB_${match.id}">
+                  Team B
+                </label>
+
+                <select id="editTeamB_${match.id}">
+                  ${teamOptions}
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="editTime_${match.id}">
+                  Date and time
+                </label>
+
+                <input
+                  type="datetime-local"
+                  id="editTime_${match.id}"
+                  value="${escapeHtml(
+                    toDateTimeLocalInputValue(match.time)
+                  )}"
+                >
+              </div>
+
+              <div class="form-field">
+                <label for="editPitch_${match.id}">
+                  Pitch
+                </label>
+
+                <input
+                  type="text"
+                  id="editPitch_${match.id}"
+                  value="${escapeHtml(match.pitch || "")}"
+                  placeholder="For example: 1"
+                >
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onclick="saveMatchDetails(
+                decodeURIComponent('${encodedGroupKey}'),
+                decodeURIComponent('${encodedMatchId}')
+              )"
+            >
+              Save Fixture Changes
+            </button>
+          </details>
         </article>
       `;
     })
     .join("");
+
+  matchList.forEach((match) => {
+    const teamASelect = byId(`editTeamA_${match.id}`);
+    const teamBSelect = byId(`editTeamB_${match.id}`);
+
+    if (teamASelect) teamASelect.value = match.teamA;
+    if (teamBSelect) teamBSelect.value = match.teamB;
+  });
 }
 
 function renderEverything() {
@@ -4623,6 +5055,7 @@ function renderEverything() {
   renderAdminStandings();
   updateAdminTeamDropdowns();
   fillMatchTeamDropdowns();
+  renderOfficialFixtureLoader();
   renderAdminMatches();
   renderPitchMapAssignments();
   renderAdminTopScorers();
@@ -4944,6 +5377,50 @@ async function addMatch() {
   }
 }
 
+async function saveMatchDetails(groupKey, matchId) {
+  const match = matches?.[groupKey]?.[matchId];
+  if (!match) return;
+
+  const teamA = byId(`editTeamA_${matchId}`)?.value || "";
+  const teamB = byId(`editTeamB_${matchId}`)?.value || "";
+  const localTime = byId(`editTime_${matchId}`)?.value || "";
+  const pitch = byId(`editPitch_${matchId}`)?.value.trim() || "";
+
+  if (!teamA || !teamB) {
+    alert("Choose both teams.");
+    return;
+  }
+
+  if (teamA === teamB) {
+    alert("A team cannot play itself.");
+    return;
+  }
+
+  const availableNames = new Set(
+    (groups[groupKey] || []).map((team) => team.name)
+  );
+
+  if (!availableNames.has(teamA) || !availableNames.has(teamB)) {
+    alert("Choose teams from the selected group.");
+    return;
+  }
+
+  const time = localTime
+    ? new Date(localTime).toISOString()
+    : "";
+
+  const saved = await commitStateChange(() => {
+    matches[groupKey][matchId].teamA = teamA;
+    matches[groupKey][matchId].teamB = teamB;
+    matches[groupKey][matchId].time = time;
+    matches[groupKey][matchId].pitch = pitch;
+  });
+
+  if (saved) {
+    alert("Fixture updated.");
+  }
+}
+
 async function saveMatchScore(groupKey, matchId) {
   const scoreAValue = byId(`scoreA_${matchId}`)?.value;
   const scoreBValue = byId(`scoreB_${matchId}`)?.value;
@@ -5036,6 +5513,7 @@ async function resetTournament() {
     topScorers = {};
     pitchMapAssignments =
       normalizePitchMapAssignments({});
+    officialFixturesLoaded = false;
     currentGroup = groupKeys[0] || "";
   });
 }
@@ -5481,6 +5959,8 @@ window.addGoal = addGoal;
 window.removeGoal = removeGoal;
 
 window.addMatch = addMatch;
+window.loadOfficialFixtures = loadOfficialFixtures;
+window.saveMatchDetails = saveMatchDetails;
 window.saveMatchScore = saveMatchScore;
 window.deleteMatch = deleteMatch;
 window.autoFillKnockoutSetup = autoFillKnockoutSetup;
