@@ -33,7 +33,6 @@ const DEFAULT_TEAM_LOGOS = {
   "Newcastle Panjab FC C": "logos/newcastle-punjab-fc-c.png",
 
   "Punjab United FC Gravesend": "logos/punjab-united-fc-gravesend.png",
-  "Singh Sabha Slough": "logos/singh-sabha-slough.png",
   "Newcastle Panjab FC B": "logos/newcastle-punjab-fc-b.png",
   "Punjabi Mags": "logos/punjabi-mags.png"
 };
@@ -102,7 +101,6 @@ function defaultGroups() {
 
     F: [
       createTeam("Punjab United FC Gravesend"),
-      createTeam("Singh Sabha Slough"),
       createTeam("Newcastle Panjab FC B"),
       createTeam("Punjabi Mags")
     ]
@@ -115,6 +113,9 @@ const OFFICIAL_TEAM_NAME_ALIASES = {
   "Chardikala FC": "Chardi Kala FC"
 };
 
+const OFFICIAL_FIXTURE_VERSION =
+  "2026-07-18-21-team-v1";
+
 const OFFICIAL_FIXTURE_DATE = {
   year: 2026,
   monthIndex: 6,
@@ -123,21 +124,21 @@ const OFFICIAL_FIXTURE_DATE = {
 
 const OFFICIAL_GROUP_FIXTURES = {
   A: [
-    [10, 0, "2", "Real Punjab FC", "Sunderland AFC"],
-    [10, 30, "2", "Sunderland AFC", "Manchester Youth FC"],
-    [11, 0, "2", "Manchester Youth FC", "Real Punjab FC"],
-    [11, 30, "2", "Sunderland AFC", "Real Punjab FC"],
-    [12, 0, "2", "Manchester Youth FC", "Sunderland AFC"],
-    [12, 30, "2", "Real Punjab FC", "Manchester Youth FC"]
+    [10, 0, "3", "Real Punjab FC", "Sunderland AFC"],
+    [10, 30, "3", "Sunderland AFC", "Manchester Youth FC"],
+    [11, 0, "3", "Manchester Youth FC", "Real Punjab FC"],
+    [11, 30, "3", "Sunderland AFC", "Real Punjab FC"],
+    [12, 0, "3", "Manchester Youth FC", "Sunderland AFC"],
+    [12, 30, "3", "Real Punjab FC", "Manchester Youth FC"]
   ],
 
   B: [
-    [10, 0, "3", "Kisan FC", "Huddersfield FC"],
-    [10, 0, "4", "Akaal FC Paris", "Chardi Kala FC"],
-    [11, 0, "3", "Kisan FC", "Akaal FC Paris"],
-    [11, 0, "4", "Chardi Kala FC", "Huddersfield FC"],
-    [12, 0, "3", "Kisan FC", "Chardi Kala FC"],
-    [12, 0, "4", "Huddersfield FC", "Akaal FC Paris"]
+    [10, 0, "4", "Kisan FC", "Chardi Kala FC"],
+    [10, 30, "4", "Huddersfield FC", "Akaal FC Paris"],
+    [11, 0, "4", "Huddersfield FC", "Chardi Kala FC"],
+    [11, 30, "4", "Chardi Kala FC", "Akaal FC Paris"],
+    [12, 0, "4", "Kisan FC", "Akaal FC Paris"],
+    [12, 30, "4", "Kisan FC", "Huddersfield FC"]
   ],
 
   C: [
@@ -150,30 +151,30 @@ const OFFICIAL_GROUP_FIXTURES = {
   ],
 
   D: [
-    [10, 30, "3", "Singh Brothers", "Slow & Steady Leeds"],
-    [10, 30, "4", "Soorma FC Paris", "FC Italy"],
-    [11, 30, "3", "Singh Brothers", "Soorma FC Paris"],
-    [11, 30, "4", "FC Italy", "Slow & Steady Leeds"],
-    [12, 30, "3", "Singh Brothers", "FC Italy"],
-    [12, 30, "4", "Slow & Steady Leeds", "Soorma FC Paris"]
+    [10, 0, "6", "Singh Brothers", "FC Italy"],
+    [10, 30, "6", "Slow & Steady Leeds", "Soorma FC Paris"],
+    [11, 0, "6", "Slow & Steady Leeds", "FC Italy"],
+    [11, 30, "6", "FC Italy", "Soorma FC Paris"],
+    [12, 0, "6", "Singh Brothers", "Soorma FC Paris"],
+    [12, 30, "6", "Singh Brothers", "Slow & Steady Leeds"]
   ],
 
   E: [
-    [10, 30, "5", "FC Punjabi Lions Belgium", "Doncaster FC A"],
-    [10, 30, "6", "GNG Thornaby", "Newcastle Panjab FC C"],
-    [11, 30, "5", "FC Punjabi Lions Belgium", "GNG Thornaby"],
-    [11, 30, "6", "Newcastle Panjab FC C", "Doncaster FC A"],
-    [12, 30, "5", "FC Punjabi Lions Belgium", "Newcastle Panjab FC C"],
-    [12, 30, "6", "Doncaster FC A", "GNG Thornaby"]
+    [10, 0, "5", "FC Punjabi Lions Belgium", "Newcastle Panjab FC C"],
+    [10, 30, "5", "Doncaster FC A", "GNG Thornaby"],
+    [11, 0, "5", "Doncaster FC A", "Newcastle Panjab FC C"],
+    [11, 30, "5", "Newcastle Panjab FC C", "GNG Thornaby"],
+    [12, 0, "5", "FC Punjabi Lions Belgium", "GNG Thornaby"],
+    [12, 30, "5", "FC Punjabi Lions Belgium", "Doncaster FC A"]
   ],
 
   F: [
-    [10, 0, "5", "Punjab United FC Gravesend", "Singh Sabha Slough"],
-    [10, 0, "6", "Newcastle Panjab FC B", "Punjabi Mags"],
-    [11, 0, "5", "Punjab United FC Gravesend", "Newcastle Panjab FC B"],
-    [11, 0, "6", "Punjabi Mags", "Singh Sabha Slough"],
-    [12, 0, "5", "Punjab United FC Gravesend", "Punjabi Mags"],
-    [12, 0, "6", "Singh Sabha Slough", "Newcastle Panjab FC B"]
+    [10, 0, "2", "Punjab United FC Gravesend", "Newcastle Panjab FC B"],
+    [10, 30, "2", "Newcastle Panjab FC B", "Punjabi Mags"],
+    [11, 0, "2", "Punjabi Mags", "Punjab United FC Gravesend"],
+    [11, 30, "2", "Newcastle Panjab FC B", "Punjab United FC Gravesend"],
+    [12, 0, "2", "Punjabi Mags", "Newcastle Panjab FC B"],
+    [12, 30, "2", "Punjab United FC Gravesend", "Punjabi Mags"]
   ]
 };
 
@@ -414,9 +415,15 @@ let pitchMapAssignments = normalizePitchMapAssignments(
   localState?.pitchMapAssignments
 );
 
+let officialFixturesVersion = String(
+  localState?.officialFixturesVersion || ""
+);
+
 let officialFixturesLoaded = Boolean(
   localState?.officialFixturesLoaded
-);
+) &&
+  officialFixturesVersion ===
+    OFFICIAL_FIXTURE_VERSION;
 
 let currentGroup = groupKeys[0] || "";
 let undoStack = [];
@@ -591,34 +598,37 @@ let knockoutResults = normalizeKnockoutResults(
 const bottomEightPlan = [
   {
     matchNumber: 1,
-    teamOneSource: "Last in Group D",
-    teamTwoSource: "Last in Group E"
-  },
-  {
-    matchNumber: 2,
-    teamOneSource: "Last in Group B",
-    teamTwoSource: "Last in Group F"
+    teamOneSource: "Seed 4",
+    teamTwoSource: "Seed 5"
   }
 ];
 
-const bottomEightSemiFinalSeedPlan = [
+const bottomEightDirectSeedPlan = [
   {
+    setupKey: 2,
     matchNumber: 1,
-    setupKey: 3,
-    teamSource: "Third-place rank 5 or 6"
+    slot: "one",
+    teamSource: "Seed 1"
   },
   {
+    setupKey: 3,
     matchNumber: 2,
+    slot: "one",
+    teamSource: "Seed 2"
+  },
+  {
     setupKey: 4,
-    teamSource: "Third-place rank 6 or 5"
+    matchNumber: 2,
+    slot: "two",
+    teamSource: "Seed 3"
   }
 ];
 
 const bottomEightRoundConfig = {
   quarterFinals: {
-    label: "Quarter-finals",
+    label: "Quarter-final",
     shortLabel: "QF",
-    matchCount: 2
+    matchCount: 1
   },
   semiFinals: {
     label: "Semi-finals",
@@ -641,45 +651,43 @@ function normalizeBottomEightSetup(rawSetup) {
 
   if (
     Object.keys(rawSetup).length > 0 &&
-    rawSetup.formatVersion !== 2
+    rawSetup.formatVersion !== 3
   ) {
     plateSetupMigrationDetected = true;
     return {};
   }
 
   const normalized = {
-    formatVersion: 2
+    formatVersion: 3
   };
 
-  for (const matchNumber of [1, 2]) {
-    const rawMatch = rawSetup?.[matchNumber];
-    const teamOne = normalizeKnockoutTeamReference(
-      rawMatch?.teamOne
-    );
-    const teamTwo = normalizeKnockoutTeamReference(
-      rawMatch?.teamTwo
-    );
+  const rawQuarterFinal = rawSetup?.[1];
+  const teamOne = normalizeKnockoutTeamReference(
+    rawQuarterFinal?.teamOne
+  );
+  const teamTwo = normalizeKnockoutTeamReference(
+    rawQuarterFinal?.teamTwo
+  );
 
-    if (teamOne || teamTwo) {
-      normalized[matchNumber] = {
-        teamOne,
-        teamTwo
-      };
-    }
+  if (teamOne || teamTwo) {
+    normalized[1] = {
+      teamOne,
+      teamTwo
+    };
   }
 
-  for (const setupKey of [3, 4]) {
+  for (const setupKey of [2, 3, 4]) {
     const rawSeed = rawSetup?.[setupKey];
 
     if (rawSeed?.directSeed !== true) continue;
 
-    const teamOne = normalizeKnockoutTeamReference(
+    const seededTeam = normalizeKnockoutTeamReference(
       rawSeed?.teamOne
     );
 
-    if (teamOne) {
+    if (seededTeam) {
       normalized[setupKey] = {
-        teamOne,
+        teamOne: seededTeam,
         directSeed: true
       };
     }
@@ -827,7 +835,8 @@ let topScorers = normalizeTopScorers(
 
 const REMOVED_TEAM_NAMES = new Set([
   "Sikh Gurdwara Darlington",
-  "TBC"
+  "TBC",
+  "Singh Sabha Slough"
 ]);
 
 let tournamentMigrationPending = false;
@@ -997,6 +1006,11 @@ function removeUnavailableTeamsFromState() {
     changed = true;
   }
 
+  if (changed) {
+    officialFixturesLoaded = false;
+    officialFixturesVersion = "";
+  }
+
   tournamentMigrationPending =
     tournamentMigrationPending ||
     changed ||
@@ -1022,12 +1036,12 @@ async function persistTournamentMigrationIfNeeded() {
     tournamentMigrationPending = false;
     await writeTournamentState();
     console.info(
-      "Saved the 22-team tournament structure to Firebase."
+      "Saved the 21-team tournament structure to Firebase."
     );
   } catch (error) {
     tournamentMigrationPending = true;
     console.error(
-      "The 22-team tournament update could not be saved.",
+      "The 21-team tournament update could not be saved.",
       error
     );
   } finally {
@@ -1065,6 +1079,7 @@ function createStateSnapshot() {
     topScorers,
     pitchMapAssignments,
     officialFixturesLoaded,
+    officialFixturesVersion,
     currentGroup
   });
 }
@@ -1089,9 +1104,14 @@ function restoreState(snapshot) {
   pitchMapAssignments = normalizePitchMapAssignments(
     snapshot.pitchMapAssignments
   );
+  officialFixturesVersion = String(
+    snapshot.officialFixturesVersion || ""
+  );
   officialFixturesLoaded = Boolean(
     snapshot.officialFixturesLoaded
-  );
+  ) &&
+    officialFixturesVersion ===
+      OFFICIAL_FIXTURE_VERSION;
   currentGroup = snapshot.currentGroup || groupKeys[0] || "";
 }
 
@@ -1109,7 +1129,8 @@ function saveLocalState() {
         bottomEightResults,
         topScorers,
         pitchMapAssignments,
-        officialFixturesLoaded
+        officialFixturesLoaded,
+        officialFixturesVersion
       })
     );
   } catch (error) {
@@ -1315,7 +1336,8 @@ async function writeTournamentState() {
     bottomEightResults,
     topScorers,
     pitchMapAssignments,
-    officialFixturesLoaded
+    officialFixturesLoaded,
+    officialFixturesVersion
   });
 }
 
@@ -1395,9 +1417,15 @@ function listenToTournamentFromFirebase() {
               data.pitchMapAssignments
             );
 
+          officialFixturesVersion = String(
+            data.officialFixturesVersion || ""
+          );
+
           officialFixturesLoaded = Boolean(
             data.officialFixturesLoaded
-          );
+          ) &&
+            officialFixturesVersion ===
+              OFFICIAL_FIXTURE_VERSION;
 
           if (!groupKeys.includes(currentGroup)) {
             currentGroup = groupKeys[0] || "";
@@ -1504,6 +1532,20 @@ function getSortedGroup(groupKey) {
       return second.gd - first.gd;
     }
 
+    const firstGoalsFor = getTeamGoalsFor(
+      groupKey,
+      first.name
+    );
+
+    const secondGoalsFor = getTeamGoalsFor(
+      groupKey,
+      second.name
+    );
+
+    if (secondGoalsFor !== firstGoalsFor) {
+      return secondGoalsFor - firstGoalsFor;
+    }
+
     return first.name.localeCompare(second.name);
   });
 }
@@ -1595,7 +1637,11 @@ function getThirdPlacedTeams() {
       return {
         ...thirdPlacedTeam,
         groupKey,
-        ppg: pointsPerGame
+        ppg: pointsPerGame,
+        gf: getTeamGoalsFor(
+          groupKey,
+          thirdPlacedTeam.name
+        )
       };
     })
     .filter(Boolean)
@@ -1606,6 +1652,10 @@ function getThirdPlacedTeams() {
 
       if (second.gd !== first.gd) {
         return second.gd - first.gd;
+      }
+
+      if (second.gf !== first.gf) {
+        return second.gf - first.gf;
       }
 
       return first.name.localeCompare(second.name);
@@ -1643,6 +1693,7 @@ function renderThirdPlaceTable() {
           <td>${team.points}</td>
           <td>${team.ppg.toFixed(2)}</td>
           <td>${team.gd}</td>
+          <td>${team.gf}</td>
         </tr>
       `;
     })
@@ -1658,6 +1709,7 @@ function renderThirdPlaceTable() {
         <th>Pts</th>
         <th>PPG</th>
         <th>GD</th>
+        <th>GF</th>
       </tr>
     </thead>
 
@@ -2576,20 +2628,20 @@ async function clearKnockoutMatchResult(
 ================================================== */
 
 function bottomEightSetupIsComplete() {
-  const quarterFinalsReady = bottomEightPlan.every((match) => {
-    const savedMatch = bottomEightSetup?.[match.matchNumber];
+  const quarterFinal = bottomEightSetup?.[1];
 
-    return Boolean(savedMatch?.teamOne && savedMatch?.teamTwo);
-  });
+  const quarterFinalReady = Boolean(
+    quarterFinal?.teamOne &&
+    quarterFinal?.teamTwo
+  );
 
-  const semiFinalSeedsReady =
-    bottomEightSemiFinalSeedPlan.every((seed) => {
-      return Boolean(
-        bottomEightSetup?.[seed.setupKey]?.teamOne
-      );
-    });
+  const directSeedsReady = [2, 3, 4].every(
+    (setupKey) => Boolean(
+      bottomEightSetup?.[setupKey]?.teamOne
+    )
+  );
 
-  return quarterFinalsReady && semiFinalSeedsReady;
+  return quarterFinalReady && directSeedsReady;
 }
 
 function getBottomEightResult(roundKey, matchNumber) {
@@ -2607,7 +2659,7 @@ function getBottomEightWinner(roundKey, matchNumber) {
 
 function getBottomEightMatchTeams(roundKey, matchNumber) {
   if (roundKey === "quarterFinals") {
-    const savedMatch = bottomEightSetup?.[matchNumber];
+    const savedMatch = bottomEightSetup?.[1];
 
     return {
       teamOne: normalizeKnockoutTeamReference(
@@ -2620,15 +2672,24 @@ function getBottomEightMatchTeams(roundKey, matchNumber) {
   }
 
   if (roundKey === "semiFinals") {
-    const directSeedKey = matchNumber === 1 ? 3 : 4;
+    if (matchNumber === 1) {
+      return {
+        teamOne: normalizeKnockoutTeamReference(
+          bottomEightSetup?.[2]?.teamOne
+        ),
+        teamTwo: getBottomEightWinner(
+          "quarterFinals",
+          1
+        )
+      };
+    }
 
     return {
-      teamOne: getBottomEightWinner(
-        "quarterFinals",
-        matchNumber
+      teamOne: normalizeKnockoutTeamReference(
+        bottomEightSetup?.[3]?.teamOne
       ),
       teamTwo: normalizeKnockoutTeamReference(
-        bottomEightSetup?.[directSeedKey]?.teamOne
+        bottomEightSetup?.[4]?.teamOne
       )
     };
   }
@@ -2650,7 +2711,7 @@ function getNextBottomEightMatch(roundKey, matchNumber) {
   if (roundKey === "quarterFinals") {
     return {
       roundKey: "semiFinals",
-      matchNumber
+      matchNumber: 1
     };
   }
 
@@ -2725,23 +2786,21 @@ function getBottomEightSlotPlaceholder(
   slot
 ) {
   if (roundKey === "quarterFinals") {
-    const plan = bottomEightPlan.find(
-      (match) => match.matchNumber === matchNumber
-    );
-
     return slot === "one"
-      ? plan?.teamOneSource || "NEST Plate team"
-      : plan?.teamTwoSource || "NEST Plate team";
+      ? "Seed 4"
+      : "Seed 5";
   }
 
   if (roundKey === "semiFinals") {
-    if (slot === "one") {
-      return `Winner of QF ${matchNumber}`;
+    if (matchNumber === 1) {
+      return slot === "one"
+        ? "Seed 1"
+        : "Winner of Seed 4 vs Seed 5";
     }
 
-    return matchNumber === 1
-      ? "Third-place rank 5 or 6"
-      : "Third-place rank 6 or 5";
+    return slot === "one"
+      ? "Seed 2"
+      : "Seed 3";
   }
 
   if (roundKey === "final") {
@@ -2771,60 +2830,62 @@ function renderBottomEightSetup() {
     })
     .join("");
 
-  const quarterFinalHtml = bottomEightPlan
-    .map(
-      (match) => `
-        <div class="form-panel knockout-match-panel">
-          <h3>NEST Plate — Quarter-final ${match.matchNumber}</h3>
+  const quarterFinalHtml = `
+    <div class="form-panel knockout-match-panel">
+      <h3>NEST Plate — Quarter-final</h3>
 
-          <p class="helper-text">
-            ${escapeHtml(match.teamOneSource)}
-            vs
-            ${escapeHtml(match.teamTwoSource)}
-          </p>
+      <p class="helper-text">
+        Seed 4 vs Seed 5
+      </p>
 
-          <div class="form-field">
-            <label for="bottomEightTeamOne_${match.matchNumber}">
-              Team 1
-            </label>
+      <div class="form-field">
+        <label for="bottomEightTeamOne_1">
+          Seed 4
+        </label>
 
-            <select id="bottomEightTeamOne_${match.matchNumber}">
-              <option value="">Select team</option>
-              ${teamOptions}
-            </select>
-          </div>
+        <select id="bottomEightTeamOne_1">
+          <option value="">Select team</option>
+          ${teamOptions}
+        </select>
+      </div>
 
-          <div class="form-field">
-            <label for="bottomEightTeamTwo_${match.matchNumber}">
-              Team 2
-            </label>
+      <div class="form-field">
+        <label for="bottomEightTeamTwo_1">
+          Seed 5
+        </label>
 
-            <select id="bottomEightTeamTwo_${match.matchNumber}">
-              <option value="">Select team</option>
-              ${teamOptions}
-            </select>
-          </div>
-        </div>
-      `
-    )
-    .join("");
+        <select id="bottomEightTeamTwo_1">
+          <option value="">Select team</option>
+          ${teamOptions}
+        </select>
+      </div>
+    </div>
+  `;
 
-  const semiFinalSeedHtml = bottomEightSemiFinalSeedPlan
+  const directSeedHtml = bottomEightDirectSeedPlan
     .map(
       (seed) => `
         <div class="form-panel knockout-match-panel">
-          <h3>NEST Plate — Semi-final ${seed.matchNumber} bye</h3>
+          <h3>
+            NEST Plate — ${escapeHtml(seed.teamSource)}
+          </h3>
 
           <p class="helper-text">
-            ${escapeHtml(seed.teamSource)} enters directly at the semi-final stage.
+            ${
+              seed.setupKey === 2
+                ? "Enters Semi-final 1 against the quarter-final winner."
+                : seed.setupKey === 3
+                  ? "Plays Seed 3 in Semi-final 2."
+                  : "Plays Seed 2 in Semi-final 2."
+            }
           </p>
 
           <div class="form-field">
-            <label for="bottomEightSemiTeam_${seed.matchNumber}">
-              Third-place team
+            <label for="bottomEightSeed_${seed.setupKey}">
+              ${escapeHtml(seed.teamSource)}
             </label>
 
-            <select id="bottomEightSemiTeam_${seed.matchNumber}">
+            <select id="bottomEightSeed_${seed.setupKey}">
               <option value="">Select team</option>
               ${teamOptions}
             </select>
@@ -2837,8 +2898,11 @@ function renderBottomEightSetup() {
   container.innerHTML = `
     <div class="section-heading">
       <div>
-        <h3>Quarter-finals</h3>
-        <p>Four last-placed teams begin in the two quarter-finals.</p>
+        <h3>Five-team seeded bracket</h3>
+        <p>
+          The five nonqualifiers are seeded by points per game,
+          then goal difference, then goals scored.
+        </p>
       </div>
     </div>
 
@@ -2848,13 +2912,16 @@ function renderBottomEightSetup() {
 
     <div class="section-heading plate-seed-heading">
       <div>
-        <h3>Semi-final byes</h3>
-        <p>The fifth- and sixth-ranked third-place teams enter here.</p>
+        <h3>Direct semi-final seeds</h3>
+        <p>
+          Seed 1 plays the quarter-final winner. Seeds 2 and 3
+          play each other in the other semi-final.
+        </p>
       </div>
     </div>
 
     <div class="form-grid">
-      ${semiFinalSeedHtml}
+      ${directSeedHtml}
     </div>
 
     <div class="subsection knockout-results-admin">
@@ -2872,39 +2939,28 @@ function renderBottomEightSetup() {
     </div>
   `;
 
-  bottomEightPlan.forEach((match) => {
-    const savedMatch = bottomEightSetup?.[match.matchNumber];
-    if (!savedMatch) return;
+  const savedQuarterFinal = bottomEightSetup?.[1];
 
-    const teamOneSelect = byId(
-      `bottomEightTeamOne_${match.matchNumber}`
-    );
+  if (savedQuarterFinal?.teamOne) {
+    byId("bottomEightTeamOne_1").value =
+      encodeTeamReference(savedQuarterFinal.teamOne);
+  }
 
-    const teamTwoSelect = byId(
-      `bottomEightTeamTwo_${match.matchNumber}`
-    );
+  if (savedQuarterFinal?.teamTwo) {
+    byId("bottomEightTeamTwo_1").value =
+      encodeTeamReference(savedQuarterFinal.teamTwo);
+  }
 
-    if (teamOneSelect && savedMatch.teamOne) {
-      teamOneSelect.value = encodeTeamReference(
-        savedMatch.teamOne
-      );
-    }
+  bottomEightDirectSeedPlan.forEach((seed) => {
+    const savedTeam =
+      bottomEightSetup?.[seed.setupKey]?.teamOne;
 
-    if (teamTwoSelect && savedMatch.teamTwo) {
-      teamTwoSelect.value = encodeTeamReference(
-        savedMatch.teamTwo
-      );
-    }
-  });
-
-  bottomEightSemiFinalSeedPlan.forEach((seed) => {
-    const savedSeed = bottomEightSetup?.[seed.setupKey]?.teamOne;
     const select = byId(
-      `bottomEightSemiTeam_${seed.matchNumber}`
+      `bottomEightSeed_${seed.setupKey}`
     );
 
-    if (select && savedSeed) {
-      select.value = encodeTeamReference(savedSeed);
+    if (select && savedTeam) {
+      select.value = encodeTeamReference(savedTeam);
     }
   });
 }
@@ -3103,123 +3159,163 @@ function renderAdminBottomEightMatch(
   `;
 }
 
-function autoFillBottomEightSetup() {
-  const group = (groupKey) => getSortedGroup(groupKey);
+function getTeamGoalsFor(groupKey, teamName) {
+  return Object.values(matches[groupKey] || {}).reduce(
+    (total, match) => {
+      if (!matchIsResult(match)) return total;
 
-  const makeTeam = (groupKey, team) => {
-    if (!team) return null;
+      if (match.teamA === teamName) {
+        return total + toNumber(match.scoreA);
+      }
 
-    return {
-      groupKey,
-      teamName: team.name
-    };
+      if (match.teamB === teamName) {
+        return total + toNumber(match.scoreB);
+      }
+
+      return total;
+    },
+    0
+  );
+}
+
+function createPlateSeedCandidate(groupKey, team) {
+  if (!team) return null;
+
+  const played = Math.max(0, toNumber(team.p));
+
+  return {
+    groupKey,
+    teamName: team.name,
+    ppg:
+      played > 0
+        ? toNumber(team.points) / played
+        : 0,
+    gd: toNumber(team.gd),
+    gf: getTeamGoalsFor(groupKey, team.name)
+  };
+}
+
+function getSeededPlateTeams() {
+  const candidates = [];
+  const selectedKeys = new Set();
+
+  const addCandidate = (candidate) => {
+    if (!candidate) return;
+
+    const key = `${candidate.groupKey}:${candidate.teamName}`;
+    if (selectedKeys.has(key)) return;
+
+    selectedKeys.add(key);
+    candidates.push(candidate);
   };
 
-  const lastPlaced = (groupKey) => {
-    const sortedGroup = group(groupKey);
+  getThirdPlacedTeams()
+    .slice(4)
+    .forEach((team) => {
+      addCandidate(
+        createPlateSeedCandidate(
+          team.groupKey,
+          team
+        )
+      );
+    });
 
-    return makeTeam(
-      groupKey,
-      sortedGroup[sortedGroup.length - 1]
+  getGroupKeys().forEach((groupKey) => {
+    const sortedGroup = getSortedGroup(groupKey);
+
+    if (sortedGroup.length < 4) return;
+
+    addCandidate(
+      createPlateSeedCandidate(
+        groupKey,
+        sortedGroup[sortedGroup.length - 1]
+      )
     );
+  });
+
+  return candidates.sort((first, second) => {
+    if (second.ppg !== first.ppg) {
+      return second.ppg - first.ppg;
+    }
+
+    if (second.gd !== first.gd) {
+      return second.gd - first.gd;
+    }
+
+    if (second.gf !== first.gf) {
+      return second.gf - first.gf;
+    }
+
+    return first.teamName.localeCompare(second.teamName);
+  });
+}
+
+function plateSeedCandidateToReference(candidate) {
+  if (!candidate) return null;
+
+  return {
+    groupKey: candidate.groupKey,
+    teamName: candidate.teamName
   };
+}
 
-  const thirdPlaced = getThirdPlacedTeams();
+function autoFillBottomEightSetup() {
+  const seededTeams = getSeededPlateTeams();
 
-  if (thirdPlaced.length < 6) {
+  if (seededTeams.length !== 5) {
     alert(
-      "All six third-placed teams are required before the NEST Plate can be selected."
+      "All six groups need valid standings before the five NEST Plate teams can be seeded."
     );
     return;
   }
 
-  const rank5 = makeTeam(
-    thirdPlaced[4].groupKey,
-    thirdPlaced[4]
+  const references = seededTeams.map(
+    plateSeedCandidateToReference
   );
 
-  const rank6 = makeTeam(
-    thirdPlaced[5].groupKey,
-    thirdPlaced[5]
+  const assignments = {
+    bottomEightTeamOne_1: references[3],
+    bottomEightTeamTwo_1: references[4],
+    bottomEightSeed_2: references[0],
+    bottomEightSeed_3: references[1],
+    bottomEightSeed_4: references[2]
+  };
+
+  Object.entries(assignments).forEach(
+    ([selectId, team]) => {
+      const select = byId(selectId);
+
+      if (select && team) {
+        select.value = encodeTeamReference(team);
+      }
+    }
   );
 
-  const quarterFinals = {
-    1: [lastPlaced("D"), lastPlaced("E")],
-    2: [lastPlaced("B"), lastPlaced("F")]
-  };
+  const hasExactTie = seededTeams.some(
+    (team, index) => {
+      const nextTeam = seededTeams[index + 1];
+      if (!nextTeam) return false;
 
-  const conflictScore = (semiFinalNumber, team) => {
-    const groupsToAvoid =
-      semiFinalNumber === 1
-        ? new Set(["D", "E"])
-        : new Set(["B", "F"]);
-
-    return groupsToAvoid.has(team.groupKey) ? 1 : 0;
-  };
-
-  let semiFinalOneTeam = rank5;
-  let semiFinalTwoTeam = rank6;
-
-  const preferredConflicts =
-    conflictScore(1, rank5) +
-    conflictScore(2, rank6);
-
-  const swappedConflicts =
-    conflictScore(1, rank6) +
-    conflictScore(2, rank5);
-
-  if (swappedConflicts < preferredConflicts) {
-    semiFinalOneTeam = rank6;
-    semiFinalTwoTeam = rank5;
-  }
-
-  for (const [matchNumber, teams] of Object.entries(
-    quarterFinals
-  )) {
-    if (!teams[0] || !teams[1]) {
-      alert(
-        "Groups B, D, E and F need their teams before the NEST Plate can be selected."
+      return (
+        team.ppg === nextTeam.ppg &&
+        team.gd === nextTeam.gd &&
+        team.gf === nextTeam.gf
       );
-      return;
     }
+  );
 
-    const teamOneSelect = byId(
-      `bottomEightTeamOne_${matchNumber}`
-    );
-
-    const teamTwoSelect = byId(
-      `bottomEightTeamTwo_${matchNumber}`
-    );
-
-    if (teamOneSelect) {
-      teamOneSelect.value = encodeTeamReference(teams[0]);
-    }
-
-    if (teamTwoSelect) {
-      teamTwoSelect.value = encodeTeamReference(teams[1]);
-    }
-  }
-
-  const semiOneSelect = byId("bottomEightSemiTeam_1");
-  const semiTwoSelect = byId("bottomEightSemiTeam_2");
-
-  if (semiOneSelect) {
-    semiOneSelect.value = encodeTeamReference(
-      semiFinalOneTeam
-    );
-  }
-
-  if (semiTwoSelect) {
-    semiTwoSelect.value = encodeTeamReference(
-      semiFinalTwoTeam
+  if (hasExactTie) {
+    alert(
+      "An exact seeding tie remains after PPG, goal difference and goals scored. The tied teams are currently ordered alphabetically; you can change them manually before saving."
     );
   }
 }
 
 async function saveBottomEightSetup() {
   const newSetup = {
-    formatVersion: 2
+    formatVersion: 3
   };
+
   const selectedTeams = new Set();
 
   const addUniqueTeam = (team, context) => {
@@ -3241,49 +3337,37 @@ async function saveBottomEightSetup() {
     return true;
   };
 
-  for (const match of bottomEightPlan) {
-    const teamOne = decodeTeamReference(
-      byId(
-        `bottomEightTeamOne_${match.matchNumber}`
-      )?.value
-    );
+  const seed4 = decodeTeamReference(
+    byId("bottomEightTeamOne_1")?.value
+  );
 
-    const teamTwo = decodeTeamReference(
-      byId(
-        `bottomEightTeamTwo_${match.matchNumber}`
-      )?.value
-    );
+  const seed5 = decodeTeamReference(
+    byId("bottomEightTeamTwo_1")?.value
+  );
 
-    if (
-      !addUniqueTeam(
-        teamOne,
-        `NEST Plate QF ${match.matchNumber} Team 1`
-      ) ||
-      !addUniqueTeam(
-        teamTwo,
-        `NEST Plate QF ${match.matchNumber} Team 2`
-      )
-    ) {
-      return;
-    }
-
-    newSetup[match.matchNumber] = {
-      teamOne,
-      teamTwo
-    };
+  if (
+    !addUniqueTeam(seed4, "Seed 4") ||
+    !addUniqueTeam(seed5, "Seed 5")
+  ) {
+    return;
   }
 
-  for (const seed of bottomEightSemiFinalSeedPlan) {
+  newSetup[1] = {
+    teamOne: seed4,
+    teamTwo: seed5
+  };
+
+  for (const seed of bottomEightDirectSeedPlan) {
     const team = decodeTeamReference(
       byId(
-        `bottomEightSemiTeam_${seed.matchNumber}`
+        `bottomEightSeed_${seed.setupKey}`
       )?.value
     );
 
     if (
       !addUniqueTeam(
         team,
-        `NEST Plate SF ${seed.matchNumber} bye`
+        seed.teamSource
       )
     ) {
       return;
@@ -3558,47 +3642,36 @@ function renderPublicBottomEightBracket() {
   if (!container) return;
 
   container.innerHTML = `
-    <div class="bottom-eight-bracket">
-      <div class="bottom-eight-side bottom-eight-side-left">
-        ${renderPublicBottomEightRound(
-          "quarterFinals",
-          [1],
-          "bottom-eight-quarter-finals"
-        )}
+    <div class="bottom-eight-bracket bottom-eight-bracket-five-team">
+      ${renderPublicBottomEightRound(
+        "quarterFinals",
+        [1],
+        "bottom-eight-quarter-finals"
+      )}
 
-        ${renderPublicBottomEightRound(
-          "semiFinals",
-          [1],
-          "bottom-eight-semi-finals"
-        )}
-      </div>
+      ${renderPublicBottomEightRound(
+        "semiFinals",
+        [1],
+        "bottom-eight-semi-finals"
+      )}
 
-      <div class="bottom-eight-centre">
-        ${renderPublicBottomEightRound(
-          "final",
-          [1],
-          "bottom-eight-final"
-        )}
-      </div>
+      ${renderPublicBottomEightRound(
+        "final",
+        [1],
+        "bottom-eight-final"
+      )}
 
-      <div class="bottom-eight-side bottom-eight-side-right">
-        ${renderPublicBottomEightRound(
-          "semiFinals",
-          [2],
-          "bottom-eight-semi-finals"
-        )}
-
-        ${renderPublicBottomEightRound(
-          "quarterFinals",
-          [2],
-          "bottom-eight-quarter-finals"
-        )}
-      </div>
+      ${renderPublicBottomEightRound(
+        "semiFinals",
+        [2],
+        "bottom-eight-semi-finals"
+      )}
     </div>
 
     ${renderPublicTournamentLockup()}
   `;
 }
+
 
 
 /* ==================================================
@@ -4497,7 +4570,7 @@ function renderOfficialFixtureLoader() {
   if (status) {
     status.textContent = officialFixturesLoaded
       ? "All 36 official fixtures are loaded. Every match can still be edited below."
-      : "Loads all 36 official group fixtures for Saturday 18 July 2026.";
+      : "Loads the revised 36-match, 21-team group schedule for Saturday 18 July 2026.";
   }
 }
 
@@ -4553,7 +4626,7 @@ async function loadOfficialFixtures() {
   }
 
   const confirmed = confirm(
-    "Load all 36 official group fixtures?\n\nThis replaces existing group matches and scores, clears test standings adjustments, goalscorers, pitch assignments and both knockout setups. Team names, logos and sponsor information are kept."
+    "Load the revised 36-match official group schedule?\n\nThis replaces existing group matches and scores, clears test standings adjustments, goalscorers, pitch assignments and both knockout setups. Team names, logos and sponsor information are kept."
   );
 
   if (!confirmed) return;
@@ -4576,12 +4649,14 @@ async function loadOfficialFixtures() {
     bottomEightResults = createEmptyBottomEightResults();
     topScorers = {};
     officialFixturesLoaded = true;
+    officialFixturesVersion =
+      OFFICIAL_FIXTURE_VERSION;
     currentGroup = "A";
   });
 
   if (saved) {
     alert(
-      "All 36 official fixtures have been loaded. They now appear in the normal Group Matches section and remain fully editable."
+      "The revised 36-match official schedule has been loaded. Every fixture remains fully editable in Group Matches."
     );
   }
 }
@@ -5727,6 +5802,7 @@ async function resetTournament() {
     pitchMapAssignments =
       normalizePitchMapAssignments({});
     officialFixturesLoaded = false;
+    officialFixturesVersion = "";
     currentGroup = groupKeys[0] || "";
   });
 }
