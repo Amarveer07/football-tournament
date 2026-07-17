@@ -1,8 +1,7 @@
 /* ==================================================
    FOOTBALL TOURNAMENT — LIVE VENUE DISPLAY
-   Reads tournament data from Firebase and renders either:
-   1) all six group tables, or
-   2) the mirrored knockout bracket.
+   Reads tournament data from Firebase and renders group tables,
+   the full fixture schedule, the live pitch map and both knockout brackets.
 ================================================== */
 
 /* ==================================================
@@ -850,6 +849,265 @@ function renderDisplayKnockoutBracket() {
 }
 
 /* ==================================================
+   Group Fixture Schedule Display
+================================================== */
+
+const DISPLAY_FIXTURE_PITCHES = [1, 2, 3, 4, 5, 6];
+
+const DISPLAY_FIXTURE_GROUP_COLOURS = {
+  A: "fixture-group-a",
+  B: "fixture-group-b",
+  C: "fixture-group-c",
+  D: "fixture-group-d",
+  E: "fixture-group-e",
+  F: "fixture-group-f"
+};
+
+function displayMatchHasScore(match) {
+  return Boolean(
+    match &&
+    match.scoreA !== null &&
+    match.scoreA !== undefined &&
+    match.scoreB !== null &&
+    match.scoreB !== undefined &&
+    Number.isFinite(Number(match.scoreA)) &&
+    Number.isFinite(Number(match.scoreB))
+  );
+}
+
+function getDisplayFixtureTimestamp(value) {
+  const timestamp = new Date(value || "").getTime();
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
+function formatDisplayFixtureTime(timestamp) {
+  if (!Number.isFinite(timestamp)) return "TBC";
+
+  return new Intl.DateTimeFormat("en-GB", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
+  })
+    .format(new Date(timestamp))
+    .replace("am", "AM")
+    .replace("pm", "PM");
+}
+
+function getDisplayFixtureEntries() {
+  const fixtures = [];
+
+  displayGroupKeys.forEach((groupKey) => {
+    Object.entries(displayMatches?.[groupKey] || {}).forEach(
+      ([matchId, match]) => {
+        if (!match || typeof match !== "object") return;
+
+        const pitchNumber = Number(
+          String(match.pitch || "").replace(/[^0-9]/g, "")
+        );
+
+        if (!DISPLAY_FIXTURE_PITCHES.includes(pitchNumber)) {
+          return;
+        }
+
+        fixtures.push({
+          groupKey,
+          matchId,
+          pitchNumber,
+          timestamp: getDisplayFixtureTimestamp(match.time),
+          teamA: String(match.teamA || "Team TBC").trim(),
+          teamB: String(match.teamB || "Team TBC").trim(),
+          scoreA: match.scoreA,
+          scoreB: match.scoreB,
+          completed: displayMatchHasScore(match)
+        });
+      }
+    );
+  });
+
+  return fixtures.sort((first, second) => {
+    const firstTime = first.timestamp ?? Number.MAX_SAFE_INTEGER;
+    const secondTime = second.timestamp ?? Number.MAX_SAFE_INTEGER;
+
+    if (firstTime !== secondTime) return firstTime - secondTime;
+    if (first.pitchNumber !== second.pitchNumber) {
+      return first.pitchNumber - second.pitchNumber;
+    }
+
+    return first.groupKey.localeCompare(second.groupKey);
+  });
+}
+
+function getDisplayFixtureTimeRows(fixtures) {
+  const timestamps = [...new Set(
+    fixtures
+      .map((fixture) => fixture.timestamp)
+      .filter((timestamp) => Number.isFinite(timestamp))
+  )].sort((first, second) => first - second);
+
+  const hasUnscheduled = fixtures.some(
+    (fixture) => !Number.isFinite(fixture.timestamp)
+  );
+
+  if (hasUnscheduled) timestamps.push(null);
+
+  return timestamps;
+}
+
+function displayFixtureIsLive(fixture) {
+  return Object.entries(displayPitchMapAssignments || {}).some(
+    ([savedPitch, assignment]) => {
+      return Boolean(
+        Number(savedPitch) === fixture.pitchNumber &&
+        assignment?.groupKey === fixture.groupKey &&
+        assignment?.matchId === fixture.matchId
+      );
+    }
+  );
+}
+
+function renderDisplayFixtureCard(fixture) {
+  if (!fixture) {
+    return `
+      <div class="fixture-display-empty" aria-label="No fixture">
+        <span>—</span>
+      </div>
+    `;
+  }
+
+  const groupClass =
+    DISPLAY_FIXTURE_GROUP_COLOURS[fixture.groupKey] || "";
+
+  const isLive = displayFixtureIsLive(fixture);
+
+  const scoreMarkup = fixture.completed
+    ? `
+        <span class="fixture-display-score">
+          ${escapeDisplayHtml(String(fixture.scoreA))}
+          <span>–</span>
+          ${escapeDisplayHtml(String(fixture.scoreB))}
+        </span>
+      `
+    : `<span class="fixture-display-versus">v</span>`;
+
+  return `
+    <article class="fixture-display-match ${groupClass} ${isLive ? "is-live" : ""} ${fixture.completed ? "is-complete" : ""}">
+      <div class="fixture-display-match-topline">
+        <span class="fixture-display-group-badge">
+          ${escapeDisplayHtml(fixture.groupKey)}
+        </span>
+
+        ${isLive ? '<span class="fixture-display-live-badge">Live</span>' : ''}
+        ${fixture.completed ? '<span class="fixture-display-complete-badge">FT</span>' : ''}
+      </div>
+
+      <div class="fixture-display-team fixture-display-team-a">
+        ${escapeDisplayHtml(fixture.teamA)}
+      </div>
+
+      ${scoreMarkup}
+
+      <div class="fixture-display-team fixture-display-team-b">
+        ${escapeDisplayHtml(fixture.teamB)}
+      </div>
+    </article>
+  `;
+}
+
+function renderDisplayFixtures() {
+  const grid = displayById("displayFixturesGrid");
+  if (!grid) return;
+
+  const fixtures = getDisplayFixtureEntries();
+  const timeRows = getDisplayFixtureTimeRows(fixtures);
+
+  const teamCount = displayGroupKeys.reduce(
+    (total, groupKey) => total + (displayGroups[groupKey] || []).length,
+    0
+  );
+
+  const teamCountElement = displayById("fixtureDisplayTeamCount");
+  const groupCountElement = displayById("fixtureDisplayGroupCount");
+  const matchCountElement = displayById("fixtureDisplayMatchCount");
+
+  if (teamCountElement) teamCountElement.textContent = String(teamCount);
+  if (groupCountElement) groupCountElement.textContent = String(displayGroupKeys.length);
+  if (matchCountElement) matchCountElement.textContent = String(fixtures.length);
+
+  if (fixtures.length === 0 || timeRows.length === 0) {
+    grid.innerHTML = `
+      <p class="display-loading">
+        No group fixtures have been loaded yet.
+      </p>
+    `;
+    return;
+  }
+
+  const fixturesBySlot = new Map();
+
+  fixtures.forEach((fixture) => {
+    const timeKey = Number.isFinite(fixture.timestamp)
+      ? String(fixture.timestamp)
+      : "unscheduled";
+
+    const key = `${timeKey}:${fixture.pitchNumber}`;
+
+    if (!fixturesBySlot.has(key)) {
+      fixturesBySlot.set(key, []);
+    }
+
+    fixturesBySlot.get(key).push(fixture);
+  });
+
+  const headerCells = DISPLAY_FIXTURE_PITCHES
+    .map((pitchNumber) => `
+      <div class="fixture-display-column-heading">
+        Pitch ${pitchNumber}
+      </div>
+    `)
+    .join("");
+
+  const rowMarkup = timeRows
+    .map((timestamp) => {
+      const timeKey = Number.isFinite(timestamp)
+        ? String(timestamp)
+        : "unscheduled";
+
+      const cells = DISPLAY_FIXTURE_PITCHES
+        .map((pitchNumber) => {
+          const slotFixtures = fixturesBySlot.get(
+            `${timeKey}:${pitchNumber}`
+          ) || [];
+
+          return `
+            <div class="fixture-display-cell">
+              ${
+                slotFixtures.length
+                  ? slotFixtures.map(renderDisplayFixtureCard).join("")
+                  : renderDisplayFixtureCard(null)
+              }
+            </div>
+          `;
+        })
+        .join("");
+
+      return `
+        <div class="fixture-display-time-cell">
+          ${escapeDisplayHtml(formatDisplayFixtureTime(timestamp))}
+        </div>
+        ${cells}
+      `;
+    })
+    .join("");
+
+  grid.innerHTML = `
+    <div class="fixture-display-corner-heading">Time</div>
+    ${headerCells}
+    ${rowMarkup}
+  `;
+}
+
+
+/* ==================================================
    Live Pitch Map
 ================================================== */
 
@@ -1276,6 +1534,7 @@ function renderDisplayPlateBracket() {
 ================================================== */
 
 function normalizeDisplayMode(value) {
+  if (value === "fixtures") return "fixtures";
   if (value === "pitchMap") return "pitchMap";
   if (value === "knockout") return "knockout";
   if (value === "plate") return "plate";
@@ -1286,6 +1545,9 @@ function normalizeDisplayMode(value) {
 function renderDisplayMode() {
   const groupsView =
     displayById("displayGroupsView");
+
+  const fixturesView =
+    displayById("displayFixturesView");
 
   const pitchMapView =
     displayById("displayPitchMapView");
@@ -1309,6 +1571,11 @@ function renderDisplayMode() {
       mode !== "groups";
   }
 
+  if (fixturesView) {
+    fixturesView.hidden =
+      mode !== "fixtures";
+  }
+
   if (pitchMapView) {
     pitchMapView.hidden =
       mode !== "pitchMap";
@@ -1325,7 +1592,10 @@ function renderDisplayMode() {
   }
 
   if (modeLabel) {
-    if (mode === "pitchMap") {
+    if (mode === "fixtures") {
+      modeLabel.textContent =
+        "Group Fixtures";
+    } else if (mode === "pitchMap") {
       modeLabel.textContent =
         "Live Pitch Map";
     } else if (mode === "knockout") {
@@ -1345,6 +1615,7 @@ function renderCompleteDisplay() {
   renderSponsorTicker();
   renderMainSponsor();
   renderAllDisplayGroups();
+  renderDisplayFixtures();
   renderDisplayPitchMap();
   renderDisplayKnockoutBracket();
   renderDisplayPlateBracket();
