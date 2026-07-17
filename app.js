@@ -5706,6 +5706,7 @@ document.addEventListener("DOMContentLoaded", () => {
 ================================================== */
 
 function normalizeVenueDisplayMode(value) {
+  if (value === "fixtures") return "fixtures";
   if (value === "pitchMap") return "pitchMap";
   if (value === "knockout") return "knockout";
   if (value === "plate") return "plate";
@@ -5716,6 +5717,13 @@ function normalizeVenueDisplayMode(value) {
 function getVenueDisplayModeCopy(mode) {
   const normalizedMode =
     normalizeVenueDisplayMode(mode);
+
+  if (normalizedMode === "fixtures") {
+    return {
+      label: "Group Fixtures",
+      changing: "Changing display to Group Fixtures…"
+    };
+  }
 
   if (normalizedMode === "pitchMap") {
     return {
@@ -5752,6 +5760,9 @@ function renderVenueDisplayMode(mode) {
   const groupsButton =
     byId("showGroupsDisplayBtn");
 
+  const fixturesButton =
+    byId("showFixturesDisplayBtn");
+
   const pitchMapButton =
     byId("showPitchMapDisplayBtn");
 
@@ -5766,6 +5777,7 @@ function renderVenueDisplayMode(mode) {
 
   const buttonModes = [
     [groupsButton, "groups"],
+    [fixturesButton, "fixtures"],
     [pitchMapButton, "pitchMap"],
     [knockoutButton, "knockout"],
     [plateButton, "plate"]
@@ -5843,6 +5855,9 @@ function startVenueDisplayControls() {
   const groupsButton =
     byId("showGroupsDisplayBtn");
 
+  const fixturesButton =
+    byId("showFixturesDisplayBtn");
+
   const pitchMapButton =
     byId("showPitchMapDisplayBtn");
 
@@ -5857,6 +5872,7 @@ function startVenueDisplayControls() {
 
   if (
     !groupsButton &&
+    !fixturesButton &&
     !pitchMapButton &&
     !knockoutButton &&
     !plateButton &&
@@ -5870,6 +5886,15 @@ function startVenueDisplayControls() {
       "click",
       () => {
         setVenueDisplayMode("groups");
+      }
+    );
+  }
+
+  if (fixturesButton) {
+    fixturesButton.addEventListener(
+      "click",
+      () => {
+        setVenueDisplayMode("fixtures");
       }
     );
   }
