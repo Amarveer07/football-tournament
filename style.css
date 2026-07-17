@@ -2280,3 +2280,41 @@ tbody tr:hover td {
   font-weight: 900;
   text-transform: uppercase;
 }
+
+
+
+/* ==================================================
+   Five-team seeded NEST Plate bracket
+================================================== */
+
+.bottom-eight-bracket-five-team {
+  grid-template-columns:
+    minmax(210px, 1fr)
+    minmax(210px, 1fr)
+    minmax(210px, 0.92fr)
+    minmax(210px, 1fr);
+
+  align-items: center;
+  gap: 14px;
+
+  min-width: 900px;
+  min-height: 430px;
+}
+
+.bottom-eight-bracket-five-team .knockout-column {
+  justify-content: center;
+}
+
+.bottom-eight-bracket-five-team .knockout-column-matches {
+  justify-content: center;
+}
+
+.bottom-eight-bracket-five-team .bottom-eight-final {
+  align-self: center;
+}
+
+@media (max-width: 700px) {
+  .bottom-eight-bracket-five-team {
+    min-width: 840px;
+  }
+}
