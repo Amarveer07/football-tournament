@@ -53,10 +53,10 @@ const DISPLAY_TEAM_LOGOS = {
   "real punjab fc": "logos/real-punjab-fc.png",
   "sunderland afc": "logos/sunderland-afc.png",
   "manchester youth": "logos/manchester-youth.png",
-  "sikh gurdwara darlington": "logos/sikh-gurdwara-darlington.png",
 
   "kisan fc": "logos/kisan-fc.png",
   "huddersfield fc": "logos/huddersfield-fc.png",
+  "akaal fc paris": "logos/akaal-fc-paris.png",
   "chardi kala fc": "logos/chardi-kala-fc.png",
 
   "newcastle panjab fc a": "logos/newcastle-punjab-fc-a.png",
@@ -70,6 +70,7 @@ const DISPLAY_TEAM_LOGOS = {
   "fc italy": "logos/fc-italy.png",
 
   "fc punjabi lions belgium": "logos/fc-punjabi-lions-belgium.png",
+  "doncaster fc a": "logos/doncaster-fc-a.png",
   "gng thornaby": "logos/gng-thornaby.png",
   "newcastle panjab fc c": "logos/newcastle-punjab-fc-c.png",
   "newcastle punjab fc c": "logos/newcastle-punjab-fc-c.png",
@@ -134,7 +135,7 @@ const PLATE_ROUNDS = {
   quarterFinals: {
     label: "Quarter-finals",
     shortLabel: "QF",
-    matchCount: 4
+    matchCount: 2
   },
   semiFinals: {
     label: "Semi-finals",
@@ -146,6 +147,22 @@ const PLATE_ROUNDS = {
     shortLabel: "Final",
     matchCount: 1
   }
+};
+
+const DISPLAY_ROUND_OF_16_PLACEHOLDERS = {
+  1: ["Winner of Group A", "Third-place rank 4 or 3"],
+  2: ["Winner of Group C", "Third-place rank 3 or 4"],
+  3: ["Winner of Group F", "Runner-up of Group B"],
+  4: ["Runner-up of Group D", "Runner-up of Group E"],
+  5: ["Winner of Group B", "Third-place rank 2 or 1"],
+  6: ["Winner of Group D", "Third-place rank 1 or 2"],
+  7: ["Winner of Group E", "Runner-up of Group A"],
+  8: ["Runner-up of Group C", "Runner-up of Group F"]
+};
+
+const DISPLAY_PLATE_QF_PLACEHOLDERS = {
+  1: ["Last in Group D", "Last in Group E"],
+  2: ["Last in Group B", "Last in Group F"]
 };
 
 /* ==================================================
@@ -658,6 +675,37 @@ function getDisplayKnockoutHeading() {
   return "Knockout Stages";
 }
 
+
+function getDisplayKnockoutPlaceholder(
+  roundKey,
+  matchNumber,
+  slot
+) {
+  if (roundKey === "roundOf16") {
+    return DISPLAY_ROUND_OF_16_PLACEHOLDERS[matchNumber]?.[
+      slot === "one" ? 0 : 1
+    ] || "Round of 16 team";
+  }
+
+  const previousRound =
+    roundKey === "quarterFinals"
+      ? KNOCKOUT_ROUNDS.roundOf16
+      : roundKey === "semiFinals"
+        ? KNOCKOUT_ROUNDS.quarterFinals
+        : roundKey === "final"
+          ? KNOCKOUT_ROUNDS.semiFinals
+          : null;
+
+  if (!previousRound) return "Team to be confirmed";
+
+  const previousMatchNumber =
+    slot === "one"
+      ? matchNumber * 2 - 1
+      : matchNumber * 2;
+
+  return `Winner of ${previousRound.shortLabel} ${previousMatchNumber}`;
+}
+
 function renderDisplayPenaltyWinnerNote(result) {
   const isPenaltyWin =
     result?.scoreOne !== null &&
@@ -680,7 +728,12 @@ function renderDisplayPenaltyWinnerNote(result) {
   `;
 }
 
-function renderDisplayBracketTeam(reference, score, winner) {
+function renderDisplayBracketTeam(
+  reference,
+  score,
+  winner,
+  placeholder = "Team to be confirmed"
+) {
   const team = findDisplayTeam(reference);
   const isWinner = displayTeamReferencesMatch(reference, winner);
 
@@ -688,7 +741,7 @@ function renderDisplayBracketTeam(reference, score, winner) {
     return `
       <div class="display-bracket-team">
         <span class="display-bracket-team-name display-bracket-placeholder">
-          Team TBC
+          ${escapeDisplayHtml(placeholder)}
         </span>
         <span class="display-bracket-score">—</span>
       </div>
@@ -728,13 +781,23 @@ function renderDisplayBracketMatch(roundKey, matchNumber) {
       ${renderDisplayBracketTeam(
         teams.teamOne,
         result.scoreOne,
-        result.winner
+        result.winner,
+        getDisplayKnockoutPlaceholder(
+          roundKey,
+          matchNumber,
+          "one"
+        )
       )}
 
       ${renderDisplayBracketTeam(
         teams.teamTwo,
         result.scoreTwo,
-        result.winner
+        result.winner,
+        getDisplayKnockoutPlaceholder(
+          roundKey,
+          matchNumber,
+          "two"
+        )
       )}
 
       ${renderDisplayPenaltyWinnerNote(result)}
@@ -770,15 +833,6 @@ function renderDisplayKnockoutBracket() {
 
   if (!bracket) return;
   if (title) title.textContent = getDisplayKnockoutHeading();
-
-  if (!displayKnockoutSetupIsComplete()) {
-    bracket.innerHTML = `
-      <p class="display-loading">
-        Knockout matches have not been confirmed yet.
-      </p>
-    `;
-    return;
-  }
 
   bracket.innerHTML = `
     ${renderDisplayBracketColumn("roundOf16", [1, 2, 3, 4])}
@@ -1018,51 +1072,83 @@ function getDisplayPlateMatchTeams(
     };
   }
 
-  const previousRound =
-    roundKey === "semiFinals"
-      ? "quarterFinals"
-      : roundKey === "final"
-        ? "semiFinals"
-        : null;
+  if (roundKey === "semiFinals") {
+    const directSeedKey = matchNumber === 1 ? 3 : 4;
 
-  if (!previousRound) {
     return {
-      teamOne: null,
-      teamTwo: null
+      teamOne: getDisplayPlateWinner(
+        "quarterFinals",
+        matchNumber
+      ),
+      teamTwo: normalizeDisplayTeamReference(
+        displayPlateSetup?.[directSeedKey]?.teamOne
+      )
+    };
+  }
+
+  if (roundKey === "final") {
+    return {
+      teamOne: getDisplayPlateWinner("semiFinals", 1),
+      teamTwo: getDisplayPlateWinner("semiFinals", 2)
     };
   }
 
   return {
-    teamOne: getDisplayPlateWinner(
-      previousRound,
-      matchNumber * 2 - 1
-    ),
-
-    teamTwo: getDisplayPlateWinner(
-      previousRound,
-      matchNumber * 2
-    )
+    teamOne: null,
+    teamTwo: null
   };
 }
 
 function displayPlateSetupIsComplete() {
-  for (
-    let matchNumber = 1;
-    matchNumber <= 4;
-    matchNumber += 1
-  ) {
-    const setupMatch =
-      displayPlateSetup?.[matchNumber];
+  const quarterFinalsReady = [1, 2].every(
+    (matchNumber) => {
+      const setupMatch =
+        displayPlateSetup?.[matchNumber];
 
-    if (
-      !setupMatch?.teamOne ||
-      !setupMatch?.teamTwo
-    ) {
-      return false;
+      return Boolean(
+        setupMatch?.teamOne && setupMatch?.teamTwo
+      );
     }
+  );
+
+  const semiFinalSeedsReady = [3, 4].every(
+    (setupKey) => Boolean(
+      displayPlateSetup?.[setupKey]?.teamOne
+    )
+  );
+
+  return quarterFinalsReady && semiFinalSeedsReady;
+}
+
+
+function getDisplayPlatePlaceholder(
+  roundKey,
+  matchNumber,
+  slot
+) {
+  if (roundKey === "quarterFinals") {
+    return DISPLAY_PLATE_QF_PLACEHOLDERS[matchNumber]?.[
+      slot === "one" ? 0 : 1
+    ] || "NEST Plate team";
   }
 
-  return true;
+  if (roundKey === "semiFinals") {
+    if (slot === "one") {
+      return `Winner of QF ${matchNumber}`;
+    }
+
+    return matchNumber === 1
+      ? "Third-place rank 5 or 6"
+      : "Third-place rank 6 or 5";
+  }
+
+  if (roundKey === "final") {
+    return slot === "one"
+      ? "Winner of SF 1"
+      : "Winner of SF 2";
+  }
+
+  return "Team to be confirmed";
 }
 
 function renderDisplayPlateMatch(
@@ -1091,13 +1177,23 @@ function renderDisplayPlateMatch(
       ${renderDisplayBracketTeam(
         teams.teamOne,
         result.scoreOne,
-        result.winner
+        result.winner,
+        getDisplayPlatePlaceholder(
+          roundKey,
+          matchNumber,
+          "one"
+        )
       )}
 
       ${renderDisplayBracketTeam(
         teams.teamTwo,
         result.scoreTwo,
-        result.winner
+        result.winner,
+        getDisplayPlatePlaceholder(
+          roundKey,
+          matchNumber,
+          "two"
+        )
       )}
 
       ${renderDisplayPenaltyWinnerNote(result)}
@@ -1141,21 +1237,10 @@ function renderDisplayPlateBracket() {
 
   if (!bracket) return;
 
-  if (!displayPlateSetupIsComplete()) {
-    bracket.innerHTML = `
-      <p class="display-loading">
-        NEST Plate Championship matches
-        have not been confirmed yet.
-      </p>
-    `;
-
-    return;
-  }
-
   bracket.innerHTML = `
     ${renderDisplayPlateColumn(
       "quarterFinals",
-      [1, 2],
+      [1],
       "plate-quarter-final-column"
     )}
 
@@ -1179,7 +1264,7 @@ function renderDisplayPlateBracket() {
 
     ${renderDisplayPlateColumn(
       "quarterFinals",
-      [3, 4],
+      [2],
       "plate-quarter-final-column"
     )}
   `;
