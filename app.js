@@ -4125,6 +4125,174 @@ function getPitchMapFixture(
   };
 }
 
+function getFixturePitchNumber(value) {
+  const pitchNumber = Number(
+    String(value || "").replace(
+      /[^0-9]/g,
+      ""
+    )
+  );
+
+  return Number.isInteger(pitchNumber)
+    ? pitchNumber
+    : null;
+}
+
+function getLivePitchNumberForFixture(
+  groupKey,
+  matchId
+) {
+  const liveEntry = Object.entries(
+    pitchMapAssignments || {}
+  ).find(([, assignment]) => {
+    return pitchMapAssignmentMatches(
+      assignment,
+      groupKey,
+      matchId
+    );
+  });
+
+  if (!liveEntry) return null;
+
+  const pitchNumber = Number(liveEntry[0]);
+
+  return Number.isInteger(pitchNumber)
+    ? pitchNumber
+    : null;
+}
+
+function getNextUnplayedFixtureForPitch(
+  pitchNumber,
+  completedGroupKey,
+  completedMatchId
+) {
+  const completedMatch =
+    matches?.[completedGroupKey]?.[
+      completedMatchId
+    ];
+
+  const completedTimestamp =
+    new Date(
+      completedMatch?.time || ""
+    ).getTime();
+
+  const fixturesAssignedElsewhere =
+    new Set(
+      Object.entries(
+        pitchMapAssignments || {}
+      )
+        .filter(
+          ([savedPitch]) =>
+            Number(savedPitch) !== pitchNumber
+        )
+        .map(([, assignment]) => {
+          if (!assignment) return "";
+
+          return (
+            `${assignment.groupKey}:` +
+            `${assignment.matchId}`
+          );
+        })
+        .filter(Boolean)
+    );
+
+  const candidates =
+    getAllPitchMapFixtures()
+      .filter((fixture) => {
+        const fixtureKey =
+          `${fixture.groupKey}:` +
+          `${fixture.matchId}`;
+
+        return (
+          getFixturePitchNumber(
+            fixture.pitch
+          ) === pitchNumber &&
+          !fixture.completed &&
+          !(
+            fixture.groupKey ===
+              completedGroupKey &&
+            fixture.matchId ===
+              completedMatchId
+          ) &&
+          !fixturesAssignedElsewhere.has(
+            fixtureKey
+          )
+        );
+      });
+
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  if (
+    Number.isFinite(completedTimestamp)
+  ) {
+    const laterFixture =
+      candidates.find((fixture) => {
+        const fixtureTimestamp =
+          new Date(
+            fixture.time || ""
+          ).getTime();
+
+        return (
+          Number.isFinite(
+            fixtureTimestamp
+          ) &&
+          fixtureTimestamp >
+            completedTimestamp
+        );
+      });
+
+    if (laterFixture) {
+      return laterFixture;
+    }
+  }
+
+  return candidates[0];
+}
+
+function advanceLivePitchAfterResult(
+  groupKey,
+  matchId
+) {
+  Object.entries(
+    pitchMapAssignments || {}
+  ).forEach(
+    ([savedPitch, assignment]) => {
+      if (
+        !pitchMapAssignmentMatches(
+          assignment,
+          groupKey,
+          matchId
+        )
+      ) {
+        return;
+      }
+
+      const pitchNumber =
+        Number(savedPitch);
+
+      const nextFixture =
+        getNextUnplayedFixtureForPitch(
+          pitchNumber,
+          groupKey,
+          matchId
+        );
+
+      pitchMapAssignments[
+        pitchNumber
+      ] = nextFixture
+        ? {
+            groupKey:
+              nextFixture.groupKey,
+            matchId:
+              nextFixture.matchId
+          }
+        : null;
+    }
+  );
+}
+
 function renderPitchMapAssignments() {
   const container = byId(
     "pitchMapAssignments"
@@ -4597,7 +4765,15 @@ function renderPublicMatches(groupKeyFromRender) {
   const completedMatches = matchList.filter(matchIsResult);
 
   upcomingElement.innerHTML = upcomingMatches.length
-    ? upcomingMatches.map(renderPublicUpcomingMatch).join("")
+    ? upcomingMatches
+        .map(
+          (match) =>
+            renderPublicUpcomingMatch(
+              match,
+              selectedGroup
+            )
+        )
+        .join("")
     : '<p class="empty-state">No upcoming matches yet.</p>';
 
   resultsElement.innerHTML = completedMatches.length
@@ -4605,12 +4781,44 @@ function renderPublicMatches(groupKeyFromRender) {
     : '<p class="empty-state">No results yet.</p>';
 }
 
-function renderPublicUpcomingMatch(match) {
+function renderPublicUpcomingMatch(
+  match,
+  groupKey
+) {
+  const livePitchNumber =
+    getLivePitchNumberForFixture(
+      groupKey,
+      match.id
+    );
+
+  const isLive =
+    Number.isInteger(livePitchNumber) &&
+    !matchIsResult(match);
+
   return `
-    <article class="match-card">
+    <article class="match-card ${isLive ? "is-live" : ""}">
+      ${
+        isLive
+          ? `
+            <div class="match-live-row">
+              <span class="match-live-badge">
+                Live
+              </span>
+
+              <span class="match-live-pitch">
+                Pitch ${livePitchNumber}
+              </span>
+            </div>
+          `
+          : ""
+      }
+
       <div class="match-title">
-        ${escapeHtml(match.teamA)} vs ${escapeHtml(match.teamB)}
+        ${escapeHtml(match.teamA)}
+        <span class="match-versus">vs</span>
+        ${escapeHtml(match.teamB)}
       </div>
+
       <div class="match-meta">
         ${escapeHtml(formatMatchTime(match.time))}
         · ${escapeHtml(formatPitchLabel(match.pitch))}
@@ -4621,7 +4829,7 @@ function renderPublicUpcomingMatch(match) {
 
 function renderPublicResult(match) {
   return `
-    <article class="match-card">
+    <article class="match-card is-complete">
       <div class="match-title">
         ${escapeHtml(match.teamA)}
         ${toNumber(match.scoreA)}–${toNumber(match.scoreB)}
@@ -5448,6 +5656,11 @@ async function saveMatchScore(groupKey, matchId) {
   await commitStateChange(() => {
     matches[groupKey][matchId].scoreA = scoreA;
     matches[groupKey][matchId].scoreB = scoreB;
+
+    advanceLivePitchAfterResult(
+      groupKey,
+      matchId
+    );
   });
 }
 
@@ -5718,7 +5931,7 @@ const VENUE_DISPLAY_ROTATIONS = {
   ]
 };
 
-const VENUE_ROTATION_INTERVAL_MS = 20000;
+const VENUE_ROTATION_INTERVAL_MS = 15000;
 
 let currentVenueDisplaySettings = {
   mode: "groups",
@@ -5768,9 +5981,6 @@ function normalizeVenueDisplaySettings(rawSettings) {
       ? rawSettings
       : {};
 
-  const intervalValue =
-    Number(settings.rotationIntervalMs);
-
   return {
     mode: normalizeVenueDisplayMode(
       settings.mode
@@ -5785,10 +5995,7 @@ function normalizeVenueDisplaySettings(rawSettings) {
       Number(settings.rotationStartedAt) || 0,
 
     rotationIntervalMs:
-      Number.isFinite(intervalValue) &&
-      intervalValue >= 5000
-        ? intervalValue
-        : VENUE_ROTATION_INTERVAL_MS
+      VENUE_ROTATION_INTERVAL_MS
   };
 }
 
@@ -5881,7 +6088,7 @@ function getVenueRotationCopy(rotationMode) {
       sequence:
         "Main Knockout → NEST Plate",
       starting:
-        "Starting the 20-second knockout rotation…",
+        "Starting the 15-second knockout rotation…",
       firstMode: "knockout"
     };
   }
@@ -5891,7 +6098,7 @@ function getVenueRotationCopy(rotationMode) {
     sequence:
       "Group Tables → Pitch Map → Fixtures",
     starting:
-      "Starting the 20-second group-stage rotation…",
+      "Starting the 15-second group-stage rotation…",
     firstMode: "groups"
   };
 }
@@ -6008,7 +6215,7 @@ function renderVenueDisplayMode(
       );
 
     status.textContent =
-      `${rotationCopy.label} active: ${rotationCopy.sequence} · 20 seconds each · Currently showing ${
+      `${rotationCopy.label} active: ${rotationCopy.sequence} · 15 seconds each · Currently showing ${
         getVenueDisplayModeCopy(
           effectiveMode
         ).label
