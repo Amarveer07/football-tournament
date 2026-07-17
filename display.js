@@ -17,7 +17,7 @@
 const DISPLAY_SPONSORS = [
   {
     name: "Sikh Channel",
-    logo: ""
+    logo: "logos/sikh-channel.png"
   },
 
   {
@@ -27,52 +27,47 @@ const DISPLAY_SPONSORS = [
 
   {
     name: "Durham County FA",
-    logo: ""
+    logo: "logos/durham-county-fa.png"
   },
 
   {
     name: "Leisure United",
-    logo: ""
+    logo: "logos/leisure-united.png"
   },
 
   {
-    name: "UK Sikh Football Association",
-    logo: ""
+    name: "Doabe Wale",
+    logo: "logos/doabe-wale.png"
   },
 
   {
-    name: "Doable Wale",
-    logo: ""
-  },
-
-  {
-    name: "Lauren Howe Photography",
-    logo: ""
+    name: "Lauren Howe Media",
+    logo: "logos/lauren-howe-media.png"
   },
 
   {
     name: "Billy Lead Photography",
-    logo: ""
+    logo: "logos/billy-lead-photography.png"
   },
 
   {
     name: "Wedz",
-    logo: ""
+    logo: "logos/wedz.png"
   },
 
   {
     name: "Ladhar Investments",
-    logo: "assets/sponsors/ladhar-investments.png"
+    logo: "logos/ladhar-investments.png"
   },
 
   {
     name: "Bikar Singh Johal",
-    logo: ""
+    logo: "logos/bikar-singh-johal.png"
   },
 
   {
     name: "Seaton Group Pharmacy",
-    logo: ""
+    logo: "logos/seaton-group-pharmacy.png"
   },
 
   {
@@ -142,7 +137,7 @@ const MAIN_SPONSOR = {
   name: "Ladhar Investments",
   label: "Main Sponsor",
   subtitle: "North East",
-  logo: "assets/sponsors/ladhar-investments.png"
+  logo: "logos/ladhar-investments.png"
 };
 
 
