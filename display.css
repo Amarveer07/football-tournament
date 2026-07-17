@@ -2624,3 +2624,170 @@ tr.group-position-last td:first-child {
       clamp(8px, 0.68vw, 10.5px);
   }
 }
+
+
+
+/* ==================================================
+   Final fixture row crop fix
+================================================== */
+
+.display-fixtures-view {
+  grid-template-rows:
+    58px
+    minmax(0, 1fr)
+    42px;
+
+  gap: 4px;
+
+  padding:
+    4px
+    8px
+    7px;
+}
+
+.fixture-display-heading {
+  height: 58px;
+  min-height: 58px;
+  padding:
+    3px
+    12px;
+}
+
+.fixture-display-title-copy h1 {
+  font-size:
+    clamp(25px, 2.7vw, 46px);
+}
+
+.fixture-display-title-copy p {
+  margin-top: 2px;
+
+  font-size:
+    clamp(11px, 0.95vw, 16px);
+}
+
+.fixture-display-brand img {
+  max-height: 48px;
+}
+
+.fixture-display-table-shell {
+  height: 100%;
+  min-height: 0;
+
+  /*
+    The internal padding reserves visible room for the
+    final row's bottom border and rounded corners.
+  */
+  padding-bottom: 4px;
+
+  overflow: hidden;
+}
+
+.fixture-display-grid {
+  height: calc(100% - 4px);
+  min-height: 0;
+}
+
+.fixture-display-cell {
+  padding:
+    2px
+    3px;
+}
+
+.fixture-display-time-cell {
+  padding: 3px;
+}
+
+.fixture-display-match {
+  height: calc(100% - 1px);
+  max-height: 100%;
+  min-height: 0;
+
+  padding:
+    2px
+    4px
+    3px;
+}
+
+.fixture-display-footer {
+  height: 42px;
+  min-height: 42px;
+
+  padding:
+    3px
+    16px;
+}
+
+.fixture-display-footer-logo {
+  width: 54px;
+  height: 34px;
+}
+
+.fixture-display-stat strong {
+  font-size:
+    clamp(14px, 1.2vw, 20px);
+}
+
+.fixture-display-stat span,
+.fixture-display-live strong {
+  font-size:
+    clamp(8px, 0.68vw, 11px);
+}
+
+@media (max-height: 760px) {
+  .display-fixtures-view {
+    grid-template-rows:
+      48px
+      minmax(0, 1fr)
+      34px;
+
+    gap: 3px;
+
+    padding:
+      3px
+      7px
+      6px;
+  }
+
+  .fixture-display-heading {
+    height: 48px;
+    min-height: 48px;
+  }
+
+  .fixture-display-brand img {
+    max-height: 39px;
+  }
+
+  .fixture-display-title-copy h1 {
+    font-size:
+      clamp(21px, 2.35vw, 38px);
+  }
+
+  .fixture-display-title-copy p {
+    font-size:
+      clamp(9px, 0.82vw, 13px);
+  }
+
+  .fixture-display-grid {
+    grid-template-rows:
+      26px
+      repeat(
+        var(--fixture-row-count, 6),
+        minmax(0, 1fr)
+      );
+  }
+
+  .fixture-display-footer {
+    height: 34px;
+    min-height: 34px;
+  }
+
+  .fixture-display-footer-logo {
+    width: 44px;
+    height: 28px;
+  }
+
+  .fixture-display-team {
+    font-size:
+      clamp(7.5px, 0.62vw, 9.5px);
+  }
+}
