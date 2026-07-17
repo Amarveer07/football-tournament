@@ -7,7 +7,7 @@
   <title>Football Tournament – Live Display</title>
 
   <!-- Venue display styling -->
-  <link rel="stylesheet" href="display.css?v=6">
+  <link rel="stylesheet" href="display.css?v=7">
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
@@ -15,7 +15,7 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Venue display logic -->
-  <script src="display.js?v=6" defer></script>
+  <script src="display.js?v=7" defer></script>
 </head>
 
 <body>
@@ -81,6 +81,76 @@
             aria-label="Main tournament sponsor"
           >
             Loading main sponsor…
+          </div>
+        </footer>
+      </section>
+
+      <!-- GROUP FIXTURE SCHEDULE MODE -->
+      <section
+        id="displayFixturesView"
+        class="display-view display-fixtures-view"
+        aria-label="Full group-stage fixture schedule"
+        hidden
+      >
+        <header class="fixture-display-heading">
+          <div class="fixture-display-brand fixture-display-brand-left">
+            <img
+              src="logos/tournament-logo-full.png"
+              alt="Ladhar Investments North East Sikh Tournament 2026"
+            >
+          </div>
+
+          <div class="fixture-display-title-copy">
+            <h1>Group Stage Fixtures</h1>
+            <p>Saturday 18 July 2026</p>
+          </div>
+
+          <div class="fixture-display-brand fixture-display-brand-right">
+            <span>Powered by</span>
+            <img
+              src="assets/sponsors/ladhar-investments.png"
+              alt="Ladhar Investments"
+            >
+          </div>
+        </header>
+
+        <div class="fixture-display-table-shell">
+          <div
+            id="displayFixturesGrid"
+            class="fixture-display-grid"
+            aria-live="polite"
+          >
+            <p class="display-loading">
+              Loading the official fixture schedule…
+            </p>
+          </div>
+        </div>
+
+        <footer class="fixture-display-footer">
+          <div class="fixture-display-stat">
+            <strong id="fixtureDisplayTeamCount">22</strong>
+            <span>Teams</span>
+          </div>
+
+          <div class="fixture-display-stat">
+            <strong id="fixtureDisplayGroupCount">6</strong>
+            <span>Groups</span>
+          </div>
+
+          <img
+            class="fixture-display-footer-logo"
+            src="logos/tournament-logo.png"
+            alt="Sikh Tournament"
+          >
+
+          <div class="fixture-display-stat">
+            <strong id="fixtureDisplayMatchCount">36</strong>
+            <span>Fixtures</span>
+          </div>
+
+          <div class="fixture-display-live">
+            <span class="fixture-display-live-dot"></span>
+            <strong>Live Tournament</strong>
           </div>
         </footer>
       </section>
