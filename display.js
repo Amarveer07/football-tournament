@@ -22,12 +22,35 @@ const DISPLAY_SPONSORS = [
 ];
 
 const GROUP_SPONSORS = {
-  A: "",
-  B: "",
-  C: "",
-  D: "",
-  E: "",
-  F: ""
+  A: {
+    name: "Northwood Estates",
+    logo: "logos/northwood-estates.png"
+  },
+
+  B: {
+    name: "Trussted Group",
+    logo: "logos/trussted-group.png"
+  },
+
+  C: {
+    name: "Stonewater Estates",
+    logo: "logos/stonewater-estates.png"
+  },
+
+  D: {
+    name: "Envy Sports",
+    logo: "logos/envy-sports.png"
+  },
+
+  E: {
+    name: "Holiday Inn Washington",
+    logo: "logos/holiday-inn-washington.png"
+  },
+
+  F: {
+    name: "Sandhu Lettings",
+    logo: "logos/sandhu-lettings.png"
+  }
 };
 
 const TOURNAMENT_BRAND = {
@@ -450,7 +473,19 @@ function renderDisplayTeamLogo(team) {
 }
 
 function getDisplayGroupSponsor(groupKey) {
-  return String(GROUP_SPONSORS[groupKey] || "").trim();
+  const sponsor = GROUP_SPONSORS[groupKey];
+
+  if (!sponsor || typeof sponsor !== "object") {
+    return {
+      name: "",
+      logo: ""
+    };
+  }
+
+  return {
+    name: String(sponsor.name || "").trim(),
+    logo: String(sponsor.logo || "").trim()
+  };
 }
 
 function formatDisplayGoalDifference(value) {
@@ -515,16 +550,6 @@ function renderDisplayGroupCard(groupKey) {
         <h2 class="display-group-title">
           Group ${escapeDisplayHtml(groupKey)}
         </h2>
-
-        <div class="display-group-sponsor">
-          <span class="display-group-sponsor-label">
-            Sponsored by
-          </span>
-
-          <span class="display-group-sponsor-name">
-            ${groupSponsor ? escapeDisplayHtml(groupSponsor) : "&nbsp;"}
-          </span>
-        </div>
       </header>
 
       <table class="display-group-table">
@@ -563,6 +588,30 @@ function renderDisplayGroupCard(groupKey) {
           }
         </tbody>
       </table>
+
+      <footer class="display-group-sponsor-footer">
+        <div class="display-group-sponsor-copy">
+          <span class="display-group-sponsor-label">
+            Sponsored by
+          </span>
+
+          <strong class="display-group-sponsor-name">
+            ${
+              groupSponsor.name
+                ? escapeDisplayHtml(groupSponsor.name)
+                : "Sponsor TBC"
+            }
+          </strong>
+        </div>
+
+        <div class="display-group-sponsor-logo-frame">
+          ${renderOptionalImage(
+            groupSponsor.logo,
+            "display-group-sponsor-logo",
+            `${groupSponsor.name || `Group ${groupKey} sponsor`} logo`
+          )}
+        </div>
+      </footer>
     </article>
   `;
 }
