@@ -86,17 +86,17 @@ function defaultGroups() {
     ],
 
     D: [
-      createTeam("Singh Brothers"),
-      createTeam("Slow & Steady Leeds"),
-      createTeam("Soorma FC Paris"),
-      createTeam("FC Italy")
-    ],
-
-    E: [
       createTeam("FC Punjabi Lions Belgium"),
       createTeam("Doncaster FC A"),
       createTeam("GNG Thornaby"),
       createTeam("Newcastle Panjab FC C")
+    ],
+
+    E: [
+      createTeam("Singh Brothers"),
+      createTeam("Slow & Steady Leeds"),
+      createTeam("Soorma FC Paris"),
+      createTeam("FC Italy")
     ],
 
     F: [
@@ -114,7 +114,7 @@ const OFFICIAL_TEAM_NAME_ALIASES = {
 };
 
 const OFFICIAL_FIXTURE_VERSION =
-  "2026-07-18-21-team-v1";
+  "2026-07-18-final-pdf-v2";
 
 const OFFICIAL_FIXTURE_DATE = {
   year: 2026,
@@ -151,21 +151,21 @@ const OFFICIAL_GROUP_FIXTURES = {
   ],
 
   D: [
-    [10, 0, "6", "Singh Brothers", "FC Italy"],
-    [10, 30, "6", "Slow & Steady Leeds", "Soorma FC Paris"],
-    [11, 0, "6", "Slow & Steady Leeds", "FC Italy"],
-    [11, 30, "6", "FC Italy", "Soorma FC Paris"],
-    [12, 0, "6", "Singh Brothers", "Soorma FC Paris"],
-    [12, 30, "6", "Singh Brothers", "Slow & Steady Leeds"]
-  ],
-
-  E: [
     [10, 0, "5", "FC Punjabi Lions Belgium", "Newcastle Panjab FC C"],
     [10, 30, "5", "Doncaster FC A", "GNG Thornaby"],
     [11, 0, "5", "Doncaster FC A", "Newcastle Panjab FC C"],
     [11, 30, "5", "Newcastle Panjab FC C", "GNG Thornaby"],
     [12, 0, "5", "FC Punjabi Lions Belgium", "GNG Thornaby"],
     [12, 30, "5", "FC Punjabi Lions Belgium", "Doncaster FC A"]
+  ],
+
+  E: [
+    [10, 0, "6", "Singh Brothers", "FC Italy"],
+    [10, 30, "6", "Slow & Steady Leeds", "Soorma FC Paris"],
+    [11, 0, "6", "Slow & Steady Leeds", "FC Italy"],
+    [11, 30, "6", "FC Italy", "Soorma FC Paris"],
+    [12, 0, "6", "Singh Brothers", "Soorma FC Paris"],
+    [12, 30, "6", "Singh Brothers", "Slow & Steady Leeds"]
   ],
 
   F: [
