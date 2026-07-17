@@ -1855,3 +1855,11 @@ tr.group-position-last td:first-child {
     width: 1140px;
   }
 }
+
+
+
+/* Descriptive knockout placeholders before qualifiers are confirmed */
+.display-bracket-placeholder {
+  white-space: normal;
+  line-height: 1.08;
+}
