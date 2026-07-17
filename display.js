@@ -118,13 +118,13 @@ const GROUP_SPONSORS = {
   },
 
   D: {
-    name: "Envy Sports",
-    logo: "logos/envy-sports.png"
+    name: "Holiday Inn Washington",
+    logo: "logos/holiday-inn-washington.png"
   },
 
   E: {
-    name: "Holiday Inn Washington",
-    logo: "logos/holiday-inn-washington.png"
+    name: "Envy Sports",
+    logo: "logos/envy-sports.png"
   },
 
   F: {
