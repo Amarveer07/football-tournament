@@ -20,7 +20,7 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Tournament application -->
-  <script src="app.js?v=36" defer></script>
+  <script src="app.js?v=37" defer></script>
 
   <style>
     /* Group position colours appear only after a result exists. */
@@ -46,6 +46,57 @@
 
     #groupTable .group-position-last td:first-child {
       border-left: 3px solid rgba(248, 113, 113, 0.68);
+    }
+
+    .official-fixtures-panel {
+      margin: 0 0 22px;
+      padding: 18px;
+      background: rgba(107, 33, 168, 0.08);
+      border: 1px solid rgba(126, 34, 206, 0.24);
+      border-radius: 16px;
+    }
+
+    .official-fixtures-panel h3 {
+      margin-top: 0;
+    }
+
+    .official-fixtures-panel p {
+      margin-bottom: 14px;
+    }
+
+    .official-fixtures-panel button:disabled {
+      cursor: not-allowed;
+      opacity: 0.62;
+    }
+
+    .official-fixtures-status {
+      margin: 10px 0 0;
+      font-size: 0.92rem;
+      opacity: 0.82;
+    }
+
+    .match-edit-panel {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(107, 33, 168, 0.16);
+    }
+
+    .match-edit-panel summary {
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .match-edit-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    @media (max-width: 700px) {
+      .match-edit-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -276,6 +327,32 @@
                   Create fixtures and enter completed results.
                 </p>
               </div>
+            </div>
+
+            <div class="official-fixtures-panel">
+              <h3>Official Fixture Pack</h3>
+
+              <p>
+                Load the full Saturday schedule in one step. All 36 fixtures
+                will appear in the normal match lists below, where scores and
+                fixture details can still be changed manually.
+              </p>
+
+              <button
+                id="loadOfficialFixturesBtn"
+                type="button"
+                onclick="loadOfficialFixtures()"
+              >
+                Load Official Fixtures
+              </button>
+
+              <p
+                id="officialFixturesStatus"
+                class="official-fixtures-status"
+                aria-live="polite"
+              >
+                Loads all 36 official group fixtures.
+              </p>
             </div>
 
             <div class="form-grid match-form">
