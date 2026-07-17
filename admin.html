@@ -1,28 +1,20 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>Football Tournament – Admin</title>
-
-  <!-- Admin styling -->
-  <link rel="stylesheet" href="admin.css?v=10">
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-auth-compat.js"></script>
-  <script src="firebase-init.js" defer></script>
-
-  <!-- Tournament application -->
-  <script src="app.js?v=40" defer></script>
-
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Football Tournament – Matchday Admin</title>
+<!-- Admin styling -->
+<link href="admin.css?v=10" rel="stylesheet"/>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-auth-compat.js"></script>
+<script defer="" src="firebase-init.js"></script>
+<!-- Tournament application -->
+<script defer="" src="app.js?v=40"></script>
+<style>
     /* Group position colours appear only after a result exists. */
     #groupTable .group-position-top-two td {
       background: rgba(34, 197, 94, 0.085);
@@ -165,1008 +157,857 @@
         grid-template-columns: 1fr;
       }
     }
-  </style>
+  
+
+    /* Matchday admin redesign */
+    :root {
+      --admin-purple: #6d28d9;
+      --admin-purple-dark: #3b0764;
+      --admin-green: #15803d;
+      --admin-blue: #0369a1;
+      --admin-amber: #b45309;
+      --admin-red: #b91c1c;
+      --admin-border: rgba(76, 29, 149, 0.15);
+      --admin-shadow: 0 18px 42px rgba(49, 18, 75, 0.09);
+    }
+
+    html { scroll-behavior: smooth; }
+    body { padding-bottom: 84px; }
+    #adminPanel { overflow: visible; }
+
+    .admin-command-centre {
+      margin: 0 0 18px;
+      padding: clamp(18px, 3vw, 28px);
+      color: #fff;
+      background: radial-gradient(circle at top right, rgba(216,180,254,.34), transparent 38%), linear-gradient(135deg, rgba(76,29,149,.98), rgba(88,28,135,.94));
+      border: 1px solid rgba(216,180,254,.32);
+      border-radius: 22px;
+      box-shadow: 0 24px 50px rgba(49,18,75,.22);
+    }
+
+    .admin-command-centre-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .admin-command-centre h2 { margin: 4px 0 7px; color: #fff; font-size: clamp(1.45rem, 3vw, 2.15rem); line-height: 1.05; }
+    .admin-command-centre p { max-width: 700px; margin: 0; color: rgba(255,255,255,.78); }
+    .admin-eyebrow { color: #e9d5ff; font-size: .76rem; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+
+    .admin-accordion-tools { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    .admin-accordion-tools button { min-height: 40px; padding: 8px 13px; color: #fff; background: rgba(255,255,255,.11); border-color: rgba(255,255,255,.25); }
+
+    .admin-jump-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+    .admin-jump-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+      min-height: 112px;
+      padding: 16px;
+      color: #fff;
+      background: rgba(255,255,255,.095);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 15px;
+      box-shadow: none;
+      text-align: left;
+    }
+    .admin-jump-card:hover, .admin-jump-card:focus-visible { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.38); transform: translateY(-2px); }
+    .admin-jump-card-primary { background: linear-gradient(135deg, rgba(168,85,247,.72), rgba(126,34,206,.78)); }
+    .admin-jump-card strong { padding-right: 38px; font-size: 1.02rem; line-height: 1.15; }
+    .admin-jump-card small { color: rgba(255,255,255,.7); font-size: .8rem; line-height: 1.25; }
+    .admin-jump-number { position: absolute; top: 12px; right: 13px; color: rgba(255,255,255,.35); font-size: .8rem; font-weight: 900; letter-spacing: .08em; }
+
+    .admin-secondary-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .admin-secondary-links button { min-height: 38px; padding: 8px 12px; color: #f3e8ff; background: rgba(255,255,255,.075); border: 1px solid rgba(255,255,255,.16); border-radius: 999px; font-size: .82rem; font-weight: 800; }
+
+    .admin-sticky-nav {
+      position: sticky;
+      top: 8px;
+      z-index: 80;
+      margin: 0 0 16px;
+      padding: 7px;
+      background: rgba(255,255,255,.93);
+      border: 1px solid var(--admin-border);
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(49,18,75,.12);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .admin-sticky-nav-inner { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; }
+    .admin-sticky-nav-inner::-webkit-scrollbar { display: none; }
+    .admin-sticky-nav button { flex: 1 0 auto; min-width: 92px; min-height: 42px; padding: 8px 12px; color: #4c1d95; background: rgba(109,40,217,.075); border: 1px solid rgba(109,40,217,.12); border-radius: 11px; font-size: .83rem; font-weight: 900; }
+    .admin-sticky-nav button:hover, .admin-sticky-nav button:focus-visible { color: #fff; background: var(--admin-purple); }
+
+    .selected-group-panel { margin-bottom: 16px; border-radius: 18px; box-shadow: var(--admin-shadow); }
+    .tabs { gap: 7px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+    .tabs button { min-width: 52px; min-height: 44px; flex: 0 0 auto; }
+
+    .admin-accordion {
+      scroll-margin-top: 82px;
+      margin: 0 0 12px;
+      background: rgba(255,255,255,.96);
+      border: 1px solid var(--admin-border);
+      border-left: 5px solid rgba(109,40,217,.52);
+      border-radius: 17px;
+      box-shadow: var(--admin-shadow);
+      overflow: clip;
+    }
+    .admin-accordion > summary { min-height: 72px; padding: 15px 18px; background: linear-gradient(90deg, rgba(109,40,217,.065), rgba(255,255,255,0)); cursor: pointer; user-select: none; }
+    .admin-accordion > summary:hover { background: linear-gradient(90deg, rgba(109,40,217,.11), rgba(255,255,255,0)); }
+    .admin-accordion[open] > summary { border-bottom: 1px solid rgba(76,29,149,.1); }
+    .accordion-summary-copy { display: grid; grid-template-columns: 1fr; gap: 3px; }
+    .admin-section-badge { justify-self: start; margin-bottom: 2px; padding: 3px 8px; color: #5b21b6; background: rgba(109,40,217,.1); border: 1px solid rgba(109,40,217,.12); border-radius: 999px; font-size: .65rem; font-weight: 900; letter-spacing: .08em; line-height: 1; text-transform: uppercase; }
+    .accordion-summary-title { font-size: 1.05rem; font-weight: 900; }
+    .accordion-summary-description { max-width: 760px; font-size: .84rem; line-height: 1.35; opacity: .72; }
+    .accordion-content { padding: clamp(16px, 3vw, 24px); }
+
+    .admin-section-live { border-left-color: #7c3aed; }
+    .admin-section-matchday { border-left-color: var(--admin-green); }
+    .admin-section-matchday .admin-section-badge { color: #166534; background: rgba(34,197,94,.11); border-color: rgba(34,197,94,.18); }
+    .admin-section-competition { border-left-color: var(--admin-blue); }
+    .admin-section-competition .admin-section-badge { color: #075985; background: rgba(14,165,233,.11); border-color: rgba(14,165,233,.17); }
+    .admin-section-knockout { border-left-color: #c026d3; }
+    .admin-section-knockout .admin-section-badge { color: #86198f; background: rgba(217,70,239,.1); border-color: rgba(217,70,239,.16); }
+    .admin-section-setup { border-left-color: #64748b; }
+    .admin-section-setup .admin-section-badge { color: #475569; background: rgba(100,116,139,.1); border-color: rgba(100,116,139,.17); }
+    .admin-section-warning { border-left-color: var(--admin-amber); }
+    .admin-section-warning .admin-section-badge { color: #92400e; background: rgba(245,158,11,.11); border-color: rgba(245,158,11,.18); }
+    .admin-section-danger { border-left-color: var(--admin-red); }
+    .admin-section-danger .admin-section-badge { color: #991b1b; background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.18); }
+
+    button, input, select { min-height: 44px; }
+    button { touch-action: manipulation; }
+    .form-panel, .official-fixtures-panel, .display-rotation-panel { border-radius: 15px; }
+
+    .admin-back-to-top {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 100;
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      color: #fff;
+      background: rgba(76,29,149,.94);
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 999px;
+      box-shadow: 0 12px 28px rgba(49,18,75,.26);
+      font-size: 1.25rem;
+      font-weight: 900;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .admin-back-to-top.is-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+    @media (max-width: 860px) {
+      .admin-jump-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .admin-command-centre-heading { flex-direction: column; }
+      .admin-accordion-tools { justify-content: flex-start; }
+    }
+
+    @media (max-width: 580px) {
+      body { padding-bottom: 76px; }
+      .admin-page { padding-left: 10px; padding-right: 10px; }
+      .admin-command-centre { padding: 17px 14px; border-radius: 17px; }
+      .admin-jump-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .admin-jump-card { min-height: 105px; padding: 13px 11px; }
+      .admin-jump-card strong { padding-right: 22px; font-size: .91rem; }
+      .admin-jump-card small { font-size: .72rem; }
+      .admin-secondary-links { gap: 6px; }
+      .admin-secondary-links button { font-size: .75rem; }
+      .admin-sticky-nav { top: 5px; margin-left: -2px; margin-right: -2px; }
+      .admin-sticky-nav button { min-width: 78px; min-height: 40px; padding: 7px 10px; font-size: .76rem; }
+      .admin-accordion > summary { min-height: 66px; padding: 13px 14px; }
+      .accordion-summary-description { display: none; }
+      .accordion-content { padding: 14px 12px; }
+      .admin-back-to-top { right: 12px; bottom: 12px; }
+    }
+</style>
 </head>
-
 <body>
-  <main class="admin-page">
-
-    <!-- ============================================
+<main class="admin-page">
+<!-- ============================================
          ADMIN LOGIN
     ============================================= -->
-
-    <section class="card login-card">
-      <div class="section-heading">
-        <div>
-          <h1>Admin Dashboard</h1>
-
-          <p>
+<section class="card login-card">
+<div class="section-heading">
+<div>
+<h1>Admin Dashboard</h1>
+<p>
             Sign in to manage the tournament.
           </p>
-        </div>
-
-        <p id="adminStatus" class="admin-status">
+</div>
+<p class="admin-status" id="adminStatus">
           Not signed in
         </p>
-      </div>
-
-      <div class="login-fields">
-        <div class="form-field">
-          <label for="adminEmail">
+</div>
+<div class="login-fields">
+<div class="form-field">
+<label for="adminEmail">
             Email
           </label>
-
-          <input
-            type="email"
-            id="adminEmail"
-            autocomplete="email"
-            placeholder="Admin email"
-          >
-        </div>
-
-        <div class="form-field">
-          <label for="adminPassword">
+<input autocomplete="email" id="adminEmail" placeholder="Admin email" type="email"/>
+</div>
+<div class="form-field">
+<label for="adminPassword">
             Password
           </label>
-
-          <input
-            type="password"
-            id="adminPassword"
-            autocomplete="current-password"
-            placeholder="Password"
-          >
-        </div>
-      </div>
-
-      <div class="button-row">
-        <button
-          type="button"
-          onclick="adminLogin()"
-        >
+<input autocomplete="current-password" id="adminPassword" placeholder="Password" type="password"/>
+</div>
+</div>
+<div class="button-row">
+<button onclick="adminLogin()" type="button">
           Sign in
         </button>
-
-        <button
-          type="button"
-          class="secondary-button"
-          onclick="adminLogout()"
-        >
+<button class="secondary-button" onclick="adminLogout()" type="button">
           Sign out
         </button>
-      </div>
-    </section>
-
-
-    <!-- ============================================
+</div>
+</section>
+<!-- ============================================
          MAIN ADMIN CONTROLS
     ============================================= -->
-
-    <section class="card" id="adminPanel">
-
-      <div class="section-heading admin-panel-heading">
-        <div>
-          <h2>Tournament Controls</h2>
-
-          <p>
+<section class="card" id="adminPanel"><div class="section-heading admin-panel-heading">
+<div>
+<h2>Tournament Controls</h2>
+<p>
             Open a section below to manage that part of the tournament.
           </p>
-        </div>
-      </div>
-
-
-      <!-- ==========================================
-           SELECTED GROUP
-      =========================================== -->
-
-      <section class="selected-group-panel">
-        <div class="selected-group-heading">
-          <h3>Selected Group</h3>
-
-          <p>
+</div>
+</div><section aria-labelledby="matchdayControlTitle" class="admin-command-centre">
+<div class="admin-command-centre-heading">
+<div>
+<span class="admin-eyebrow">Matchday dashboard</span>
+<h2 id="matchdayControlTitle">What do you need to manage?</h2>
+<p>Jump straight to the controls you will use most during the tournament.</p>
+</div>
+<div class="admin-accordion-tools">
+<button class="secondary-button" id="adminOpenAll" type="button">Open all</button>
+<button class="secondary-button" id="adminCloseAll" type="button">Close all</button>
+</div>
+</div>
+<div class="admin-jump-grid">
+<button class="admin-jump-card admin-jump-card-primary" data-admin-target="admin-group-stage" type="button"><span class="admin-jump-number">01</span><strong>Scores &amp; Fixtures</strong><small>Enter results and manage matches</small></button>
+<button class="admin-jump-card" data-admin-target="admin-live-pitch-map" type="button"><span class="admin-jump-number">02</span><strong>Pitch Map</strong><small>Choose the match on each pitch</small></button>
+<button class="admin-jump-card" data-admin-target="admin-venue-display" type="button"><span class="admin-jump-number">03</span><strong>Venue Display</strong><small>Switch screens and rotations</small></button>
+<button class="admin-jump-card" data-admin-target="admin-top-goalscorers" type="button"><span class="admin-jump-number">04</span><strong>Goalscorers</strong><small>Update player goal totals</small></button>
+<button class="admin-jump-card" data-admin-target="admin-knockout-stage" type="button"><span class="admin-jump-number">05</span><strong>Main Knockout</strong><small>Set qualifiers and results</small></button>
+<button class="admin-jump-card" data-admin-target="admin-nest-plate" type="button"><span class="admin-jump-number">06</span><strong>NEST Plate</strong><small>Manage the Plate bracket</small></button>
+</div>
+<div aria-label="Additional admin sections" class="admin-secondary-links">
+<button data-admin-target="admin-third-place" type="button">Third-place table</button>
+<button data-admin-target="admin-teams-logos" type="button">Teams &amp; logos</button>
+<button data-admin-target="admin-group-management" type="button">Group setup</button>
+<button data-admin-target="admin-manual-corrections" type="button">Manual corrections</button>
+<button data-admin-target="admin-undo-reset" type="button">Undo &amp; reset</button>
+</div>
+</section><nav aria-label="Matchday quick navigation" class="admin-sticky-nav">
+<div class="admin-sticky-nav-inner">
+<button data-admin-target="admin-group-stage" type="button">Scores</button>
+<button data-admin-target="admin-live-pitch-map" type="button">Pitches</button>
+<button data-admin-target="admin-venue-display" type="button">Display</button>
+<button data-admin-target="admin-top-goalscorers" type="button">Scorers</button>
+<button data-admin-target="admin-knockout-stage" type="button">Knockout</button>
+<button data-admin-target="admin-nest-plate" type="button">Plate</button>
+</div>
+</nav><section class="selected-group-panel" id="admin-selected-group">
+<div class="selected-group-heading">
+<h3>Selected Group</h3>
+<p>
             Choose which group you are currently managing.
           </p>
-        </div>
-
-        <!-- Filled dynamically by app.js -->
-        <nav
-          class="tabs"
-          aria-label="Tournament groups"
-        ></nav>
-      </section>
-
-
-      <!-- ==========================================
-           VENUE DISPLAY
-      =========================================== -->
-
-      <details class="admin-accordion" open>
-        <summary>
-          <span class="accordion-summary-copy">
-            <span class="accordion-summary-title">
+</div>
+<!-- Filled dynamically by app.js -->
+<nav aria-label="Tournament groups" class="tabs"></nav>
+</section><details class="admin-accordion admin-section-live" id="admin-venue-display">
+<summary>
+<span class="accordion-summary-copy"><span class="admin-section-badge">Live screen</span>
+<span class="accordion-summary-title">
               Venue Display
             </span>
-
-            <span class="accordion-summary-description">
+<span class="accordion-summary-description">
               Switch the live screen between group tables, the full fixture schedule, the pitch map, the main knockout and the NEST Plate.
             </span>
-          </span>
-        </summary>
-
-        <div class="accordion-content">
-          <p class="admin-section-description">
+</span>
+</summary>
+<div class="accordion-content">
+<p class="admin-section-description">
             Choose what currently appears on the live tournament display.
           </p>
-
-          <div class="display-control-buttons">
-            <button
-              id="showGroupsDisplayBtn"
-              type="button"
-              class="primary-button"
-            >
+<div class="display-control-buttons">
+<button class="primary-button" id="showGroupsDisplayBtn" type="button">
               Show Group Tables
             </button>
-
-            <button
-              id="showFixturesDisplayBtn"
-              type="button"
-              class="secondary-button"
-            >
+<button class="secondary-button" id="showFixturesDisplayBtn" type="button">
               Show Fixtures
             </button>
-
-            <button
-              id="showPitchMapDisplayBtn"
-              type="button"
-              class="secondary-button"
-            >
+<button class="secondary-button" id="showPitchMapDisplayBtn" type="button">
               Show Pitch Map
             </button>
-
-            <button
-              id="showKnockoutDisplayBtn"
-              type="button"
-              class="secondary-button"
-            >
+<button class="secondary-button" id="showKnockoutDisplayBtn" type="button">
               Show Main Knockout
             </button>
-
-            <button
-              id="showPlateDisplayBtn"
-              type="button"
-              class="secondary-button"
-            >
+<button class="secondary-button" id="showPlateDisplayBtn" type="button">
               Show NEST Plate
             </button>
-          </div>
-
-          <div class="display-rotation-panel">
-            <h3>Automatic display rotations</h3>
-
-            <p>
+</div>
+<div class="display-rotation-panel">
+<h3>Automatic display rotations</h3>
+<p>
               Each screen remains visible for 20 seconds.
               Starting one rotation automatically replaces the other.
             </p>
-
-            <div class="display-rotation-options">
-              <div class="display-rotation-option">
-                <strong>Group-stage rotation</strong>
-
-                <span>
+<div class="display-rotation-options">
+<div class="display-rotation-option">
+<strong>Group-stage rotation</strong>
+<span>
                   Group Tables → Pitch Map → Fixtures
                 </span>
-
-                <button
-                  id="startGroupRotationBtn"
-                  type="button"
-                  class="primary-button"
-                >
+<button class="primary-button" id="startGroupRotationBtn" type="button">
                   Start Group Rotation
                 </button>
-              </div>
-
-              <div class="display-rotation-option">
-                <strong>Knockout rotation</strong>
-
-                <span>
+</div>
+<div class="display-rotation-option">
+<strong>Knockout rotation</strong>
+<span>
                   Main Knockout → NEST Plate
                 </span>
-
-                <button
-                  id="startKnockoutRotationBtn"
-                  type="button"
-                  class="primary-button"
-                >
+<button class="primary-button" id="startKnockoutRotationBtn" type="button">
                   Start Knockout Rotation
                 </button>
-              </div>
-            </div>
-
-            <div class="display-rotation-buttons">
-              <button
-                id="stopDisplayRotationBtn"
-                type="button"
-                class="secondary-button"
-                disabled
-              >
+</div>
+</div>
+<div class="display-rotation-buttons">
+<button class="secondary-button" disabled="" id="stopDisplayRotationBtn" type="button">
                 Stop Rotation
               </button>
-            </div>
-          </div>
-
-          <p
-            id="displayModeStatus"
-            class="display-mode-status"
-          >
+</div>
+</div>
+<p class="display-mode-status" id="displayModeStatus">
             Current display: Group Tables
           </p>
-        </div>
-      </details>
-
-
-      <!-- ==========================================
-           GROUP STAGE
-      =========================================== -->
-
-      <details class="admin-accordion" open>
-        <summary>
-          <span class="accordion-summary-copy">
-            <span class="accordion-summary-title">
+</div>
+</details><details class="admin-accordion admin-section-matchday" id="admin-group-stage" open="">
+<summary>
+<span class="accordion-summary-copy"><span class="admin-section-badge">Scores &amp; fixtures</span>
+<span class="accordion-summary-title">
               Group Stage
             </span>
-
-            <span class="accordion-summary-description">
+<span class="accordion-summary-description">
               View standings, create fixtures and enter results.
             </span>
-          </span>
-        </summary>
-
-        <div class="accordion-content">
-
-          <!-- Standings -->
-
-          <section class="accordion-subsection">
-            <div class="section-heading">
-              <div>
-                <h2>Standings</h2>
-
-                <p>
+</span>
+</summary>
+<div class="accordion-content">
+<!-- Standings -->
+<section class="accordion-subsection">
+<div class="section-heading">
+<div>
+<h2>Standings</h2>
+<p>
                   Current table for the selected group.
                 </p>
-              </div>
-            </div>
-
-            <div class="table-wrap">
-              <table id="groupTable">
-                <caption class="visually-hidden">
+</div>
+</div>
+<div class="table-wrap">
+<table id="groupTable">
+<caption class="visually-hidden">
                   Tournament group standings
                 </caption>
-              </table>
-            </div>
-          </section>
-
-
-          <!-- Match scheduling -->
-
-          <section class="accordion-subsection">
-            <div class="section-heading">
-              <div>
-                <h2>Match Schedule</h2>
-
-                <p>
+</table>
+</div>
+</section>
+<!-- Match scheduling -->
+<section class="accordion-subsection">
+<div class="section-heading">
+<div>
+<h2>Match Schedule</h2>
+<p>
                   Create fixtures and enter completed results.
                 </p>
-              </div>
-            </div>
-
-            <div class="official-fixtures-panel">
-              <h3>Official Fixture Pack</h3>
-
-              <p>
+</div>
+</div>
+<div class="official-fixtures-panel">
+<h3>Official Fixture Pack</h3>
+<p>
                 Load the full Saturday schedule in one step. All 36 fixtures
                 will appear in the normal match lists below, where scores and
                 fixture details can still be changed manually.
               </p>
-
-              <button
-                id="loadOfficialFixturesBtn"
-                type="button"
-                onclick="loadOfficialFixtures()"
-              >
+<button id="loadOfficialFixturesBtn" onclick="loadOfficialFixtures()" type="button">
                 Load Official Fixtures
               </button>
-
-              <p
-                id="officialFixturesStatus"
-                class="official-fixtures-status"
-                aria-live="polite"
-              >
+<p aria-live="polite" class="official-fixtures-status" id="officialFixturesStatus">
                 Loads all 36 official group fixtures.
               </p>
-            </div>
-
-            <div class="form-grid match-form">
-              <div class="form-field">
-                <label for="matchGroup">
+</div>
+<div class="form-grid match-form">
+<div class="form-field">
+<label for="matchGroup">
                   Group
                 </label>
-
-                <select id="matchGroup"></select>
-              </div>
-
-              <div class="form-field">
-                <label for="matchTeamA">
+<select id="matchGroup"></select>
+</div>
+<div class="form-field">
+<label for="matchTeamA">
                   Team A
                 </label>
-
-                <select id="matchTeamA"></select>
-              </div>
-
-              <div class="form-field">
-                <label for="matchTeamB">
+<select id="matchTeamA"></select>
+</div>
+<div class="form-field">
+<label for="matchTeamB">
                   Team B
                 </label>
-
-                <select id="matchTeamB"></select>
-              </div>
-
-              <div class="form-field">
-                <label for="matchTime">
+<select id="matchTeamB"></select>
+</div>
+<div class="form-field">
+<label for="matchTime">
                   Date and time
                 </label>
-
-                <input
-                  type="datetime-local"
-                  id="matchTime"
-                >
-              </div>
-
-              <div class="form-field">
-                <label for="matchPitch">
+<input id="matchTime" type="datetime-local"/>
+</div>
+<div class="form-field">
+<label for="matchPitch">
                   Pitch
                 </label>
-
-                <input
-                  type="text"
-                  id="matchPitch"
-                  placeholder="For example: Pitch 1"
-                >
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onclick="addMatch()"
-            >
+<input id="matchPitch" placeholder="For example: Pitch 1" type="text"/>
+</div>
+</div>
+<button onclick="addMatch()" type="button">
               Add Match
             </button>
-
-            <div class="subsection">
-              <h3>Matches in this group</h3>
-
-              <div
-                id="adminMatchesList"
-                aria-live="polite"
-              >
+<div class="subsection">
+<h3>Matches in this group</h3>
+<div aria-live="polite" id="adminMatchesList">
                 Loading matches…
               </div>
-            </div>
-          </section>
-
-        </div>
-      </details>
-
-
-      <!-- ==========================================
-           TOP GOALSCORERS
-      =========================================== -->
-
-      <details class="admin-accordion">
-        <summary>
-          <span class="accordion-summary-copy">
-            <span class="accordion-summary-title">
-              Top Goalscorers
-            </span>
-
-            <span class="accordion-summary-description">
-              Add player numbers and update their tournament goal totals.
-            </span>
-          </span>
-        </summary>
-
-        <div class="accordion-content">
-          <div class="section-heading">
-            <div>
-              <h2>Goalscorer Management</h2>
-
-              <p>
-                Add a player using their team and shirt number.
-                Only the leading five are shown on the public page.
-              </p>
-            </div>
-          </div>
-
-          <div class="form-panel">
-            <h3>Add a goalscorer</h3>
-
-            <div class="form-grid">
-              <div class="form-field">
-                <label for="scorerTeamSelect">
-                  Team
-                </label>
-
-                <select id="scorerTeamSelect"></select>
-              </div>
-
-              <div class="form-field">
-                <label for="scorerNumberInput">
-                  Player number
-                </label>
-
-                <input
-                  type="number"
-                  id="scorerNumberInput"
-                  min="1"
-                  max="99"
-                  step="1"
-                  inputmode="numeric"
-                  placeholder="For example: 10"
-                >
-              </div>
-
-              <div class="form-field">
-                <label for="scorerStartingGoals">
-                  Starting goals
-                </label>
-
-                <input
-                  type="number"
-                  id="scorerStartingGoals"
-                  min="0"
-                  step="1"
-                  inputmode="numeric"
-                  value="0"
-                >
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onclick="addTopScorer()"
-            >
-              Add Goalscorer
-            </button>
-          </div>
-
-          <div class="subsection">
-            <h3>All recorded goalscorers</h3>
-
-            <div
-              id="adminTopScorersList"
-              aria-live="polite"
-            >
-              Loading goalscorers…
-            </div>
-          </div>
-        </div>
-      </details>
-
-
-      <!-- ==========================================
-           LIVE PITCH MAP
-      =========================================== -->
-
-      <details class="admin-accordion">
-        <summary>
-          <span class="accordion-summary-copy">
-            <span class="accordion-summary-title">
+</div>
+</section>
+</div>
+</details><details class="admin-accordion admin-section-matchday" id="admin-live-pitch-map">
+<summary>
+<span class="accordion-summary-copy"><span class="admin-section-badge">Pitch control</span>
+<span class="accordion-summary-title">
               Live Pitch Map
             </span>
-
-            <span class="accordion-summary-description">
+<span class="accordion-summary-description">
               Choose the match currently playing on each of the six pitches.
             </span>
-          </span>
-        </summary>
-
-        <div class="accordion-content">
-          <div class="section-heading">
-            <div>
-              <h2>Current Pitch Assignments</h2>
-
-              <p>
+</span>
+</summary>
+<div class="accordion-content">
+<div class="section-heading">
+<div>
+<h2>Current Pitch Assignments</h2>
+<p>
                 Manually select the fixture currently being played on each pitch.
                 Choose “No match currently” whenever a pitch is unused.
               </p>
-            </div>
-          </div>
-
-          <div id="pitchMapAssignments">
+</div>
+</div>
+<div id="pitchMapAssignments">
             Loading pitch assignments…
           </div>
-        </div>
-      </details>
-
-
-      <!-- ==========================================
-           TEAMS AND LOGOS
-      =========================================== -->
-
-      <details class="admin-accordion">
-        <summary>
-          <span class="accordion-summary-copy">
-            <span class="accordion-summary-title">
-              Teams and Logos
+</div>
+</details><details class="admin-accordion admin-section-matchday" id="admin-top-goalscorers">
+<summary>
+<span class="accordion-summary-copy"><span class="admin-section-badge">Player stats</span>
+<span class="accordion-summary-title">
+              Top Goalscorers
             </span>
-
-            <span class="accordion-summary-description">
-              Add, rename or remove teams and update their logos.
+<span class="accordion-summary-description">
+              Add player numbers and update their tournament goal totals.
             </span>
-          </span>
-        </summary>
-
-        <div class="accordion-content">
-          <div class="form-grid">
-
-            <!-- Rename team -->
-
-            <div class="form-panel">
-              <h3>Rename a team</h3>
-
-              <div class="form-field">
-                <label for="renameSelect">
-                  Team
-                </label>
-
-                <select id="renameSelect"></select>
-              </div>
-
-              <div class="form-field">
-                <label for="renameInput">
-                  New name
-                </label>
-
-                <input
-                  type="text"
-                  id="renameInput"
-                  placeholder="New team name"
-                >
-              </div>
-
-              <button
-                type="button"
-                onclick="renameTeam()"
-              >
-                Rename Team
-              </button>
-            </div>
-
-
-            <!-- Add team -->
-
-            <div class="form-panel">
-              <h3>Add a team</h3>
-
-              <div class="form-field">
-                <label for="newTeamInput">
-                  Team name
-                </label>
-
-                <input
-                  type="text"
-                  id="newTeamInput"
-                  placeholder="New team name"
-                >
-              </div>
-
-              <button
-                type="button"
-                onclick="addTeam()"
-              >
-                Add Team
-              </button>
-            </div>
-
-
-            <!-- Team logo -->
-
-            <div class="form-panel">
-              <h3>Team logo</h3>
-
-              <div class="form-field">
-                <label for="logoTeamSelect">
-                  Team
-                </label>
-
-                <select id="logoTeamSelect"></select>
-              </div>
-
-              <div class="form-field">
-                <label for="logoInput">
-                  Logo file path
-                </label>
-
-                <input
-                  type="text"
-                  id="logoInput"
-                  placeholder="assets/logos/team-logo.png"
-                >
-              </div>
-
-              <button
-                type="button"
-                onclick="setTeamLogo()"
-              >
-                Save Logo
-              </button>
-            </div>
-
-
-            <!-- Remove team -->
-
-            <div class="form-panel danger-panel">
-              <h3>Remove a team</h3>
-
-              <div class="form-field">
-                <label for="removeSelect">
-                  Team
-                </label>
-
-                <select id="removeSelect"></select>
-              </div>
-
-              <button
-                type="button"
-                class="danger-button"
-                onclick="removeTeam()"
-              >
-                Remove Team
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </details>
-
-
-      <!-- ==========================================
-           GROUP MANAGEMENT
-      =========================================== -->
-
-      <details class="admin-accordion">
-        <summary>
-          <span class="accordion-summary-copy">
-            <span class="accordion-summary-title">
-              Group Management
-            </span>
-
-            <span class="accordion-summary-description">
-              Add new groups or remove unused groups.
-            </span>
-          </span>
-        </summary>
-
-        <div class="accordion-content">
-          <div class="form-grid">
-
-            <!-- Add group -->
-
-            <div class="form-panel">
-              <h3>Add a group</h3>
-
-              <div class="form-field">
-                <label for="newGroupName">
-                  Group name
-                </label>
-
-                <input
-                  type="text"
-                  id="newGroupName"
-                  placeholder="For example: G"
-                >
-              </div>
-
-              <button
-                type="button"
-                onclick="addGroup()"
-              >
-                Add Group
-              </button>
-            </div>
-
-
-            <!-- Remove group -->
-
-            <div class="form-panel danger-panel">
-              <h3>Remove a group</h3>
-
-              <div class="form-field">
-                <label for="removeGroupSelect">
-                  Group
-                </label>
-
-                <select id="removeGroupSelect"></select>
-              </div>
-
-              <button
-                type="button"
-                class="danger-button"
-                onclick="removeGroup()"
-              >
-                Remove Group
-              </button>
-
-              <p class="helper-text">
-                A group must have no teams or matches before it can be removed.
+</span>
+</summary>
+<div class="accordion-content">
+<div class="section-heading">
+<div>
+<h2>Goalscorer Management</h2>
+<p>
+                Add a player using their team and shirt number.
+                Only the leading five are shown on the public page.
               </p>
+</div>
+</div>
+<div class="form-panel">
+<h3>Add a goalscorer</h3>
+<div class="form-grid">
+<div class="form-field">
+<label for="scorerTeamSelect">
+                  Team
+                </label>
+<select id="scorerTeamSelect"></select>
+</div>
+<div class="form-field">
+<label for="scorerNumberInput">
+                  Player number
+                </label>
+<input id="scorerNumberInput" inputmode="numeric" max="99" min="1" placeholder="For example: 10" step="1" type="number"/>
+</div>
+<div class="form-field">
+<label for="scorerStartingGoals">
+                  Starting goals
+                </label>
+<input id="scorerStartingGoals" inputmode="numeric" min="0" step="1" type="number" value="0"/>
+</div>
+</div>
+<button onclick="addTopScorer()" type="button">
+              Add Goalscorer
+            </button>
+</div>
+<div class="subsection">
+<h3>All recorded goalscorers</h3>
+<div aria-live="polite" id="adminTopScorersList">
+              Loading goalscorers…
             </div>
-
-          </div>
-        </div>
-      </details>
-
-<!-- ==========================================
-     THIRD-PLACE RANKINGS
-=========================================== -->
-
-<details class="admin-accordion">
-  <summary>
-    <span class="accordion-summary-copy">
-      <span class="accordion-summary-title">
+</div>
+</div>
+</details><details class="admin-accordion admin-section-competition" id="admin-third-place">
+<summary>
+<span class="accordion-summary-copy"><span class="admin-section-badge">Qualification</span>
+<span class="accordion-summary-title">
         Third-Place Rankings
       </span>
-
-      <span class="accordion-summary-description">
+<span class="accordion-summary-description">
         View the third-placed team from each group and the four qualifiers.
       </span>
-    </span>
-  </summary>
-
-  <div class="accordion-content">
-    <div class="section-heading">
-      <div>
-        <h2>Third-Place Rankings</h2>
-
-        <p>
+</span>
+</summary>
+<div class="accordion-content">
+<div class="section-heading">
+<div>
+<h2>Third-Place Rankings</h2>
+<p>
           Third-placed teams are ranked by points per game, then goal difference.
           The top four reach the main knockout; fifth and sixth enter the NEST Plate.
         </p>
-      </div>
-    </div>
-
-    <div class="table-wrap">
-      <table id="thirdPlaceTable">
-        <caption class="visually-hidden">
+</div>
+</div>
+<div class="table-wrap">
+<table id="thirdPlaceTable">
+<caption class="visually-hidden">
           Ranking of third-placed teams
         </caption>
-      </table>
-    </div>
-  </div>
-</details>
-      <!-- ==========================================
-           KNOCKOUT STAGE
-      =========================================== -->
-
-      <details class="admin-accordion">
-        <summary>
-          <span class="accordion-summary-copy">
-            <span class="accordion-summary-title">
+</table>
+</div>
+</div>
+</details><details class="admin-accordion admin-section-knockout" id="admin-knockout-stage">
+<summary>
+<span class="accordion-summary-copy"><span class="admin-section-badge">Main competition</span>
+<span class="accordion-summary-title">
               Knockout Stage
             </span>
-
-            <span class="accordion-summary-description">
+<span class="accordion-summary-description">
               Set qualifiers and manage knockout results.
             </span>
-          </span>
-        </summary>
-
-        <div class="accordion-content">
-          <div class="section-heading">
-            <div>
-              <h2>Knockout Setup</h2>
-
-              <p>
+</span>
+</summary>
+<div class="accordion-content">
+<div class="section-heading">
+<div>
+<h2>Knockout Setup</h2>
+<p>
                 Assign all 16 qualified teams to the eight Round of 16 matches.
               </p>
-            </div>
-          </div>
-
-          <div id="knockoutSetup">
+</div>
+</div>
+<div id="knockoutSetup">
             Loading knockout setup…
           </div>
-
-          <div class="button-row">
-            <button
-              type="button"
-              onclick="autoFillKnockoutSetup()"
-            >
+<div class="button-row">
+<button onclick="autoFillKnockoutSetup()" type="button">
               Auto-Fill Suggested Teams
             </button>
-
-            <button
-              type="button"
-              onclick="saveKnockoutSetup()"
-            >
+<button onclick="saveKnockoutSetup()" type="button">
               Save Knockout Setup
             </button>
-          </div>
-
-          <p class="helper-text">
+</div>
+<p class="helper-text">
             You can override every selected team manually before saving.
           </p>
-        </div>
-      </details>
-
-
-      <!-- ==========================================
-           BOTTOM 8 KNOCKOUT
-      =========================================== -->
-
-      <details class="admin-accordion">
-        <summary>
-          <span class="accordion-summary-copy">
-            <span class="accordion-summary-title">
+</div>
+</details><details class="admin-accordion admin-section-knockout" id="admin-nest-plate">
+<summary>
+<span class="accordion-summary-copy"><span class="admin-section-badge">Plate competition</span>
+<span class="accordion-summary-title">
               NEST Plate Championship
             </span>
-
-            <span class="accordion-summary-description">
+<span class="accordion-summary-description">
               Select the six Plate teams and manage their knockout results.
             </span>
-          </span>
-        </summary>
-
-        <div class="accordion-content">
-          <div class="section-heading">
-            <div>
-              <h2>NEST Plate Setup</h2>
-
-              <p>
+</span>
+</summary>
+<div class="accordion-content">
+<div class="section-heading">
+<div>
+<h2>NEST Plate Setup</h2>
+<p>
                 Set the two quarter-finals and the two third-place teams
                 receiving byes into the semi-finals.
               </p>
-            </div>
-          </div>
-
-          <div id="bottomEightSetup">
+</div>
+</div>
+<div id="bottomEightSetup">
             Loading NEST Plate setup…
           </div>
-
-          <div class="button-row">
-            <button
-              type="button"
-              onclick="autoFillBottomEightSetup()"
-            >
+<div class="button-row">
+<button onclick="autoFillBottomEightSetup()" type="button">
               Auto-Fill NEST Plate Teams
             </button>
-
-            <button
-              type="button"
-              onclick="saveBottomEightSetup()"
-            >
+<button onclick="saveBottomEightSetup()" type="button">
               Save NEST Plate Setup
             </button>
-          </div>
-
-          <p class="helper-text">
+</div>
+<p class="helper-text">
             You can manually change every selected team before saving.
           </p>
-        </div>
-      </details>
-
-
-      <!-- ==========================================
-           MANUAL CORRECTIONS
-      =========================================== -->
-
-      <details class="admin-accordion">
-        <summary>
-          <span class="accordion-summary-copy">
-            <span class="accordion-summary-title">
+</div>
+</details><details class="admin-accordion admin-section-setup" id="admin-teams-logos">
+<summary>
+<span class="accordion-summary-copy"><span class="admin-section-badge">Setup</span>
+<span class="accordion-summary-title">
+              Teams and Logos
+            </span>
+<span class="accordion-summary-description">
+              Add, rename or remove teams and update their logos.
+            </span>
+</span>
+</summary>
+<div class="accordion-content">
+<div class="form-grid">
+<!-- Rename team -->
+<div class="form-panel">
+<h3>Rename a team</h3>
+<div class="form-field">
+<label for="renameSelect">
+                  Team
+                </label>
+<select id="renameSelect"></select>
+</div>
+<div class="form-field">
+<label for="renameInput">
+                  New name
+                </label>
+<input id="renameInput" placeholder="New team name" type="text"/>
+</div>
+<button onclick="renameTeam()" type="button">
+                Rename Team
+              </button>
+</div>
+<!-- Add team -->
+<div class="form-panel">
+<h3>Add a team</h3>
+<div class="form-field">
+<label for="newTeamInput">
+                  Team name
+                </label>
+<input id="newTeamInput" placeholder="New team name" type="text"/>
+</div>
+<button onclick="addTeam()" type="button">
+                Add Team
+              </button>
+</div>
+<!-- Team logo -->
+<div class="form-panel">
+<h3>Team logo</h3>
+<div class="form-field">
+<label for="logoTeamSelect">
+                  Team
+                </label>
+<select id="logoTeamSelect"></select>
+</div>
+<div class="form-field">
+<label for="logoInput">
+                  Logo file path
+                </label>
+<input id="logoInput" placeholder="assets/logos/team-logo.png" type="text"/>
+</div>
+<button onclick="setTeamLogo()" type="button">
+                Save Logo
+              </button>
+</div>
+<!-- Remove team -->
+<div class="form-panel danger-panel">
+<h3>Remove a team</h3>
+<div class="form-field">
+<label for="removeSelect">
+                  Team
+                </label>
+<select id="removeSelect"></select>
+</div>
+<button class="danger-button" onclick="removeTeam()" type="button">
+                Remove Team
+              </button>
+</div>
+</div>
+</div>
+</details><details class="admin-accordion admin-section-setup" id="admin-group-management">
+<summary>
+<span class="accordion-summary-copy"><span class="admin-section-badge">Setup</span>
+<span class="accordion-summary-title">
+              Group Management
+            </span>
+<span class="accordion-summary-description">
+              Add new groups or remove unused groups.
+            </span>
+</span>
+</summary>
+<div class="accordion-content">
+<div class="form-grid">
+<!-- Add group -->
+<div class="form-panel">
+<h3>Add a group</h3>
+<div class="form-field">
+<label for="newGroupName">
+                  Group name
+                </label>
+<input id="newGroupName" placeholder="For example: G" type="text"/>
+</div>
+<button onclick="addGroup()" type="button">
+                Add Group
+              </button>
+</div>
+<!-- Remove group -->
+<div class="form-panel danger-panel">
+<h3>Remove a group</h3>
+<div class="form-field">
+<label for="removeGroupSelect">
+                  Group
+                </label>
+<select id="removeGroupSelect"></select>
+</div>
+<button class="danger-button" onclick="removeGroup()" type="button">
+                Remove Group
+              </button>
+<p class="helper-text">
+                A group must have no teams or matches before it can be removed.
+              </p>
+</div>
+</div>
+</div>
+</details><details class="admin-accordion admin-section-warning" id="admin-manual-corrections">
+<summary>
+<span class="accordion-summary-copy"><span class="admin-section-badge">Emergency tools</span>
+<span class="accordion-summary-title">
               Manual Corrections
             </span>
-
-            <span class="accordion-summary-description">
+<span class="accordion-summary-description">
               Apply a correction when a match result cannot be edited.
             </span>
-          </span>
-        </summary>
-
-        <div class="accordion-content">
-          <p class="helper-text accordion-warning">
+</span>
+</summary>
+<div class="accordion-content">
+<p class="helper-text accordion-warning">
             These controls directly change a team’s record. Use them only
             when the correction cannot be made through a match result.
           </p>
-
-          <div class="form-field compact-field">
-            <label for="teamSelect">
+<div class="form-field compact-field">
+<label for="teamSelect">
               Team
             </label>
-
-            <select id="teamSelect"></select>
-          </div>
-
-          <div class="button-row adjustment-buttons">
-            <button
-              type="button"
-              onclick="addWin()"
-            >
+<select id="teamSelect"></select>
+</div>
+<div class="button-row adjustment-buttons">
+<button onclick="addWin()" type="button">
               Add Win
             </button>
-
-            <button
-              type="button"
-              onclick="addDraw()"
-            >
+<button onclick="addDraw()" type="button">
               Add Draw
             </button>
-
-            <button
-              type="button"
-              onclick="addLoss()"
-            >
+<button onclick="addLoss()" type="button">
               Add Loss
             </button>
-
-            <button
-              type="button"
-              onclick="addGoal()"
-            >
+<button onclick="addGoal()" type="button">
               Increase GD
             </button>
-
-            <button
-              type="button"
-              onclick="removeGoal()"
-            >
+<button onclick="removeGoal()" type="button">
               Decrease GD
             </button>
-          </div>
-        </div>
-      </details>
-
-
-      <!-- ==========================================
-           ADMINISTRATIVE ACTIONS
-      =========================================== -->
-
-      <details class="admin-accordion danger-accordion">
-        <summary>
-          <span class="accordion-summary-copy">
-            <span class="accordion-summary-title">
+</div>
+</div>
+</details><details class="admin-accordion danger-accordion admin-section-danger" id="admin-undo-reset">
+<summary>
+<span class="accordion-summary-copy"><span class="admin-section-badge">Danger zone</span>
+<span class="accordion-summary-title">
               Undo and Reset
             </span>
-
-            <span class="accordion-summary-description">
+<span class="accordion-summary-description">
               Undo the latest change or reset the tournament.
             </span>
-          </span>
-        </summary>
-
-        <div class="accordion-content">
-          <p class="helper-text accordion-warning">
+</span>
+</summary>
+<div class="accordion-content">
+<p class="helper-text accordion-warning">
             Reset Tournament clears tournament data and should only be used
             when you are certain you want to start again.
           </p>
-
-          <div class="button-row">
-            <button
-              type="button"
-              onclick="undoLastAction()"
-            >
+<div class="button-row">
+<button onclick="undoLastAction()" type="button">
               Undo Last Action
             </button>
-
-            <button
-              type="button"
-              class="danger-button"
-              onclick="resetTournament()"
-            >
+<button class="danger-button" onclick="resetTournament()" type="button">
               Reset Tournament
             </button>
-          </div>
-        </div>
-      </details>
+</div>
+</div>
+</details></section>
+</main>
+<button aria-label="Back to top" class="admin-back-to-top" id="adminBackToTop" title="Back to top" type="button">↑</button><script>
+(() => {
+  const storageKey = 'footballTournamentAdminOpenSections';
+  const accordions = () => [...document.querySelectorAll('#adminPanel details.admin-accordion')];
 
-    </section>
-  </main>
-</body>
+  function saveOpenSections() {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(accordions().filter(item => item.open).map(item => item.id).filter(Boolean)));
+    } catch {}
+  }
+
+  function restoreOpenSections() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(storageKey));
+      if (!Array.isArray(stored)) return;
+      accordions().forEach(item => { item.open = stored.includes(item.id); });
+    } catch {}
+  }
+
+  function openTarget(id) {
+    const section = document.getElementById(id);
+    if (!section) return;
+    if (section.tagName.toLowerCase() === 'details') {
+      section.open = true;
+      saveOpenSections();
+    }
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    restoreOpenSections();
+    document.querySelectorAll('[data-admin-target]').forEach(button => {
+      button.addEventListener('click', () => openTarget(button.dataset.adminTarget));
+    });
+    accordions().forEach(item => item.addEventListener('toggle', saveOpenSections));
+    document.getElementById('adminOpenAll')?.addEventListener('click', () => {
+      accordions().forEach(item => { item.open = true; });
+      saveOpenSections();
+    });
+    document.getElementById('adminCloseAll')?.addEventListener('click', () => {
+      accordions().forEach(item => { item.open = false; });
+      saveOpenSections();
+    });
+    const back = document.getElementById('adminBackToTop');
+    window.addEventListener('scroll', () => back?.classList.toggle('is-visible', window.scrollY > 650), { passive: true });
+    back?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  });
+})();
+</script></body>
 </html>
