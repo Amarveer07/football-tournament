@@ -7,7 +7,7 @@
   <title>Football Tournament – Live Display</title>
 
   <!-- Venue display styling -->
-  <link rel="stylesheet" href="display.css?v=5">
+  <link rel="stylesheet" href="display.css?v=6">
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
@@ -15,13 +15,13 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Venue display logic -->
-  <script src="display.js?v=5" defer></script>
+  <script src="display.js?v=6" defer></script>
 </head>
 
 <body>
   <div class="display-shell">
 
-    <!-- Sponsor strip -->
+    <!-- Sponsor strip stays visible in both group and knockout modes -->
     <header class="sponsor-strip" aria-label="Tournament sponsors">
       <div class="sponsor-strip-window">
         <div id="sponsorTickerTrack" class="sponsor-ticker-track">
@@ -45,7 +45,7 @@
       </div>
     </header>
 
-    <!-- Connection and display-mode indicator -->
+    <!-- Small connection and mode indicator -->
     <div class="display-status-bar">
       <div class="display-live-status">
         <span
@@ -54,9 +54,7 @@
           aria-hidden="true"
         ></span>
 
-        <span id="displayLiveText">
-          Connecting…
-        </span>
+        <span id="displayLiveText">Connecting…</span>
       </div>
 
       <div id="displayModeLabel" class="display-mode-label">
@@ -66,16 +64,14 @@
 
     <main class="display-stage">
 
-      <!-- GROUP TABLE MODE -->
+      <!-- GROUP MODE: six live tables in a 3 × 2 grid -->
       <section
         id="displayGroupsView"
         class="display-view display-groups-view"
         aria-label="Live group standings"
       >
         <div id="displayGroupsGrid" class="display-groups-grid">
-          <p class="display-loading">
-            Loading all six groups…
-          </p>
+          <p class="display-loading">Loading all six groups…</p>
         </div>
 
         <footer class="display-brand-footer">
@@ -89,7 +85,6 @@
         </footer>
       </section>
 
-
       <!-- LIVE PITCH MAP MODE -->
       <section
         id="displayPitchMapView"
@@ -98,14 +93,10 @@
         hidden
       >
         <div class="pitch-map-title-row">
-          <h1>
-            NEST26 Tournament Site Map
-          </h1>
+          <h1>NEST26 Tournament Site Map</h1>
         </div>
 
         <div class="pitch-map-layout">
-
-          <!-- Rules and tournament branding -->
           <aside class="pitch-map-sidebar">
             <img
               class="pitch-map-tournament-logo"
@@ -114,41 +105,22 @@
             >
 
             <div class="pitch-map-rule">
-              <span class="pitch-map-rule-icon">
-                🐕
-              </span>
-
-              <strong>
-                No dogs
-              </strong>
+              <span class="pitch-map-rule-icon">🐕</span>
+              <strong>No dogs</strong>
             </div>
 
             <div class="pitch-map-rule">
-              <span class="pitch-map-rule-icon">
-                🍷
-              </span>
-
-              <strong>
-                No alcohol
-              </strong>
+              <span class="pitch-map-rule-icon">🍷</span>
+              <strong>No alcohol</strong>
             </div>
 
             <div class="pitch-map-rule">
-              <span class="pitch-map-rule-icon">
-                🚭
-              </span>
-
-              <strong>
-                No smoking<br>
-                No vaping
-              </strong>
+              <span class="pitch-map-rule-icon">🚭</span>
+              <strong>No smoking<br>No vaping</strong>
             </div>
           </aside>
 
-
-          <!-- Live six-pitch area -->
           <div class="pitch-map-main">
-
             <div
               id="displayPitchMapGrid"
               class="pitch-map-grid"
@@ -159,76 +131,43 @@
               </p>
             </div>
 
-
-            <!-- Fixed venue information -->
             <div class="pitch-map-facilities">
-
               <div class="pitch-map-facility pitch-map-kids">
-                <span>
-                  🛝
-                </span>
-
-                <strong>
-                  Kids Play Area
-                </strong>
+                <span>🛝</span>
+                <strong>Kids Play Area</strong>
               </div>
 
               <div class="pitch-map-facility pitch-map-food">
-                <span>
-                  🍔
-                </span>
-
-                <strong>
-                  Food Stalls
-                </strong>
+                <span>🍔</span>
+                <strong>Food Stalls</strong>
               </div>
 
               <div class="pitch-map-facility pitch-map-information">
-                <span>
-                  ⓘ
-                </span>
-
-                <strong>
-                  Information Centre
-                </strong>
+                <span>ⓘ</span>
+                <strong>Information Centre</strong>
               </div>
 
               <div class="pitch-map-facility pitch-map-registration">
-                <span>
-                  📋
-                </span>
-
-                <strong>
-                  Registration
-                </strong>
+                <span>📋</span>
+                <strong>Registration</strong>
               </div>
 
               <div class="pitch-map-location">
-                <span class="pitch-map-pin">
-                  ●
-                </span>
-
-                <strong>
-                  You are here!
-                </strong>
-
-                <span class="pitch-map-arrow">
-                  ↙
-                </span>
+                <span class="pitch-map-pin">●</span>
+                <strong>You are here!</strong>
+                <span class="pitch-map-arrow">↙</span>
               </div>
-
             </div>
           </div>
         </div>
 
         <p class="pitch-map-footer-message">
-          Thank you for being part of NEST26 — play fair,
-          respect all, enjoy the game!
+          Thank you for being part of NEST26 — play fair, respect all,
+          enjoy the game!
         </p>
       </section>
 
-
-      <!-- MAIN KNOCKOUT MODE -->
+      <!-- KNOCKOUT MODE: mirrored bracket -->
       <section
         id="displayKnockoutView"
         class="display-view display-knockout-view"
@@ -236,9 +175,7 @@
         hidden
       >
         <div class="display-knockout-heading">
-          <h1 id="displayKnockoutTitle">
-            Knockout Stage
-          </h1>
+          <h1 id="displayKnockoutTitle">Knockout Stage</h1>
         </div>
 
         <div
@@ -251,6 +188,7 @@
           </p>
         </div>
 
+        <!-- Positioned in the middle of the mirrored bracket by display.css -->
         <div
           id="knockoutMainSponsor"
           class="main-sponsor-brand knockout-main-sponsor"
@@ -260,8 +198,7 @@
         </div>
       </section>
 
-
-      <!-- NEST PLATE MODE -->
+      <!-- NEST PLATE MODE: mirrored eight-team bracket -->
       <section
         id="displayPlateView"
         class="display-view display-knockout-view display-plate-view"
@@ -269,9 +206,7 @@
         hidden
       >
         <div class="display-knockout-heading">
-          <h1>
-            NEST Plate Championship
-          </h1>
+          <h1>NEST Plate Championship</h1>
         </div>
 
         <div
@@ -280,7 +215,7 @@
           aria-live="polite"
         >
           <p class="display-loading">
-            Loading NEST Plate Championship…
+            Loading the NEST Plate Championship bracket…
           </p>
         </div>
 
