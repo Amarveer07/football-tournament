@@ -5705,6 +5705,31 @@ document.addEventListener("DOMContentLoaded", () => {
    Venue Display Controls
 ================================================== */
 
+const VENUE_DISPLAY_ROTATIONS = {
+  groupStage: [
+    "groups",
+    "pitchMap",
+    "fixtures"
+  ],
+
+  knockout: [
+    "knockout",
+    "plate"
+  ]
+};
+
+const VENUE_ROTATION_INTERVAL_MS = 20000;
+
+let currentVenueDisplaySettings = {
+  mode: "groups",
+  rotationMode: "off",
+  rotationStartedAt: 0,
+  rotationIntervalMs:
+    VENUE_ROTATION_INTERVAL_MS
+};
+
+let venueRotationStatusTimer = null;
+
 function normalizeVenueDisplayMode(value) {
   if (value === "fixtures") return "fixtures";
   if (value === "pitchMap") return "pitchMap";
@@ -5714,6 +5739,93 @@ function normalizeVenueDisplayMode(value) {
   return "groups";
 }
 
+function normalizeVenueRotationMode(value) {
+  if (value === "groupStage") {
+    return "groupStage";
+  }
+
+  if (value === "knockout") {
+    return "knockout";
+  }
+
+  return "off";
+}
+
+function getVenueRotationOrder(rotationMode) {
+  return (
+    VENUE_DISPLAY_ROTATIONS[
+      normalizeVenueRotationMode(
+        rotationMode
+      )
+    ] || []
+  );
+}
+
+function normalizeVenueDisplaySettings(rawSettings) {
+  const settings =
+    rawSettings &&
+    typeof rawSettings === "object"
+      ? rawSettings
+      : {};
+
+  const intervalValue =
+    Number(settings.rotationIntervalMs);
+
+  return {
+    mode: normalizeVenueDisplayMode(
+      settings.mode
+    ),
+
+    rotationMode:
+      normalizeVenueRotationMode(
+        settings.rotationMode
+      ),
+
+    rotationStartedAt:
+      Number(settings.rotationStartedAt) || 0,
+
+    rotationIntervalMs:
+      Number.isFinite(intervalValue) &&
+      intervalValue >= 5000
+        ? intervalValue
+        : VENUE_ROTATION_INTERVAL_MS
+  };
+}
+
+function getVenueRotatingMode(
+  settings = currentVenueDisplaySettings,
+  now = Date.now()
+) {
+  const normalized =
+    normalizeVenueDisplaySettings(settings);
+
+  const rotationOrder =
+    getVenueRotationOrder(
+      normalized.rotationMode
+    );
+
+  if (
+    rotationOrder.length === 0 ||
+    normalized.rotationStartedAt <= 0
+  ) {
+    return normalized.mode;
+  }
+
+  const elapsed = Math.max(
+    0,
+    now - normalized.rotationStartedAt
+  );
+
+  const rotationIndex =
+    Math.floor(
+      elapsed /
+      normalized.rotationIntervalMs
+    ) %
+    rotationOrder.length;
+
+  return rotationOrder[rotationIndex];
+}
+
 function getVenueDisplayModeCopy(mode) {
   const normalizedMode =
     normalizeVenueDisplayMode(mode);
@@ -5721,21 +5833,24 @@ function getVenueDisplayModeCopy(mode) {
   if (normalizedMode === "fixtures") {
     return {
       label: "Group Fixtures",
-      changing: "Changing display to Group Fixtures…"
+      changing:
+        "Changing display to Group Fixtures…"
     };
   }
 
   if (normalizedMode === "pitchMap") {
     return {
       label: "Live Pitch Map",
-      changing: "Changing display to Live Pitch Map…"
+      changing:
+        "Changing display to Live Pitch Map…"
     };
   }
 
   if (normalizedMode === "knockout") {
     return {
-      label: "Knockout Bracket",
-      changing: "Changing display to Knockout Bracket…"
+      label: "Main Knockout",
+      changing:
+        "Changing display to Main Knockout…"
     };
   }
 
@@ -5749,13 +5864,57 @@ function getVenueDisplayModeCopy(mode) {
 
   return {
     label: "Group Tables",
-    changing: "Changing display to Group Tables…"
+    changing:
+      "Changing display to Group Tables…"
   };
 }
 
-function renderVenueDisplayMode(mode) {
+function getVenueRotationCopy(rotationMode) {
   const normalizedMode =
-    normalizeVenueDisplayMode(mode);
+    normalizeVenueRotationMode(
+      rotationMode
+    );
+
+  if (normalizedMode === "knockout") {
+    return {
+      label: "Knockout rotation",
+      sequence:
+        "Main Knockout → NEST Plate",
+      starting:
+        "Starting the 20-second knockout rotation…",
+      firstMode: "knockout"
+    };
+  }
+
+  return {
+    label: "Group-stage rotation",
+    sequence:
+      "Group Tables → Pitch Map → Fixtures",
+    starting:
+      "Starting the 20-second group-stage rotation…",
+    firstMode: "groups"
+  };
+}
+
+function renderVenueDisplayMode(
+  settings = currentVenueDisplaySettings
+) {
+  const normalizedSettings =
+    normalizeVenueDisplaySettings(settings);
+
+  currentVenueDisplaySettings =
+    normalizedSettings;
+
+  const effectiveMode =
+    getVenueRotatingMode(
+      normalizedSettings
+    );
+
+  const rotationMode =
+    normalizedSettings.rotationMode;
+
+  const rotationIsActive =
+    rotationMode !== "off";
 
   const groupsButton =
     byId("showGroupsDisplayBtn");
@@ -5771,6 +5930,15 @@ function renderVenueDisplayMode(mode) {
 
   const plateButton =
     byId("showPlateDisplayBtn");
+
+  const startGroupRotationButton =
+    byId("startGroupRotationBtn");
+
+  const startKnockoutRotationButton =
+    byId("startKnockoutRotationBtn");
+
+  const stopRotationButton =
+    byId("stopDisplayRotationBtn");
 
   const status =
     byId("displayModeStatus");
@@ -5788,7 +5956,8 @@ function renderVenueDisplayMode(mode) {
       if (!button) return;
 
       const isShowing =
-        normalizedMode === buttonMode;
+        !rotationIsActive &&
+        effectiveMode === buttonMode;
 
       button.disabled = isShowing;
 
@@ -5799,11 +5968,56 @@ function renderVenueDisplayMode(mode) {
     }
   );
 
-  if (status) {
+  if (startGroupRotationButton) {
+    const groupRotationIsActive =
+      rotationMode === "groupStage";
+
+    startGroupRotationButton.disabled =
+      groupRotationIsActive;
+
+    startGroupRotationButton.setAttribute(
+      "aria-pressed",
+      String(groupRotationIsActive)
+    );
+  }
+
+  if (startKnockoutRotationButton) {
+    const knockoutRotationIsActive =
+      rotationMode === "knockout";
+
+    startKnockoutRotationButton.disabled =
+      knockoutRotationIsActive;
+
+    startKnockoutRotationButton.setAttribute(
+      "aria-pressed",
+      String(knockoutRotationIsActive)
+    );
+  }
+
+  if (stopRotationButton) {
+    stopRotationButton.disabled =
+      !rotationIsActive;
+  }
+
+  if (!status) return;
+
+  if (rotationIsActive) {
+    const rotationCopy =
+      getVenueRotationCopy(
+        rotationMode
+      );
+
+    status.textContent =
+      `${rotationCopy.label} active: ${rotationCopy.sequence} · 20 seconds each · Currently showing ${
+        getVenueDisplayModeCopy(
+          effectiveMode
+        ).label
+      }`;
+  } else {
     status.textContent =
       `Current display: ${
         getVenueDisplayModeCopy(
-          normalizedMode
+          effectiveMode
         ).label
       }`;
   }
@@ -5837,7 +6051,11 @@ async function setVenueDisplayMode(mode) {
     await window.db
       .ref("tournament/displaySettings")
       .update({
-        mode: normalizedMode
+        mode: normalizedMode,
+        rotationMode: "off",
+        rotationStartedAt: null,
+        rotationIntervalMs:
+          VENUE_ROTATION_INTERVAL_MS
       });
   } catch (error) {
     console.error(
@@ -5847,6 +6065,113 @@ async function setVenueDisplayMode(mode) {
 
     alert(
       `The venue display could not be changed: ${error.message}`
+    );
+  }
+}
+
+async function startVenueDisplayRotation(
+  rotationMode
+) {
+  const normalizedRotationMode =
+    normalizeVenueRotationMode(
+      rotationMode
+    );
+
+  if (
+    normalizedRotationMode === "off"
+  ) {
+    return;
+  }
+
+  if (!requireAdmin()) return;
+
+  if (!databaseIsReady()) {
+    alert(
+      "The database is not connected yet. Try again in a moment."
+    );
+
+    return;
+  }
+
+  const rotationCopy =
+    getVenueRotationCopy(
+      normalizedRotationMode
+    );
+
+  const status =
+    byId("displayModeStatus");
+
+  if (status) {
+    status.textContent =
+      rotationCopy.starting;
+  }
+
+  try {
+    await window.db
+      .ref("tournament/displaySettings")
+      .update({
+        mode: rotationCopy.firstMode,
+        rotationMode:
+          normalizedRotationMode,
+        rotationStartedAt:
+          firebase.database.ServerValue.TIMESTAMP,
+        rotationIntervalMs:
+          VENUE_ROTATION_INTERVAL_MS
+      });
+  } catch (error) {
+    console.error(
+      "The venue display rotation could not be started.",
+      error
+    );
+
+    alert(
+      `The display rotation could not be started: ${error.message}`
+    );
+  }
+}
+
+async function stopVenueDisplayRotation() {
+  if (!requireAdmin()) return;
+
+  if (!databaseIsReady()) {
+    alert(
+      "The database is not connected yet. Try again in a moment."
+    );
+
+    return;
+  }
+
+  const currentMode =
+    getVenueRotatingMode(
+      currentVenueDisplaySettings
+    );
+
+  const status =
+    byId("displayModeStatus");
+
+  if (status) {
+    status.textContent =
+      "Stopping the display rotation…";
+  }
+
+  try {
+    await window.db
+      .ref("tournament/displaySettings")
+      .update({
+        mode: currentMode,
+        rotationMode: "off",
+        rotationStartedAt: null,
+        rotationIntervalMs:
+          VENUE_ROTATION_INTERVAL_MS
+      });
+  } catch (error) {
+    console.error(
+      "The venue display rotation could not be stopped.",
+      error
+    );
+
+    alert(
+      `The display rotation could not be stopped: ${error.message}`
     );
   }
 }
@@ -5867,6 +6192,15 @@ function startVenueDisplayControls() {
   const plateButton =
     byId("showPlateDisplayBtn");
 
+  const startGroupRotationButton =
+    byId("startGroupRotationBtn");
+
+  const startKnockoutRotationButton =
+    byId("startKnockoutRotationBtn");
+
+  const stopRotationButton =
+    byId("stopDisplayRotationBtn");
+
   const status =
     byId("displayModeStatus");
 
@@ -5876,6 +6210,9 @@ function startVenueDisplayControls() {
     !pitchMapButton &&
     !knockoutButton &&
     !plateButton &&
+    !startGroupRotationButton &&
+    !startKnockoutRotationButton &&
+    !stopRotationButton &&
     !status
   ) {
     return;
@@ -5926,6 +6263,53 @@ function startVenueDisplayControls() {
     );
   }
 
+  if (startGroupRotationButton) {
+    startGroupRotationButton.addEventListener(
+      "click",
+      () => {
+        startVenueDisplayRotation(
+          "groupStage"
+        );
+      }
+    );
+  }
+
+  if (startKnockoutRotationButton) {
+    startKnockoutRotationButton.addEventListener(
+      "click",
+      () => {
+        startVenueDisplayRotation(
+          "knockout"
+        );
+      }
+    );
+  }
+
+  if (stopRotationButton) {
+    stopRotationButton.addEventListener(
+      "click",
+      stopVenueDisplayRotation
+    );
+  }
+
+  if (venueRotationStatusTimer) {
+    clearInterval(
+      venueRotationStatusTimer
+    );
+  }
+
+  venueRotationStatusTimer =
+    setInterval(() => {
+      if (
+        currentVenueDisplaySettings
+          .rotationMode !== "off"
+      ) {
+        renderVenueDisplayMode(
+          currentVenueDisplaySettings
+        );
+      }
+    }, 1000);
+
   if (!databaseIsReady()) {
     if (status) {
       status.textContent =
@@ -5940,11 +6324,8 @@ function startVenueDisplayControls() {
     .on(
       "value",
       (snapshot) => {
-        const settings =
-          snapshot.val() || {};
-
         renderVenueDisplayMode(
-          settings.mode
+          snapshot.val() || {}
         );
       },
       (error) => {
