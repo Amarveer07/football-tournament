@@ -108,7 +108,7 @@ body {
   display: flex;
   align-items: center;
   width: max-content;
-  animation: sponsorTicker 34s linear infinite;
+  animation: sponsorTicker 78s linear infinite;
   will-change: transform;
 }
 
@@ -127,27 +127,34 @@ body {
   align-items: center;
   gap: 13px;
   flex-shrink: 0;
-  min-width: 250px;
+  min-width: 285px;
   height: 54px;
   margin-right: 38px;
-  padding: 7px 20px;
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 18px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 999px;
 }
 
+.sponsor-ticker-item-no-logo {
+  justify-content: center;
+  min-width: 255px;
+}
+
 .sponsor-ticker-logo {
-  width: 39px;
-  height: 39px;
-  flex: 0 0 39px;
+  width: auto;
+  max-width: 108px;
+  height: 40px;
+  flex: 0 0 auto;
   object-fit: contain;
+  border-radius: 5px;
 }
 
 .sponsor-ticker-name {
   color: #fff;
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: 0.03em;
+  font-size: 17px;
+  font-weight: 850;
+  letter-spacing: 0.025em;
   white-space: nowrap;
 }
 
@@ -903,13 +910,14 @@ tr.group-position-last td:first-child {
   }
 
   .sponsor-ticker-logo {
-    width: 32px;
+    width: auto;
+    max-width: 88px;
     height: 32px;
-    flex-basis: 32px;
+    flex-basis: auto;
   }
 
   .sponsor-ticker-name {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .display-groups-view {
