@@ -330,6 +330,276 @@
       .accordion-content { padding: 14px 12px; }
       .admin-back-to-top { right: 12px; bottom: 12px; }
     }
+
+
+    /* ==================================================
+       High-contrast dark admin theme
+    ================================================== */
+
+    :root {
+      --admin-page-bg: #12071d;
+      --admin-panel-bg: #241032;
+      --admin-panel-bg-2: #301342;
+      --admin-panel-border: rgba(232, 121, 249, 0.28);
+      --admin-text: #ffffff;
+      --admin-muted: #d8c9e2;
+      --admin-field-bg: #ffffff;
+      --admin-field-text: #21122b;
+    }
+
+    body,
+    .admin-page {
+      color: var(--admin-text);
+      background:
+        radial-gradient(circle at top, rgba(126, 34, 206, 0.24), transparent 34%),
+        linear-gradient(180deg, #1b0928 0%, var(--admin-page-bg) 100%);
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(192, 38, 211, 0.12), transparent 28%),
+        radial-gradient(circle at 85% 35%, rgba(124, 58, 237, 0.1), transparent 30%);
+      content: "";
+      pointer-events: none;
+    }
+
+    .card,
+    .selected-group-panel,
+    .admin-accordion,
+    .form-panel,
+    .official-fixtures-panel,
+    .display-rotation-panel,
+    .display-rotation-option,
+    .subsection,
+    .accordion-subsection,
+    .danger-panel {
+      color: var(--admin-text);
+      background: linear-gradient(145deg, rgba(48, 19, 66, 0.98), rgba(32, 13, 45, 0.98));
+      border-color: var(--admin-panel-border);
+      box-shadow: 0 16px 38px rgba(0, 0, 0, 0.28);
+    }
+
+    .login-card,
+    #adminPanel > .card {
+      background: linear-gradient(145deg, rgba(48, 19, 66, 0.98), rgba(32, 13, 45, 0.98));
+    }
+
+    .admin-sticky-nav {
+      background: rgba(28, 10, 40, 0.96);
+      border-color: rgba(232, 121, 249, 0.32);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.34);
+    }
+
+    .admin-sticky-nav button {
+      color: #f7eaff;
+      background: rgba(168, 85, 247, 0.18);
+      border-color: rgba(216, 180, 254, 0.22);
+    }
+
+    .admin-sticky-nav button:hover,
+    .admin-sticky-nav button:focus-visible {
+      color: #ffffff;
+      background: #7e22ce;
+      border-color: #d8b4fe;
+    }
+
+    .admin-accordion {
+      background: linear-gradient(145deg, rgba(42, 16, 58, 0.99), rgba(26, 10, 37, 0.99));
+      border-color: rgba(232, 121, 249, 0.22);
+    }
+
+    .admin-accordion > summary,
+    .admin-accordion > summary:hover {
+      color: #ffffff;
+      background: linear-gradient(90deg, rgba(126, 34, 206, 0.24), rgba(48, 19, 66, 0.3));
+    }
+
+    .admin-accordion[open] > summary {
+      border-bottom-color: rgba(232, 121, 249, 0.22);
+    }
+
+    .accordion-summary-title,
+    .section-heading h1,
+    .section-heading h2,
+    .section-heading h3,
+    .selected-group-heading h2,
+    .selected-group-heading h3,
+    .form-panel h3,
+    .official-fixtures-panel h3,
+    .display-rotation-panel h3,
+    .subsection h3,
+    .subsection h4,
+    .accordion-subsection h3,
+    .accordion-subsection h4 {
+      color: #ffffff;
+    }
+
+    p,
+    .helper-text,
+    .admin-section-description,
+    .accordion-summary-description,
+    .official-fixtures-status,
+    .display-mode-status,
+    .display-rotation-option span,
+    .admin-status {
+      color: var(--admin-muted);
+      opacity: 1;
+    }
+
+    .admin-section-badge {
+      color: #f5e9ff;
+      background: rgba(168, 85, 247, 0.22);
+      border-color: rgba(216, 180, 254, 0.28);
+    }
+
+    .admin-section-matchday .admin-section-badge,
+    .admin-section-competition .admin-section-badge,
+    .admin-section-knockout .admin-section-badge,
+    .admin-section-setup .admin-section-badge,
+    .admin-section-warning .admin-section-badge,
+    .admin-section-danger .admin-section-badge {
+      color: #ffffff;
+    }
+
+    .form-field label,
+    label,
+    legend,
+    summary,
+    strong {
+      color: #ffffff;
+    }
+
+    input,
+    select,
+    textarea {
+      color: var(--admin-field-text) !important;
+      background: var(--admin-field-bg) !important;
+      border: 2px solid rgba(216, 180, 254, 0.64) !important;
+      box-shadow: 0 3px 9px rgba(0, 0, 0, 0.18);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #706376;
+      opacity: 1;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #c026d3 !important;
+      outline: 3px solid rgba(192, 38, 211, 0.22);
+    }
+
+    option {
+      color: #21122b;
+      background: #ffffff;
+    }
+
+    .table-wrap {
+      background: #1c0b27;
+      border: 1px solid rgba(232, 121, 249, 0.22);
+      border-radius: 13px;
+    }
+
+    table {
+      color: #ffffff;
+      background: #1c0b27;
+    }
+
+    th {
+      color: #ffffff;
+      background: #5b1780 !important;
+      border-color: rgba(255, 255, 255, 0.14) !important;
+    }
+
+    td {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.025);
+      border-color: rgba(255, 255, 255, 0.11) !important;
+    }
+
+    tbody tr:nth-child(even) td {
+      background: rgba(255, 255, 255, 0.055);
+    }
+
+    #groupTable .group-position-top-two td {
+      background: rgba(34, 197, 94, 0.17) !important;
+    }
+
+    #groupTable .group-position-third td {
+      background: rgba(250, 204, 21, 0.15) !important;
+    }
+
+    #groupTable .group-position-last td {
+      background: rgba(239, 68, 68, 0.15) !important;
+    }
+
+    .tabs button,
+    .secondary-button,
+    button.secondary-button {
+      color: #ffffff;
+      background: rgba(126, 34, 206, 0.42);
+      border-color: rgba(216, 180, 254, 0.34);
+    }
+
+    .tabs button:hover,
+    .secondary-button:hover,
+    button.secondary-button:hover {
+      background: rgba(147, 51, 234, 0.72);
+    }
+
+    .tabs button.active,
+    .tabs button[aria-selected="true"],
+    .primary-button,
+    button.primary-button {
+      color: #ffffff;
+      background: linear-gradient(135deg, #9333ea, #6d28d9);
+      border-color: rgba(233, 213, 255, 0.44);
+    }
+
+    button:disabled {
+      color: rgba(255, 255, 255, 0.58) !important;
+      background: rgba(100, 76, 112, 0.45) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    .danger-panel,
+    .danger-accordion {
+      background: linear-gradient(145deg, rgba(74, 19, 32, 0.94), rgba(43, 12, 22, 0.98));
+    }
+
+    .danger-button {
+      color: #ffffff;
+      background: #b91c1c;
+      border-color: #fca5a5;
+    }
+
+    .accordion-warning {
+      color: #fde68a;
+      background: rgba(180, 83, 9, 0.22);
+      border-color: rgba(251, 191, 36, 0.36);
+    }
+
+    .match-edit-panel {
+      border-top-color: rgba(232, 121, 249, 0.24);
+    }
+
+    a {
+      color: #e9b9ff;
+    }
+
+    @media (max-width: 580px) {
+      .card,
+      .selected-group-panel,
+      .admin-accordion {
+        border-radius: 14px;
+      }
+    }
+
 </style>
 </head>
 <body>
