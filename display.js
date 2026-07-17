@@ -16,8 +16,88 @@
 
 const DISPLAY_SPONSORS = [
   {
+    name: "Sikh Channel",
+    logo: ""
+  },
+
+  {
+    name: "Sunderland",
+    logo: "logos/sunderland-afc.png"
+  },
+
+  {
+    name: "Durham County FA",
+    logo: ""
+  },
+
+  {
+    name: "Leisure United",
+    logo: ""
+  },
+
+  {
+    name: "UK Sikh Football Association",
+    logo: ""
+  },
+
+  {
+    name: "Doable Wale",
+    logo: ""
+  },
+
+  {
+    name: "Lauren Howe Photography",
+    logo: ""
+  },
+
+  {
+    name: "Billy Lead Photography",
+    logo: ""
+  },
+
+  {
+    name: "Wedz",
+    logo: ""
+  },
+
+  {
     name: "Ladhar Investments",
     logo: "assets/sponsors/ladhar-investments.png"
+  },
+
+  {
+    name: "Bikar Singh Johal",
+    logo: ""
+  },
+
+  {
+    name: "Seaton Group Pharmacy",
+    logo: ""
+  },
+
+  {
+    name: "Sahota Stores",
+    logo: "logos/sahota-stores.png"
+  },
+
+  {
+    name: "Kular Stores",
+    logo: "logos/kular-stores.png"
+  },
+
+  {
+    name: "Sukhwinder Singh Dhillon",
+    logo: "logos/sukhwinder-singh-dhillon.png"
+  },
+
+  {
+    name: "B&S K Group",
+    logo: "logos/bs-k-group.png"
+  },
+
+  {
+    name: "Gills Premier",
+    logo: "logos/gills-premier.png"
   }
 ];
 
@@ -374,7 +454,11 @@ function renderSponsorTickerGroup(sponsors) {
       ${sponsors
         .map(
           (sponsor) => `
-            <div class="sponsor-ticker-item">
+            <div class="sponsor-ticker-item${
+              sponsor.logo
+                ? ""
+                : " sponsor-ticker-item-no-logo"
+            }">
               ${renderOptionalImage(
                 sponsor.logo,
                 "sponsor-ticker-logo",
