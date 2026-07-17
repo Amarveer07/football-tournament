@@ -2248,3 +2248,124 @@ tr.group-position-last td:first-child {
     margin-left: auto;
   }
 }
+
+
+/* ==================================================
+   Group sponsor logo footers
+================================================== */
+
+.display-group-heading {
+  min-height: 42px;
+  flex: 0 0 42px;
+  padding: 5px 10px;
+}
+
+.display-group-title {
+  font-size: clamp(20px, 1.55vw, 30px);
+}
+
+.display-group-table {
+  height: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.display-group-sponsor-footer {
+  display: grid;
+  grid-template-columns: minmax(115px, 0.88fr) minmax(145px, 1.4fr);
+  align-items: center;
+  gap: 10px;
+
+  min-height: 68px;
+  flex: 0 0 68px;
+  padding: 7px 10px;
+
+  background:
+    linear-gradient(
+      100deg,
+      rgba(50, 8, 72, 0.98),
+      rgba(19, 2, 29, 0.98)
+    );
+
+  border-top: 1px solid rgba(232, 121, 249, 0.48);
+}
+
+.display-group-sponsor-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+
+.display-group-sponsor-label {
+  color: rgba(255, 255, 255, 0.64);
+  font-size: clamp(8px, 0.58vw, 11px);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.display-group-sponsor-name {
+  display: block;
+  min-width: 0;
+  max-width: none;
+  min-height: 0;
+  overflow: hidden;
+
+  color: #ffffff;
+  font-size: clamp(11px, 0.82vw, 16px);
+  font-weight: 950;
+  line-height: 1.08;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.display-group-sponsor-logo-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 0;
+  height: 52px;
+  overflow: hidden;
+  padding: 4px 8px;
+
+  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  border-radius: 8px;
+
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.3);
+}
+
+.display-group-sponsor-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@media (min-width: 1101px) and (max-height: 850px) {
+  .display-group-heading {
+    min-height: 38px;
+    flex-basis: 38px;
+  }
+
+  .display-group-sponsor-footer {
+    min-height: 58px;
+    flex-basis: 58px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .display-group-sponsor-logo-frame {
+    height: 44px;
+  }
+
+  .display-group-sponsor-name {
+    font-size: 11px;
+  }
+}
