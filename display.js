@@ -103,8 +103,32 @@ let displayPlateSetup = {};
 let displayPlateResults = {};
 let displaySettings = {
   mode: "groups",
-  sponsorTicker: true
+  sponsorTicker: true,
+  rotationMode: "off",
+  rotationStartedAt: 0,
+  rotationIntervalMs: 20000
 };
+
+const DISPLAY_ROTATION_ORDERS = {
+  groupStage: [
+    "groups",
+    "pitchMap",
+    "fixtures"
+  ],
+
+  knockout: [
+    "knockout",
+    "plate"
+  ]
+};
+
+const DEFAULT_DISPLAY_ROTATION_INTERVAL_MS = 20000;
+const DISPLAY_TRANSITION_DURATION_MS = 620;
+
+let displayRotationTimer = null;
+let displayTransitionTimer = null;
+let activeDisplayMode = null;
+let displayServerTimeOffset = 0;
 
 const KNOCKOUT_ROUNDS = {
   roundOf16: {
@@ -1530,7 +1554,7 @@ function renderDisplayPlateBracket() {
 
 
 /* ==================================================
-   Display Mode
+   Display Mode and Rotation
 ================================================== */
 
 function normalizeDisplayMode(value) {
@@ -1542,73 +1566,368 @@ function normalizeDisplayMode(value) {
   return "groups";
 }
 
-function renderDisplayMode() {
-  const groupsView =
-    displayById("displayGroupsView");
+function normalizeDisplayRotationMode(value) {
+  if (value === "groupStage") {
+    return "groupStage";
+  }
 
-  const fixturesView =
-    displayById("displayFixturesView");
+  if (value === "knockout") {
+    return "knockout";
+  }
 
-  const pitchMapView =
-    displayById("displayPitchMapView");
+  return "off";
+}
 
-  const knockoutView =
-    displayById("displayKnockoutView");
+function getDisplayRotationOrder(
+  rotationMode
+) {
+  return (
+    DISPLAY_ROTATION_ORDERS[
+      normalizeDisplayRotationMode(
+        rotationMode
+      )
+    ] || []
+  );
+}
 
-  const plateView =
-    displayById("displayPlateView");
+function getDisplayRotationIntervalMs() {
+  const intervalValue =
+    Number(displaySettings.rotationIntervalMs);
 
+  return (
+    Number.isFinite(intervalValue) &&
+    intervalValue >= 5000
+  )
+    ? intervalValue
+    : DEFAULT_DISPLAY_ROTATION_INTERVAL_MS;
+}
+
+function getDisplayNow() {
+  return Date.now() +
+    displayServerTimeOffset;
+}
+
+function getEffectiveDisplayMode(
+  now = getDisplayNow()
+) {
+  const rotationMode =
+    normalizeDisplayRotationMode(
+      displaySettings.rotationMode
+    );
+
+  const startedAt =
+    Number(
+      displaySettings.rotationStartedAt
+    ) || 0;
+
+  const rotationOrder =
+    getDisplayRotationOrder(
+      rotationMode
+    );
+
+  if (
+    rotationOrder.length === 0 ||
+    startedAt <= 0
+  ) {
+    return normalizeDisplayMode(
+      displaySettings.mode
+    );
+  }
+
+  const interval =
+    getDisplayRotationIntervalMs();
+
+  const elapsed = Math.max(
+    0,
+    now - startedAt
+  );
+
+  const rotationIndex =
+    Math.floor(elapsed / interval) %
+    rotationOrder.length;
+
+  return rotationOrder[
+    rotationIndex
+  ];
+}
+
+function getDisplayView(mode) {
+  const viewIds = {
+    groups: "displayGroupsView",
+    fixtures: "displayFixturesView",
+    pitchMap: "displayPitchMapView",
+    knockout: "displayKnockoutView",
+    plate: "displayPlateView"
+  };
+
+  return displayById(
+    viewIds[normalizeDisplayMode(mode)]
+  );
+}
+
+function getAllDisplayViews() {
+  return [
+    getDisplayView("groups"),
+    getDisplayView("fixtures"),
+    getDisplayView("pitchMap"),
+    getDisplayView("knockout"),
+    getDisplayView("plate")
+  ].filter(Boolean);
+}
+
+function updateDisplayModeLabel(mode) {
   const modeLabel =
     displayById("displayModeLabel");
 
-  const mode =
-    normalizeDisplayMode(
-      displaySettings.mode
+  if (!modeLabel) return;
+
+  if (mode === "fixtures") {
+    modeLabel.textContent =
+      "Group Fixtures";
+  } else if (mode === "pitchMap") {
+    modeLabel.textContent =
+      "Live Pitch Map";
+  } else if (mode === "knockout") {
+    modeLabel.textContent =
+      "Main Knockout";
+  } else if (mode === "plate") {
+    modeLabel.textContent =
+      "NEST Plate Championship";
+  } else {
+    modeLabel.textContent =
+      "Group Stage";
+  }
+}
+
+function showDisplayModeImmediately(mode) {
+  const normalizedMode =
+    normalizeDisplayMode(mode);
+
+  if (displayTransitionTimer) {
+    clearTimeout(
+      displayTransitionTimer
     );
 
-  if (groupsView) {
-    groupsView.hidden =
-      mode !== "groups";
+    displayTransitionTimer = null;
   }
 
-  if (fixturesView) {
-    fixturesView.hidden =
-      mode !== "fixtures";
-  }
+  getAllDisplayViews().forEach(
+    (view) => {
+      const isActive =
+        view === getDisplayView(
+          normalizedMode
+        );
 
-  if (pitchMapView) {
-    pitchMapView.hidden =
-      mode !== "pitchMap";
-  }
+      view.classList.remove(
+        "display-view-entering",
+        "display-view-leaving"
+      );
 
-  if (knockoutView) {
-    knockoutView.hidden =
-      mode !== "knockout";
-  }
-
-  if (plateView) {
-    plateView.hidden =
-      mode !== "plate";
-  }
-
-  if (modeLabel) {
-    if (mode === "fixtures") {
-      modeLabel.textContent =
-        "Group Fixtures";
-    } else if (mode === "pitchMap") {
-      modeLabel.textContent =
-        "Live Pitch Map";
-    } else if (mode === "knockout") {
-      modeLabel.textContent =
-        "Main Knockout";
-    } else if (mode === "plate") {
-      modeLabel.textContent =
-        "NEST Plate Championship";
-    } else {
-      modeLabel.textContent =
-        "Group Stage";
+      view.hidden = !isActive;
+      view.setAttribute(
+        "aria-hidden",
+        String(!isActive)
+      );
     }
+  );
+
+  activeDisplayMode =
+    normalizedMode;
+
+  updateDisplayModeLabel(
+    normalizedMode
+  );
+}
+
+function transitionToDisplayMode(mode) {
+  const normalizedMode =
+    normalizeDisplayMode(mode);
+
+  const nextView =
+    getDisplayView(normalizedMode);
+
+  const currentView =
+    getDisplayView(activeDisplayMode);
+
+  if (!nextView) return;
+
+  if (
+    !currentView ||
+    activeDisplayMode === normalizedMode
+  ) {
+    showDisplayModeImmediately(
+      normalizedMode
+    );
+
+    return;
   }
+
+  if (displayTransitionTimer) {
+    clearTimeout(
+      displayTransitionTimer
+    );
+  }
+
+  getAllDisplayViews().forEach(
+    (view) => {
+      if (
+        view !== currentView &&
+        view !== nextView
+      ) {
+        view.hidden = true;
+        view.classList.remove(
+          "display-view-entering",
+          "display-view-leaving"
+        );
+      }
+    }
+  );
+
+  nextView.hidden = false;
+  nextView.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+  nextView.classList.remove(
+    "display-view-leaving"
+  );
+
+  nextView.classList.add(
+    "display-view-entering"
+  );
+
+  currentView.classList.remove(
+    "display-view-entering"
+  );
+
+  currentView.classList.add(
+    "display-view-leaving"
+  );
+
+  /*
+    Two animation frames allow the browser to paint the
+    incoming starting position before it transitions.
+  */
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      nextView.classList.remove(
+        "display-view-entering"
+      );
+    });
+  });
+
+  activeDisplayMode =
+    normalizedMode;
+
+  updateDisplayModeLabel(
+    normalizedMode
+  );
+
+  displayTransitionTimer =
+    setTimeout(() => {
+      currentView.hidden = true;
+
+      currentView.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+      currentView.classList.remove(
+        "display-view-leaving"
+      );
+
+      displayTransitionTimer = null;
+    }, DISPLAY_TRANSITION_DURATION_MS);
+}
+
+function renderDisplayMode({
+  animate = true
+} = {}) {
+  const targetMode =
+    getEffectiveDisplayMode();
+
+  if (activeDisplayMode === null) {
+    showDisplayModeImmediately(
+      targetMode
+    );
+
+    return;
+  }
+
+  if (targetMode === activeDisplayMode) {
+    updateDisplayModeLabel(
+      targetMode
+    );
+
+    return;
+  }
+
+  if (animate) {
+    transitionToDisplayMode(
+      targetMode
+    );
+  } else {
+    showDisplayModeImmediately(
+      targetMode
+    );
+  }
+}
+
+function scheduleDisplayRotation() {
+  if (displayRotationTimer) {
+    clearTimeout(
+      displayRotationTimer
+    );
+
+    displayRotationTimer = null;
+  }
+
+  const rotationMode =
+    normalizeDisplayRotationMode(
+      displaySettings.rotationMode
+    );
+
+  if (
+    getDisplayRotationOrder(
+      rotationMode
+    ).length === 0
+  ) {
+    return;
+  }
+
+  const startedAt =
+    Number(
+      displaySettings.rotationStartedAt
+    ) || 0;
+
+  if (startedAt <= 0) return;
+
+  const interval =
+    getDisplayRotationIntervalMs();
+
+  const elapsed = Math.max(
+    0,
+    getDisplayNow() - startedAt
+  );
+
+  const remainder =
+    elapsed % interval;
+
+  const delay =
+    Math.max(
+      80,
+      interval - remainder + 35
+    );
+
+  displayRotationTimer =
+    setTimeout(() => {
+      renderDisplayMode({
+        animate: true
+      });
+
+      scheduleDisplayRotation();
+    }, delay);
 }
 
 function renderCompleteDisplay() {
@@ -1619,7 +1938,10 @@ function renderCompleteDisplay() {
   renderDisplayPitchMap();
   renderDisplayKnockoutBracket();
   renderDisplayPlateBracket();
-  renderDisplayMode();
+  renderDisplayMode({
+    animate: true
+  });
+  scheduleDisplayRotation();
 }
 
 /* ==================================================
@@ -1683,8 +2005,24 @@ function listenToDisplayTournament() {
           : {};
 
       displaySettings = {
-        mode: normalizeDisplayMode(data.displaySettings?.mode),
-        sponsorTicker: data.displaySettings?.sponsorTicker !== false
+        mode: normalizeDisplayMode(
+          data.displaySettings?.mode
+        ),
+        sponsorTicker:
+          data.displaySettings?.sponsorTicker !== false,
+        rotationMode:
+          normalizeDisplayRotationMode(
+            data.displaySettings?.rotationMode
+          ),
+        rotationStartedAt:
+          Number(
+            data.displaySettings?.rotationStartedAt
+          ) || 0,
+        rotationIntervalMs:
+          Number(
+            data.displaySettings?.rotationIntervalMs
+          ) ||
+          DEFAULT_DISPLAY_ROTATION_INTERVAL_MS
       };
 
       renderCompleteDisplay();
@@ -1702,6 +2040,19 @@ function listenToDisplayTournament() {
 
 function listenToDisplayConnection() {
   if (!displayDatabaseIsReady()) return;
+
+  window.db
+    .ref(".info/serverTimeOffset")
+    .on("value", (snapshot) => {
+      displayServerTimeOffset =
+        Number(snapshot.val()) || 0;
+
+      renderDisplayMode({
+        animate: false
+      });
+
+      scheduleDisplayRotation();
+    });
 
   window.db.ref(".info/connected").on("value", (snapshot) => {
     const isConnected = Boolean(snapshot.val());
