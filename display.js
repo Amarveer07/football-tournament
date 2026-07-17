@@ -178,7 +178,6 @@ const DISPLAY_TEAM_LOGOS = {
   "newcastle punjab fc c": "logos/newcastle-punjab-fc-c.png",
 
   "punjab united fc gravesend": "logos/punjab-united-fc-gravesend.png",
-  "singh sabha slough": "logos/singh-sabha-slough.png",
   "newcastle panjab fc b": "logos/newcastle-punjab-fc-b.png",
   "newcastle punjab fc b": "logos/newcastle-punjab-fc-b.png",
   "punjabi mags": "logos/punjabi-mags.png"
@@ -259,9 +258,9 @@ const KNOCKOUT_ROUNDS = {
 
 const PLATE_ROUNDS = {
   quarterFinals: {
-    label: "Quarter-finals",
+    label: "Quarter-final",
     shortLabel: "QF",
-    matchCount: 2
+    matchCount: 1
   },
   semiFinals: {
     label: "Semi-finals",
@@ -287,8 +286,7 @@ const DISPLAY_ROUND_OF_16_PLACEHOLDERS = {
 };
 
 const DISPLAY_PLATE_QF_PLACEHOLDERS = {
-  1: ["Last in Group D", "Last in Group E"],
-  2: ["Last in Group B", "Last in Group F"]
+  1: ["Seed 4", "Seed 5"]
 };
 
 /* ==================================================
@@ -395,6 +393,31 @@ function normalizeDisplayGroups(rawGroups, groupKeys) {
   return groups;
 }
 
+function getDisplayTeamGoalsFor(
+  groupKey,
+  teamName
+) {
+  return Object.values(
+    displayMatches?.[groupKey] || {}
+  ).reduce((total, match) => {
+    if (!displayMatchHasScore(match)) {
+      return total;
+    }
+
+    if (match.teamA === teamName) {
+      return total +
+        displayToNumber(match.scoreA);
+    }
+
+    if (match.teamB === teamName) {
+      return total +
+        displayToNumber(match.scoreB);
+    }
+
+    return total;
+  }, 0);
+}
+
 function getSortedDisplayGroup(groupKey) {
   return [...(displayGroups[groupKey] || [])].sort(
     (first, second) => {
@@ -404,6 +427,22 @@ function getSortedDisplayGroup(groupKey) {
 
       if (second.gd !== first.gd) {
         return second.gd - first.gd;
+      }
+
+      const firstGoalsFor =
+        getDisplayTeamGoalsFor(
+          groupKey,
+          first.name
+        );
+
+      const secondGoalsFor =
+        getDisplayTeamGoalsFor(
+          groupKey,
+          second.name
+        );
+
+      if (secondGoalsFor !== firstGoalsFor) {
+        return secondGoalsFor - firstGoalsFor;
       }
 
       return first.name.localeCompare(second.name);
@@ -1525,7 +1564,7 @@ function getDisplayPlateMatchTeams(
 ) {
   if (roundKey === "quarterFinals") {
     const setupMatch =
-      displayPlateSetup?.[matchNumber];
+      displayPlateSetup?.[1];
 
     return {
       teamOne: normalizeDisplayTeamReference(
@@ -1539,15 +1578,24 @@ function getDisplayPlateMatchTeams(
   }
 
   if (roundKey === "semiFinals") {
-    const directSeedKey = matchNumber === 1 ? 3 : 4;
+    if (matchNumber === 1) {
+      return {
+        teamOne: normalizeDisplayTeamReference(
+          displayPlateSetup?.[2]?.teamOne
+        ),
+        teamTwo: getDisplayPlateWinner(
+          "quarterFinals",
+          1
+        )
+      };
+    }
 
     return {
-      teamOne: getDisplayPlateWinner(
-        "quarterFinals",
-        matchNumber
+      teamOne: normalizeDisplayTeamReference(
+        displayPlateSetup?.[3]?.teamOne
       ),
       teamTwo: normalizeDisplayTeamReference(
-        displayPlateSetup?.[directSeedKey]?.teamOne
+        displayPlateSetup?.[4]?.teamOne
       )
     };
   }
@@ -1566,24 +1614,15 @@ function getDisplayPlateMatchTeams(
 }
 
 function displayPlateSetupIsComplete() {
-  const quarterFinalsReady = [1, 2].every(
-    (matchNumber) => {
-      const setupMatch =
-        displayPlateSetup?.[matchNumber];
+  const quarterFinal = displayPlateSetup?.[1];
 
-      return Boolean(
-        setupMatch?.teamOne && setupMatch?.teamTwo
-      );
-    }
+  return Boolean(
+    quarterFinal?.teamOne &&
+    quarterFinal?.teamTwo &&
+    displayPlateSetup?.[2]?.teamOne &&
+    displayPlateSetup?.[3]?.teamOne &&
+    displayPlateSetup?.[4]?.teamOne
   );
-
-  const semiFinalSeedsReady = [3, 4].every(
-    (setupKey) => Boolean(
-      displayPlateSetup?.[setupKey]?.teamOne
-    )
-  );
-
-  return quarterFinalsReady && semiFinalSeedsReady;
 }
 
 
@@ -1593,19 +1632,21 @@ function getDisplayPlatePlaceholder(
   slot
 ) {
   if (roundKey === "quarterFinals") {
-    return DISPLAY_PLATE_QF_PLACEHOLDERS[matchNumber]?.[
-      slot === "one" ? 0 : 1
-    ] || "NEST Plate team";
+    return slot === "one"
+      ? "Seed 4"
+      : "Seed 5";
   }
 
   if (roundKey === "semiFinals") {
-    if (slot === "one") {
-      return `Winner of QF ${matchNumber}`;
+    if (matchNumber === 1) {
+      return slot === "one"
+        ? "Seed 1"
+        : "Winner of Seed 4 vs Seed 5";
     }
 
-    return matchNumber === 1
-      ? "Third-place rank 5 or 6"
-      : "Third-place rank 6 or 5";
+    return slot === "one"
+      ? "Seed 2"
+      : "Seed 3";
   }
 
   if (roundKey === "final") {
@@ -1727,14 +1768,9 @@ function renderDisplayPlateBracket() {
       [2],
       "plate-semi-final-column"
     )}
-
-    ${renderDisplayPlateColumn(
-      "quarterFinals",
-      [2],
-      "plate-quarter-final-column"
-    )}
   `;
 }
+
 
 
 /* ==================================================
