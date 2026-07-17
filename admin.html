@@ -20,7 +20,7 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Tournament application -->
-  <script src="app.js?v=35" defer></script>
+  <script src="app.js?v=36" defer></script>
 
   <style>
     /* Group position colours appear only after a result exists. */
@@ -721,8 +721,8 @@
         <h2>Third-Place Rankings</h2>
 
         <p>
-          The third-placed team from every group, ranked across the tournament.
-          The top four qualify for the knockout stage.
+          Third-placed teams are ranked by points per game, then goal difference.
+          The top four reach the main knockout; fifth and sixth enter the NEST Plate.
         </p>
       </div>
     </div>
@@ -799,11 +799,11 @@
         <summary>
           <span class="accordion-summary-copy">
             <span class="accordion-summary-title">
-              Bottom 8 Knockout
+              NEST Plate Championship
             </span>
 
             <span class="accordion-summary-description">
-              Select the eight non-qualifiers and manage their knockout results.
+              Select the six Plate teams and manage their knockout results.
             </span>
           </span>
         </summary>
@@ -811,17 +811,17 @@
         <div class="accordion-content">
           <div class="section-heading">
             <div>
-              <h2>Bottom 8 Setup</h2>
+              <h2>NEST Plate Setup</h2>
 
               <p>
-                Assign the eight teams to four quarter-finals.
-                The semi-finals and final progress automatically.
+                Set the two quarter-finals and the two third-place teams
+                receiving byes into the semi-finals.
               </p>
             </div>
           </div>
 
           <div id="bottomEightSetup">
-            Loading Bottom 8 setup…
+            Loading NEST Plate setup…
           </div>
 
           <div class="button-row">
@@ -829,14 +829,14 @@
               type="button"
               onclick="autoFillBottomEightSetup()"
             >
-              Auto-Fill Bottom 8 Teams
+              Auto-Fill NEST Plate Teams
             </button>
 
             <button
               type="button"
               onclick="saveBottomEightSetup()"
             >
-              Save Bottom 8 Setup
+              Save NEST Plate Setup
             </button>
           </div>
 
