@@ -209,7 +209,7 @@ let displaySettings = {
   sponsorTicker: true,
   rotationMode: "off",
   rotationStartedAt: 0,
-  rotationIntervalMs: 20000
+  rotationIntervalMs: 15000
 };
 
 const DISPLAY_ROTATION_ORDERS = {
@@ -225,7 +225,7 @@ const DISPLAY_ROTATION_ORDERS = {
   ]
 };
 
-const DEFAULT_DISPLAY_ROTATION_INTERVAL_MS = 20000;
+const DEFAULT_DISPLAY_ROTATION_INTERVAL_MS = 15000;
 const DISPLAY_TRANSITION_DURATION_MS = 620;
 
 let displayRotationTimer = null;
@@ -1110,16 +1110,28 @@ function getDisplayFixtureTimeRows(fixtures) {
   return timestamps;
 }
 
-function displayFixtureIsLive(fixture) {
-  return Object.entries(displayPitchMapAssignments || {}).some(
-    ([savedPitch, assignment]) => {
-      return Boolean(
-        Number(savedPitch) === fixture.pitchNumber &&
-        assignment?.groupKey === fixture.groupKey &&
-        assignment?.matchId === fixture.matchId
-      );
-    }
-  );
+function getDisplayFixtureLivePitch(
+  fixture
+) {
+  const liveEntry = Object.entries(
+    displayPitchMapAssignments || {}
+  ).find(([, assignment]) => {
+    return Boolean(
+      assignment?.groupKey ===
+        fixture.groupKey &&
+      assignment?.matchId ===
+        fixture.matchId
+    );
+  });
+
+  if (!liveEntry) return null;
+
+  const pitchNumber =
+    Number(liveEntry[0]);
+
+  return Number.isInteger(pitchNumber)
+    ? pitchNumber
+    : null;
 }
 
 function renderDisplayFixtureCard(fixture) {
@@ -1134,7 +1146,17 @@ function renderDisplayFixtureCard(fixture) {
   const groupClass =
     DISPLAY_FIXTURE_GROUP_COLOURS[fixture.groupKey] || "";
 
-  const isLive = displayFixtureIsLive(fixture);
+  const livePitchNumber =
+    fixture.completed
+      ? null
+      : getDisplayFixtureLivePitch(
+          fixture
+        );
+
+  const isLive =
+    Number.isInteger(
+      livePitchNumber
+    );
 
   const scoreMarkup = fixture.completed
     ? `
@@ -1153,17 +1175,36 @@ function renderDisplayFixtureCard(fixture) {
           ${escapeDisplayHtml(fixture.groupKey)}
         </span>
 
-        ${isLive ? '<span class="fixture-display-live-badge">Live</span>' : ''}
+        ${
+          isLive
+            ? `
+              <span class="fixture-display-live-badge">
+                Live${
+                  livePitchNumber !==
+                    fixture.pitchNumber
+                    ? ` · P${livePitchNumber}`
+                    : ""
+                }
+              </span>
+            `
+            : ""
+        }
         ${fixture.completed ? '<span class="fixture-display-complete-badge">FT</span>' : ''}
       </div>
 
-      <div class="fixture-display-team fixture-display-team-a">
+      <div
+        class="fixture-display-team fixture-display-team-a"
+        title="${escapeDisplayHtml(fixture.teamA)}"
+      >
         ${escapeDisplayHtml(fixture.teamA)}
       </div>
 
       ${scoreMarkup}
 
-      <div class="fixture-display-team fixture-display-team-b">
+      <div
+        class="fixture-display-team fixture-display-team-b"
+        title="${escapeDisplayHtml(fixture.teamB)}"
+      >
         ${escapeDisplayHtml(fixture.teamB)}
       </div>
     </article>
@@ -1176,6 +1217,16 @@ function renderDisplayFixtures() {
 
   const fixtures = getDisplayFixtureEntries();
   const timeRows = getDisplayFixtureTimeRows(fixtures);
+
+  grid.style.setProperty(
+    "--fixture-row-count",
+    String(
+      Math.max(
+        1,
+        timeRows.length
+      )
+    )
+  );
 
   const teamCount = displayGroupKeys.reduce(
     (total, groupKey) => total + (displayGroups[groupKey] || []).length,
@@ -1724,15 +1775,7 @@ function getDisplayRotationOrder(
 }
 
 function getDisplayRotationIntervalMs() {
-  const intervalValue =
-    Number(displaySettings.rotationIntervalMs);
-
-  return (
-    Number.isFinite(intervalValue) &&
-    intervalValue >= 5000
-  )
-    ? intervalValue
-    : DEFAULT_DISPLAY_ROTATION_INTERVAL_MS;
+  return DEFAULT_DISPLAY_ROTATION_INTERVAL_MS;
 }
 
 function getDisplayNow() {
