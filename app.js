@@ -12,10 +12,10 @@ const DEFAULT_TEAM_LOGOS = {
   "Real Punjab FC": "logos/real-punjab-fc.png",
   "Sunderland AFC": "logos/sunderland-afc.png",
   "Manchester Youth": "logos/manchester-youth.png",
-  "Sikh Gurdwara Darlington": "logos/sikh-gurdwara-darlington.png",
 
   "Kisan FC": "logos/kisan-fc.png",
   "Huddersfield FC": "logos/huddersfield-fc.png",
+  "Akaal FC Paris": "logos/akaal-fc-paris.png",
   "Chardi Kala FC": "logos/chardi-kala-fc.png",
 
   "Newcastle Panjab FC A": "logos/newcastle-punjab-fc-a.png",
@@ -28,6 +28,7 @@ const DEFAULT_TEAM_LOGOS = {
   "FC Italy": "logos/fc-italy.png",
 
   "FC Punjabi Lions Belgium": "logos/fc-punjabi-lions-belgium.png",
+  "Doncaster FC A": "logos/doncaster-fc-a.png",
   "GNG Thornaby": "logos/gng-thornaby.png",
   "Newcastle Panjab FC C": "logos/newcastle-punjab-fc-c.png",
 
@@ -69,8 +70,7 @@ function defaultGroups() {
     A: [
       createTeam("Real Punjab FC"),
       createTeam("Sunderland AFC"),
-      createTeam("Manchester Youth"),
-      createTeam("Sikh Gurdwara Darlington")
+      createTeam("Manchester Youth")
     ],
 
     B: [
@@ -83,8 +83,7 @@ function defaultGroups() {
     C: [
       createTeam("Newcastle Panjab FC A"),
       createTeam("Glasgow Gurdwara"),
-      createTeam("We Start Now"),
-      createTeam("TBC")
+      createTeam("We Start Now")
     ],
 
     D: [
@@ -305,43 +304,43 @@ let undoStack = [];
 const roundOf16Plan = [
   {
     matchNumber: 1,
-    teamOneSource: "Group A winner",
+    teamOneSource: "Winner of Group A",
     teamTwoSource: "Third-place rank 4 or 3"
   },
   {
     matchNumber: 2,
-    teamOneSource: "Group C winner",
+    teamOneSource: "Winner of Group C",
     teamTwoSource: "Third-place rank 3 or 4"
   },
   {
     matchNumber: 3,
-    teamOneSource: "Group F winner",
-    teamTwoSource: "Group B runner-up"
+    teamOneSource: "Winner of Group F",
+    teamTwoSource: "Runner-up of Group B"
   },
   {
     matchNumber: 4,
-    teamOneSource: "Group D runner-up",
-    teamTwoSource: "Group E runner-up"
+    teamOneSource: "Runner-up of Group D",
+    teamTwoSource: "Runner-up of Group E"
   },
   {
     matchNumber: 5,
-    teamOneSource: "Group B winner",
+    teamOneSource: "Winner of Group B",
     teamTwoSource: "Third-place rank 2 or 1"
   },
   {
     matchNumber: 6,
-    teamOneSource: "Group D winner",
+    teamOneSource: "Winner of Group D",
     teamTwoSource: "Third-place rank 1 or 2"
   },
   {
     matchNumber: 7,
-    teamOneSource: "Group E winner",
-    teamTwoSource: "Group A runner-up"
+    teamOneSource: "Winner of Group E",
+    teamTwoSource: "Runner-up of Group A"
   },
   {
     matchNumber: 8,
-    teamOneSource: "Group C runner-up",
-    teamTwoSource: "Group F runner-up"
+    teamOneSource: "Runner-up of Group C",
+    teamTwoSource: "Runner-up of Group F"
   }
 ];
 
@@ -472,23 +471,26 @@ let knockoutResults = normalizeKnockoutResults(
 const bottomEightPlan = [
   {
     matchNumber: 1,
-    teamOneSource: "Last place in Group A",
-    teamTwoSource: "Last place in Group E"
+    teamOneSource: "Last in Group D",
+    teamTwoSource: "Last in Group E"
   },
   {
     matchNumber: 2,
-    teamOneSource: "Last place in Group C",
-    teamTwoSource: "Third-place ranking 5 or 6"
+    teamOneSource: "Last in Group B",
+    teamTwoSource: "Last in Group F"
+  }
+];
+
+const bottomEightSemiFinalSeedPlan = [
+  {
+    matchNumber: 1,
+    setupKey: 3,
+    teamSource: "Third-place rank 5 or 6"
   },
   {
-    matchNumber: 3,
-    teamOneSource: "Last place in Group B",
-    teamTwoSource: "Last place in Group F"
-  },
-  {
-    matchNumber: 4,
-    teamOneSource: "Last place in Group D",
-    teamTwoSource: "Third-place ranking 6 or 5"
+    matchNumber: 2,
+    setupKey: 4,
+    teamSource: "Third-place rank 6 or 5"
   }
 ];
 
@@ -496,7 +498,7 @@ const bottomEightRoundConfig = {
   quarterFinals: {
     label: "Quarter-finals",
     shortLabel: "QF",
-    matchCount: 4
+    matchCount: 2
   },
   semiFinals: {
     label: "Semi-finals",
@@ -510,11 +512,65 @@ const bottomEightRoundConfig = {
   }
 };
 
-let bottomEightSetup =
-  localState?.bottomEightSetup &&
-  typeof localState.bottomEightSetup === "object"
-    ? clone(localState.bottomEightSetup)
-    : {};
+let plateSetupMigrationDetected = false;
+
+function normalizeBottomEightSetup(rawSetup) {
+  if (!rawSetup || typeof rawSetup !== "object") {
+    return {};
+  }
+
+  if (
+    Object.keys(rawSetup).length > 0 &&
+    rawSetup.formatVersion !== 2
+  ) {
+    plateSetupMigrationDetected = true;
+    return {};
+  }
+
+  const normalized = {
+    formatVersion: 2
+  };
+
+  for (const matchNumber of [1, 2]) {
+    const rawMatch = rawSetup?.[matchNumber];
+    const teamOne = normalizeKnockoutTeamReference(
+      rawMatch?.teamOne
+    );
+    const teamTwo = normalizeKnockoutTeamReference(
+      rawMatch?.teamTwo
+    );
+
+    if (teamOne || teamTwo) {
+      normalized[matchNumber] = {
+        teamOne,
+        teamTwo
+      };
+    }
+  }
+
+  for (const setupKey of [3, 4]) {
+    const rawSeed = rawSetup?.[setupKey];
+
+    if (rawSeed?.directSeed !== true) continue;
+
+    const teamOne = normalizeKnockoutTeamReference(
+      rawSeed?.teamOne
+    );
+
+    if (teamOne) {
+      normalized[setupKey] = {
+        teamOne,
+        directSeed: true
+      };
+    }
+  }
+
+  return normalized;
+}
+
+let bottomEightSetup = normalizeBottomEightSetup(
+  localState?.bottomEightSetup
+);
 
 function createEmptyBottomEightResults() {
   const results = {};
@@ -649,6 +705,133 @@ let topScorers = normalizeTopScorers(
   localState?.topScorers
 );
 
+const REMOVED_TEAM_NAMES = new Set([
+  "Sikh Gurdwara Darlington",
+  "TBC"
+]);
+
+let tournamentMigrationPending = false;
+let tournamentMigrationRunning = false;
+let tournamentDataLoadedFromFirebase = false;
+
+function teamHasBeenRemoved(teamName) {
+  return REMOVED_TEAM_NAMES.has(
+    String(teamName || "").trim()
+  );
+}
+
+function setupContainsRemovedTeam(setup) {
+  return Object.values(setup || {}).some((match) => {
+    return [match?.teamOne, match?.teamTwo].some(
+      (team) => teamHasBeenRemoved(team?.teamName)
+    );
+  });
+}
+
+function removeUnavailableTeamsFromState() {
+  let changed = false;
+  const deletedMatchKeys = new Set();
+
+  getGroupKeys().forEach((groupKey) => {
+    const currentTeams = groups[groupKey] || [];
+    const filteredTeams = currentTeams.filter(
+      (team) => !teamHasBeenRemoved(team.name)
+    );
+
+    if (filteredTeams.length !== currentTeams.length) {
+      groups[groupKey] = filteredTeams;
+      changed = true;
+    }
+
+    Object.entries(matches[groupKey] || {}).forEach(
+      ([matchId, match]) => {
+        if (
+          teamHasBeenRemoved(match?.teamA) ||
+          teamHasBeenRemoved(match?.teamB)
+        ) {
+          delete matches[groupKey][matchId];
+          deletedMatchKeys.add(`${groupKey}:${matchId}`);
+          changed = true;
+        }
+      }
+    );
+  });
+
+  Object.keys(pitchMapAssignments).forEach(
+    (pitchNumber) => {
+      const assignment = pitchMapAssignments[pitchNumber];
+      if (!assignment) return;
+
+      const key = `${assignment.groupKey}:${assignment.matchId}`;
+      const match =
+        matches?.[assignment.groupKey]?.[assignment.matchId];
+
+      if (deletedMatchKeys.has(key) || !match) {
+        pitchMapAssignments[pitchNumber] = null;
+        changed = true;
+      }
+    }
+  );
+
+  Object.entries(topScorers).forEach(([scorerId, scorer]) => {
+    if (teamHasBeenRemoved(scorer?.teamName)) {
+      delete topScorers[scorerId];
+      changed = true;
+    }
+  });
+
+  if (setupContainsRemovedTeam(knockoutSetup)) {
+    knockoutSetup = {};
+    knockoutResults = createEmptyKnockoutResults();
+    changed = true;
+  }
+
+  if (setupContainsRemovedTeam(bottomEightSetup)) {
+    bottomEightSetup = {};
+    bottomEightResults = createEmptyBottomEightResults();
+    changed = true;
+  }
+
+  tournamentMigrationPending =
+    tournamentMigrationPending ||
+    changed ||
+    plateSetupMigrationDetected;
+
+  return changed;
+}
+
+async function persistTournamentMigrationIfNeeded() {
+  if (
+    !tournamentMigrationPending ||
+    tournamentMigrationRunning ||
+    !tournamentDataLoadedFromFirebase ||
+    !databaseIsReady() ||
+    !adminIsAuthenticated()
+  ) {
+    return;
+  }
+
+  tournamentMigrationRunning = true;
+
+  try {
+    tournamentMigrationPending = false;
+    await writeTournamentState();
+    console.info(
+      "Saved the 22-team tournament structure to Firebase."
+    );
+  } catch (error) {
+    tournamentMigrationPending = true;
+    console.error(
+      "The 22-team tournament update could not be saved.",
+      error
+    );
+  } finally {
+    tournamentMigrationRunning = false;
+  }
+}
+
+removeUnavailableTeamsFromState();
+
 function getGroupKeys() {
   return [...groupKeys].sort((a, b) => a.localeCompare(b));
 }
@@ -688,7 +871,9 @@ function restoreState(snapshot) {
   knockoutResults = normalizeKnockoutResults(
     snapshot.knockoutResults
   );
-  bottomEightSetup = clone(snapshot.bottomEightSetup || {});
+  bottomEightSetup = normalizeBottomEightSetup(
+    snapshot.bottomEightSetup
+  );
   bottomEightResults = normalizeBottomEightResults(
     snapshot.bottomEightResults
   );
@@ -960,11 +1145,9 @@ function listenToTournamentFromFirebase() {
             data.knockoutResults
           );
 
-          bottomEightSetup =
-            data.bottomEightSetup &&
-            typeof data.bottomEightSetup === "object"
-              ? clone(data.bottomEightSetup)
-              : {};
+          bottomEightSetup = normalizeBottomEightSetup(
+            data.bottomEightSetup
+          );
 
           bottomEightResults = normalizeBottomEightResults(
             data.bottomEightResults
@@ -982,13 +1165,17 @@ function listenToTournamentFromFirebase() {
           if (!groupKeys.includes(currentGroup)) {
             currentGroup = groupKeys[0] || "";
           }
+
+          removeUnavailableTeamsFromState();
         }
       }
 
+      tournamentDataLoadedFromFirebase = true;
       recalculateStandingsFromMatches();
       saveLocalState();
       renderEverything();
       setLastUpdatedNow();
+      persistTournamentMigrationIfNeeded();
     },
     (error) => {
       console.error("Tournament data could not be loaded.", error);
@@ -1158,15 +1345,26 @@ function getThirdPlacedTeams() {
 
       if (!thirdPlacedTeam) return null;
 
+      const played = Math.max(
+        0,
+        toNumber(thirdPlacedTeam.p)
+      );
+
+      const pointsPerGame =
+        played > 0
+          ? toNumber(thirdPlacedTeam.points) / played
+          : 0;
+
       return {
         ...thirdPlacedTeam,
-        groupKey
+        groupKey,
+        ppg: pointsPerGame
       };
     })
     .filter(Boolean)
     .sort((first, second) => {
-      if (second.points !== first.points) {
-        return second.points - first.points;
+      if (second.ppg !== first.ppg) {
+        return second.ppg - first.ppg;
       }
 
       if (second.gd !== first.gd) {
@@ -1194,15 +1392,19 @@ function renderThirdPlaceTable() {
 
   const rows = thirdPlacedTeams
     .map((team, index) => {
-      const qualifiedClass =
-        index < 4 ? "third-place-qualified" : "";
+      const rowClass =
+        index < 4
+          ? "third-place-qualified"
+          : "third-place-plate";
 
       return `
-        <tr class="${qualifiedClass}">
+        <tr class="${rowClass}">
           <td>${index + 1}</td>
           <td>${renderTeamName(team)}</td>
           <td>${escapeHtml(team.groupKey)}</td>
+          <td>${team.p}</td>
           <td>${team.points}</td>
+          <td>${team.ppg.toFixed(2)}</td>
           <td>${team.gd}</td>
         </tr>
       `;
@@ -1215,7 +1417,9 @@ function renderThirdPlaceTable() {
         <th>Rank</th>
         <th>Team</th>
         <th>Group</th>
+        <th>P</th>
         <th>Pts</th>
+        <th>PPG</th>
         <th>GD</th>
       </tr>
     </thead>
@@ -1415,12 +1619,52 @@ function knockoutHasAnyResults() {
   );
 }
 
-function getKnockoutDisplayTeam(reference) {
+
+function getKnockoutSlotPlaceholder(
+  roundKey,
+  matchNumber,
+  slot
+) {
+  if (roundKey === "roundOf16") {
+    const plan = roundOf16Plan.find(
+      (match) => match.matchNumber === matchNumber
+    );
+
+    return slot === "one"
+      ? plan?.teamOneSource || "Round of 16 team"
+      : plan?.teamTwoSource || "Round of 16 team";
+  }
+
+  const previousRoundKey =
+    roundKey === "quarterFinals"
+      ? "roundOf16"
+      : roundKey === "semiFinals"
+        ? "quarterFinals"
+        : roundKey === "final"
+          ? "semiFinals"
+          : null;
+
+  if (!previousRoundKey) return "Team to be confirmed";
+
+  const previousRound = knockoutRoundConfig[previousRoundKey];
+  const previousMatchNumber =
+    slot === "one"
+      ? matchNumber * 2 - 1
+      : matchNumber * 2;
+
+  return `Winner of ${previousRound.shortLabel} ${previousMatchNumber}`;
+}
+
+function getKnockoutDisplayTeam(
+  reference,
+  placeholder = "Team to be confirmed"
+) {
   if (!reference) {
     return {
-      name: "TBC",
+      name: placeholder,
       logo: "",
-      groupKey: ""
+      groupKey: "",
+      isPlaceholder: true
     };
   }
 
@@ -1431,14 +1675,16 @@ function getKnockoutDisplayTeam(reference) {
   if (savedTeam) {
     return {
       ...savedTeam,
-      groupKey: reference.groupKey
+      groupKey: reference.groupKey,
+      isPlaceholder: false
     };
   }
 
   return {
-    name: reference.teamName || "TBC",
+    name: reference.teamName || placeholder,
     logo: "",
-    groupKey: reference.groupKey || ""
+    groupKey: reference.groupKey || "",
+    isPlaceholder: false
   };
 }
 
@@ -1594,10 +1840,20 @@ function renderAdminKnockoutMatch(
   );
 
   const teamOne = getKnockoutDisplayTeam(
-    teams.teamOne
+    teams.teamOne,
+    getKnockoutSlotPlaceholder(
+      roundKey,
+      matchNumber,
+      "one"
+    )
   );
   const teamTwo = getKnockoutDisplayTeam(
-    teams.teamTwo
+    teams.teamTwo,
+    getKnockoutSlotPlaceholder(
+      roundKey,
+      matchNumber,
+      "two"
+    )
   );
 
   const teamsReady = Boolean(
@@ -2079,15 +2335,24 @@ async function clearKnockoutMatchResult(
 }
 
 /* ==================================================
-   Bottom 8 Knockout
+   NEST Plate Championship
 ================================================== */
 
 function bottomEightSetupIsComplete() {
-  return bottomEightPlan.every((match) => {
+  const quarterFinalsReady = bottomEightPlan.every((match) => {
     const savedMatch = bottomEightSetup?.[match.matchNumber];
 
     return Boolean(savedMatch?.teamOne && savedMatch?.teamTwo);
   });
+
+  const semiFinalSeedsReady =
+    bottomEightSemiFinalSeedPlan.every((seed) => {
+      return Boolean(
+        bottomEightSetup?.[seed.setupKey]?.teamOne
+      );
+    });
+
+  return quarterFinalsReady && semiFinalSeedsReady;
 }
 
 function getBottomEightResult(roundKey, matchNumber) {
@@ -2117,29 +2382,30 @@ function getBottomEightMatchTeams(roundKey, matchNumber) {
     };
   }
 
-  const previousRoundKey =
-    roundKey === "semiFinals"
-      ? "quarterFinals"
-      : roundKey === "final"
-        ? "semiFinals"
-        : null;
+  if (roundKey === "semiFinals") {
+    const directSeedKey = matchNumber === 1 ? 3 : 4;
 
-  if (!previousRoundKey) {
     return {
-      teamOne: null,
-      teamTwo: null
+      teamOne: getBottomEightWinner(
+        "quarterFinals",
+        matchNumber
+      ),
+      teamTwo: normalizeKnockoutTeamReference(
+        bottomEightSetup?.[directSeedKey]?.teamOne
+      )
+    };
+  }
+
+  if (roundKey === "final") {
+    return {
+      teamOne: getBottomEightWinner("semiFinals", 1),
+      teamTwo: getBottomEightWinner("semiFinals", 2)
     };
   }
 
   return {
-    teamOne: getBottomEightWinner(
-      previousRoundKey,
-      matchNumber * 2 - 1
-    ),
-    teamTwo: getBottomEightWinner(
-      previousRoundKey,
-      matchNumber * 2
-    )
+    teamOne: null,
+    teamTwo: null
   };
 }
 
@@ -2147,7 +2413,7 @@ function getNextBottomEightMatch(roundKey, matchNumber) {
   if (roundKey === "quarterFinals") {
     return {
       roundKey: "semiFinals",
-      matchNumber: Math.ceil(matchNumber / 2)
+      matchNumber
     };
   }
 
@@ -2215,6 +2481,41 @@ function bottomEightHasAnyResults() {
   );
 }
 
+
+function getBottomEightSlotPlaceholder(
+  roundKey,
+  matchNumber,
+  slot
+) {
+  if (roundKey === "quarterFinals") {
+    const plan = bottomEightPlan.find(
+      (match) => match.matchNumber === matchNumber
+    );
+
+    return slot === "one"
+      ? plan?.teamOneSource || "NEST Plate team"
+      : plan?.teamTwoSource || "NEST Plate team";
+  }
+
+  if (roundKey === "semiFinals") {
+    if (slot === "one") {
+      return `Winner of QF ${matchNumber}`;
+    }
+
+    return matchNumber === 1
+      ? "Third-place rank 5 or 6"
+      : "Third-place rank 6 or 5";
+  }
+
+  if (roundKey === "final") {
+    return slot === "one"
+      ? "Winner of SF 1"
+      : "Winner of SF 2";
+  }
+
+  return "Team to be confirmed";
+}
+
 function renderBottomEightSetup() {
   const container = byId("bottomEightSetup");
   if (!container) return;
@@ -2233,11 +2534,11 @@ function renderBottomEightSetup() {
     })
     .join("");
 
-  const setupHtml = bottomEightPlan
+  const quarterFinalHtml = bottomEightPlan
     .map(
       (match) => `
         <div class="form-panel knockout-match-panel">
-          <h3>Bottom 8 — Quarter-final ${match.matchNumber}</h3>
+          <h3>NEST Plate — Quarter-final ${match.matchNumber}</h3>
 
           <p class="helper-text">
             ${escapeHtml(match.teamOneSource)}
@@ -2271,15 +2572,58 @@ function renderBottomEightSetup() {
     )
     .join("");
 
+  const semiFinalSeedHtml = bottomEightSemiFinalSeedPlan
+    .map(
+      (seed) => `
+        <div class="form-panel knockout-match-panel">
+          <h3>NEST Plate — Semi-final ${seed.matchNumber} bye</h3>
+
+          <p class="helper-text">
+            ${escapeHtml(seed.teamSource)} enters directly at the semi-final stage.
+          </p>
+
+          <div class="form-field">
+            <label for="bottomEightSemiTeam_${seed.matchNumber}">
+              Third-place team
+            </label>
+
+            <select id="bottomEightSemiTeam_${seed.matchNumber}">
+              <option value="">Select team</option>
+              ${teamOptions}
+            </select>
+          </div>
+        </div>
+      `
+    )
+    .join("");
+
   container.innerHTML = `
+    <div class="section-heading">
+      <div>
+        <h3>Quarter-finals</h3>
+        <p>Four last-placed teams begin in the two quarter-finals.</p>
+      </div>
+    </div>
+
     <div class="form-grid">
-      ${setupHtml}
+      ${quarterFinalHtml}
+    </div>
+
+    <div class="section-heading plate-seed-heading">
+      <div>
+        <h3>Semi-final byes</h3>
+        <p>The fifth- and sixth-ranked third-place teams enter here.</p>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      ${semiFinalSeedHtml}
     </div>
 
     <div class="subsection knockout-results-admin">
       <div class="section-heading">
         <div>
-          <h3>Bottom 8 Results</h3>
+          <h3>NEST Plate Results</h3>
           <p>
             Enter scores for every round. If a match is tied,
             choose the winner after penalties.
@@ -2292,9 +2636,7 @@ function renderBottomEightSetup() {
   `;
 
   bottomEightPlan.forEach((match) => {
-    const savedMatch =
-      bottomEightSetup?.[match.matchNumber];
-
+    const savedMatch = bottomEightSetup?.[match.matchNumber];
     if (!savedMatch) return;
 
     const teamOneSelect = byId(
@@ -2315,6 +2657,17 @@ function renderBottomEightSetup() {
       teamTwoSelect.value = encodeTeamReference(
         savedMatch.teamTwo
       );
+    }
+  });
+
+  bottomEightSemiFinalSeedPlan.forEach((seed) => {
+    const savedSeed = bottomEightSetup?.[seed.setupKey]?.teamOne;
+    const select = byId(
+      `bottomEightSemiTeam_${seed.matchNumber}`
+    );
+
+    if (select && savedSeed) {
+      select.value = encodeTeamReference(savedSeed);
     }
   });
 }
@@ -2367,11 +2720,21 @@ function renderAdminBottomEightMatch(
   );
 
   const teamOne = getKnockoutDisplayTeam(
-    teams.teamOne
+    teams.teamOne,
+    getBottomEightSlotPlaceholder(
+      roundKey,
+      matchNumber,
+      "one"
+    )
   );
 
   const teamTwo = getKnockoutDisplayTeam(
-    teams.teamTwo
+    teams.teamTwo,
+    getBottomEightSlotPlaceholder(
+      roundKey,
+      matchNumber,
+      "two"
+    )
   );
 
   const teamsReady = Boolean(
@@ -2528,7 +2891,7 @@ function autoFillBottomEightSetup() {
 
   if (thirdPlaced.length < 6) {
     alert(
-      "All six third-placed teams are required before the Bottom 8 can be selected."
+      "All six third-placed teams are required before the NEST Plate can be selected."
     );
     return;
   }
@@ -2543,47 +2906,42 @@ function autoFillBottomEightSetup() {
     thirdPlaced[5]
   );
 
-  let matchTwoOpponent = rank5;
-  let matchFourOpponent = rank6;
-
-  const preferredOrderWorks =
-    rank5.groupKey !== "C" &&
-    rank6.groupKey !== "D";
-
-  const swappedOrderWorks =
-    rank6.groupKey !== "C" &&
-    rank5.groupKey !== "D";
-
-  if (!preferredOrderWorks && swappedOrderWorks) {
-    matchTwoOpponent = rank6;
-    matchFourOpponent = rank5;
-  }
-
-  const suggestedMatches = {
-    1: [
-      lastPlaced("A"),
-      lastPlaced("E")
-    ],
-    2: [
-      lastPlaced("C"),
-      matchTwoOpponent
-    ],
-    3: [
-      lastPlaced("B"),
-      lastPlaced("F")
-    ],
-    4: [
-      lastPlaced("D"),
-      matchFourOpponent
-    ]
+  const quarterFinals = {
+    1: [lastPlaced("D"), lastPlaced("E")],
+    2: [lastPlaced("B"), lastPlaced("F")]
   };
 
+  const conflictScore = (semiFinalNumber, team) => {
+    const groupsToAvoid =
+      semiFinalNumber === 1
+        ? new Set(["D", "E"])
+        : new Set(["B", "F"]);
+
+    return groupsToAvoid.has(team.groupKey) ? 1 : 0;
+  };
+
+  let semiFinalOneTeam = rank5;
+  let semiFinalTwoTeam = rank6;
+
+  const preferredConflicts =
+    conflictScore(1, rank5) +
+    conflictScore(2, rank6);
+
+  const swappedConflicts =
+    conflictScore(1, rank6) +
+    conflictScore(2, rank5);
+
+  if (swappedConflicts < preferredConflicts) {
+    semiFinalOneTeam = rank6;
+    semiFinalTwoTeam = rank5;
+  }
+
   for (const [matchNumber, teams] of Object.entries(
-    suggestedMatches
+    quarterFinals
   )) {
     if (!teams[0] || !teams[1]) {
       alert(
-        "Every group needs its full set of teams before the Bottom 8 can be selected."
+        "Groups B, D, E and F need their teams before the NEST Plate can be selected."
       );
       return;
     }
@@ -2597,22 +2955,54 @@ function autoFillBottomEightSetup() {
     );
 
     if (teamOneSelect) {
-      teamOneSelect.value = encodeTeamReference(
-        teams[0]
-      );
+      teamOneSelect.value = encodeTeamReference(teams[0]);
     }
 
     if (teamTwoSelect) {
-      teamTwoSelect.value = encodeTeamReference(
-        teams[1]
-      );
+      teamTwoSelect.value = encodeTeamReference(teams[1]);
     }
+  }
+
+  const semiOneSelect = byId("bottomEightSemiTeam_1");
+  const semiTwoSelect = byId("bottomEightSemiTeam_2");
+
+  if (semiOneSelect) {
+    semiOneSelect.value = encodeTeamReference(
+      semiFinalOneTeam
+    );
+  }
+
+  if (semiTwoSelect) {
+    semiTwoSelect.value = encodeTeamReference(
+      semiFinalTwoTeam
+    );
   }
 }
 
 async function saveBottomEightSetup() {
-  const newSetup = {};
+  const newSetup = {
+    formatVersion: 2
+  };
   const selectedTeams = new Set();
+
+  const addUniqueTeam = (team, context) => {
+    if (!team) {
+      alert(`Select a team for ${context}.`);
+      return false;
+    }
+
+    const teamKey = `${team.groupKey}:${team.teamName}`;
+
+    if (selectedTeams.has(teamKey)) {
+      alert(
+        `${team.teamName} has been selected more than once.`
+      );
+      return false;
+    }
+
+    selectedTeams.add(teamKey);
+    return true;
+  };
 
   for (const match of bottomEightPlan) {
     const teamOne = decodeTeamReference(
@@ -2627,36 +3017,44 @@ async function saveBottomEightSetup() {
       )?.value
     );
 
-    if (!teamOne || !teamTwo) {
-      alert(
-        `Select both teams for Bottom 8 Match ${match.matchNumber}.`
-      );
-      return;
-    }
-
-    const teamOneKey =
-      `${teamOne.groupKey}:${teamOne.teamName}`;
-
-    const teamTwoKey =
-      `${teamTwo.groupKey}:${teamTwo.teamName}`;
-
     if (
-      selectedTeams.has(teamOneKey) ||
-      selectedTeams.has(teamTwoKey) ||
-      teamOneKey === teamTwoKey
+      !addUniqueTeam(
+        teamOne,
+        `NEST Plate QF ${match.matchNumber} Team 1`
+      ) ||
+      !addUniqueTeam(
+        teamTwo,
+        `NEST Plate QF ${match.matchNumber} Team 2`
+      )
     ) {
-      alert(
-        `A team has been selected more than once. Check Bottom 8 Match ${match.matchNumber}.`
-      );
       return;
     }
-
-    selectedTeams.add(teamOneKey);
-    selectedTeams.add(teamTwoKey);
 
     newSetup[match.matchNumber] = {
       teamOne,
       teamTwo
+    };
+  }
+
+  for (const seed of bottomEightSemiFinalSeedPlan) {
+    const team = decodeTeamReference(
+      byId(
+        `bottomEightSemiTeam_${seed.matchNumber}`
+      )?.value
+    );
+
+    if (
+      !addUniqueTeam(
+        team,
+        `NEST Plate SF ${seed.matchNumber} bye`
+      )
+    ) {
+      return;
+    }
+
+    newSetup[seed.setupKey] = {
+      teamOne: team,
+      directSeed: true
     };
   }
 
@@ -2668,7 +3066,7 @@ async function saveBottomEightSetup() {
     setupChanged &&
     bottomEightHasAnyResults() &&
     !confirm(
-      "Changing the Bottom 8 setup will clear every Bottom 8 result. Continue?"
+      "Changing the NEST Plate setup will clear every NEST Plate result. Continue?"
     )
   ) {
     return;
@@ -2684,7 +3082,7 @@ async function saveBottomEightSetup() {
   });
 
   if (saved) {
-    alert("Bottom 8 setup saved.");
+    alert("NEST Plate setup saved.");
   }
 }
 
@@ -2710,7 +3108,7 @@ async function saveBottomEightMatchResult(
 
   if (!teams.teamOne || !teams.teamTwo) {
     alert(
-      "Both teams must be confirmed before saving this Bottom 8 result."
+      "Both teams must be confirmed before saving this NEST Plate result."
     );
     return;
   }
@@ -2741,7 +3139,7 @@ async function saveBottomEightMatchResult(
     scoreTwo < 0
   ) {
     alert(
-      "Bottom 8 scores must be whole numbers of 0 or more."
+      "NEST Plate scores must be whole numbers of 0 or more."
     );
     return;
   }
@@ -2814,7 +3212,7 @@ async function clearBottomEightMatchResult(
 
   if (
     !confirm(
-      "Clear this Bottom 8 result and any later results that depend on it?"
+      "Clear this NEST Plate result and any later results that depend on it?"
     )
   ) {
     return;
@@ -2869,13 +3267,23 @@ function renderPublicBottomEightMatch(
       ${renderPublicKnockoutTeamRow(
         teams.teamOne,
         result.scoreOne,
-        result.winner
+        result.winner,
+        getBottomEightSlotPlaceholder(
+          roundKey,
+          matchNumber,
+          "one"
+        )
       )}
 
       ${renderPublicKnockoutTeamRow(
         teams.teamTwo,
         result.scoreTwo,
-        result.winner
+        result.winner,
+        getBottomEightSlotPlaceholder(
+          roundKey,
+          matchNumber,
+          "two"
+        )
       )}
 
       ${renderPublicPenaltyWinnerNote(result)}
@@ -2912,21 +3320,12 @@ function renderPublicBottomEightBracket() {
   const container = byId("publicBottomEightBracket");
   if (!container) return;
 
-  if (!bottomEightSetupIsComplete()) {
-    container.innerHTML = `
-      <p class="empty-state">
-        NEST Plate Championship matches have not been confirmed yet.
-      </p>
-    `;
-    return;
-  }
-
   container.innerHTML = `
     <div class="bottom-eight-bracket">
       <div class="bottom-eight-side bottom-eight-side-left">
         ${renderPublicBottomEightRound(
           "quarterFinals",
-          [1, 2],
+          [1],
           "bottom-eight-quarter-finals"
         )}
 
@@ -2954,7 +3353,7 @@ function renderPublicBottomEightBracket() {
 
         ${renderPublicBottomEightRound(
           "quarterFinals",
-          [3, 4],
+          [2],
           "bottom-eight-quarter-finals"
         )}
       </div>
@@ -3913,9 +4312,13 @@ function renderPublicPenaltyWinnerNote(result) {
 function renderPublicKnockoutTeamRow(
   reference,
   score,
-  winnerReference
+  winnerReference,
+  placeholder = "Team to be confirmed"
 ) {
-  const team = getKnockoutDisplayTeam(reference);
+  const team = getKnockoutDisplayTeam(
+    reference,
+    placeholder
+  );
   const isWinner = teamReferencesMatch(
     reference,
     winnerReference
@@ -3924,7 +4327,7 @@ function renderPublicKnockoutTeamRow(
   return `
     <div class="knockout-team-row ${
       isWinner ? "knockout-team-winner" : ""
-    }">
+    } ${reference ? "" : "knockout-team-placeholder"}">
       ${renderTeamName(team)}
       <span class="knockout-score">
         ${score === null ? "—" : score}
@@ -3960,13 +4363,23 @@ function renderPublicKnockoutMatch(
       ${renderPublicKnockoutTeamRow(
         teams.teamOne,
         result.scoreOne,
-        result.winner
+        result.winner,
+        getKnockoutSlotPlaceholder(
+          roundKey,
+          matchNumber,
+          "one"
+        )
       )}
 
       ${renderPublicKnockoutTeamRow(
         teams.teamTwo,
         result.scoreTwo,
-        result.winner
+        result.winner,
+        getKnockoutSlotPlaceholder(
+          roundKey,
+          matchNumber,
+          "two"
+        )
       )}
 
       ${renderPublicPenaltyWinnerNote(result)}
@@ -4001,15 +4414,6 @@ function renderPublicKnockoutRound(
 function renderPublicKnockoutBracket() {
   const container = byId("publicKnockoutBracket");
   if (!container) return;
-
-  if (!knockoutSetupIsComplete()) {
-    container.innerHTML = `
-      <p class="empty-state">
-        Knockout matches have not been confirmed yet.
-      </p>
-    `;
-    return;
-  }
 
   container.innerHTML = `
     <div class="knockout-bracket">
@@ -4803,6 +5207,7 @@ function startAuthenticationListener() {
         overwritten.
       */
       syncAvailableTeamLogosToFirebase();
+      persistTournamentMigrationIfNeeded();
     } else {
       setAdminStatus("Not signed in");
       setAdminPanelVisibility(false);
