@@ -93,15 +93,15 @@ const DISPLAY_SPONSORS = [
   {
     name: "Gills Premier",
     logo: "logos/gills-premier.png"
+  },
+
+  {
+    name: "Envy Sports",
+    logo: "logos/envy-sports.png"
   }
 ];
 
 const GROUP_SPONSORS = {
-  A: {
-    name: "Northwood Estates",
-    logo: "logos/northwood-estates.png"
-  },
-
   B: {
     name: "Trussted Group",
     logo: "logos/trussted-group.png"
@@ -118,8 +118,8 @@ const GROUP_SPONSORS = {
   },
 
   E: {
-    name: "Envy Sports",
-    logo: "logos/envy-sports.png"
+    name: "Northwood Estates",
+    logo: "logos/northwood-estates.png"
   },
 
   F: {
@@ -252,11 +252,6 @@ const KNOCKOUT_ROUNDS = {
 
 
 const PLATE_ROUNDS = {
-  quarterFinals: {
-    label: "Quarter-final",
-    shortLabel: "QF",
-    matchCount: 1
-  },
   semiFinals: {
     label: "Semi-finals",
     shortLabel: "SF",
@@ -270,19 +265,16 @@ const PLATE_ROUNDS = {
 };
 
 const DISPLAY_ROUND_OF_16_PLACEHOLDERS = {
-  1: ["Winner of Group A", "Third-place rank 4 or 3"],
-  2: ["Winner of Group C", "Third-place rank 3 or 4"],
-  3: ["Winner of Group F", "Runner-up of Group B"],
-  4: ["Runner-up of Group D", "Runner-up of Group E"],
-  5: ["Winner of Group B", "Third-place rank 2 or 1"],
-  6: ["Winner of Group D", "Third-place rank 1 or 2"],
-  7: ["Winner of Group E", "Runner-up of Group A"],
-  8: ["Runner-up of Group C", "Runner-up of Group F"]
+  1: ["Winner of Group B", "1st seed 4th / Group F 3rd"],
+  2: ["Runner-up of Group C", "Runner-up of Group D"],
+  3: ["Winner of Group E", "3rd place of Group D"],
+  4: ["Winner of Group F", "3rd place of Group C"],
+  5: ["Winner of Group D", "3rd place of Group E"],
+  6: ["3rd place of Group B", "Runner-up of Group F"],
+  7: ["Winner of Group C", "Group F 3rd / 1st seed 4th"],
+  8: ["Runner-up of Group B", "Runner-up of Group E"]
 };
 
-const DISPLAY_PLATE_QF_PLACEHOLDERS = {
-  1: ["Seed 4", "Seed 5"]
-};
 
 /* ==================================================
    General Helpers
@@ -1629,9 +1621,9 @@ function getDisplayPlateMatchTeams(
   roundKey,
   matchNumber
 ) {
-  if (roundKey === "quarterFinals") {
+  if (roundKey === "semiFinals") {
     const setupMatch =
-      displayPlateSetup?.[1];
+      displayPlateSetup?.[matchNumber];
 
     return {
       teamOne: normalizeDisplayTeamReference(
@@ -1640,29 +1632,6 @@ function getDisplayPlateMatchTeams(
 
       teamTwo: normalizeDisplayTeamReference(
         setupMatch?.teamTwo
-      )
-    };
-  }
-
-  if (roundKey === "semiFinals") {
-    if (matchNumber === 1) {
-      return {
-        teamOne: normalizeDisplayTeamReference(
-          displayPlateSetup?.[2]?.teamOne
-        ),
-        teamTwo: getDisplayPlateWinner(
-          "quarterFinals",
-          1
-        )
-      };
-    }
-
-    return {
-      teamOne: normalizeDisplayTeamReference(
-        displayPlateSetup?.[3]?.teamOne
-      ),
-      teamTwo: normalizeDisplayTeamReference(
-        displayPlateSetup?.[4]?.teamOne
       )
     };
   }
@@ -1681,15 +1650,14 @@ function getDisplayPlateMatchTeams(
 }
 
 function displayPlateSetupIsComplete() {
-  const quarterFinal = displayPlateSetup?.[1];
+  return [1, 2].every((matchNumber) => {
+    const match = displayPlateSetup?.[matchNumber];
 
-  return Boolean(
-    quarterFinal?.teamOne &&
-    quarterFinal?.teamTwo &&
-    displayPlateSetup?.[2]?.teamOne &&
-    displayPlateSetup?.[3]?.teamOne &&
-    displayPlateSetup?.[4]?.teamOne
-  );
+    return Boolean(
+      match?.teamOne &&
+      match?.teamTwo
+    );
+  });
 }
 
 
@@ -1698,17 +1666,11 @@ function getDisplayPlatePlaceholder(
   matchNumber,
   slot
 ) {
-  if (roundKey === "quarterFinals") {
-    return slot === "one"
-      ? "Seed 4"
-      : "Seed 5";
-  }
-
   if (roundKey === "semiFinals") {
     if (matchNumber === 1) {
       return slot === "one"
         ? "Seed 1"
-        : "Winner of Seed 4 vs Seed 5";
+        : "Seed 4";
     }
 
     return slot === "one"
@@ -1727,11 +1689,10 @@ function getDisplayPlatePlaceholder(
 
 function getDisplayPlateSeedReference(seedNumber) {
   const seedSources = {
-    1: displayPlateSetup?.[2]?.teamOne,
-    2: displayPlateSetup?.[3]?.teamOne,
-    3: displayPlateSetup?.[4]?.teamOne,
-    4: displayPlateSetup?.[1]?.teamOne,
-    5: displayPlateSetup?.[1]?.teamTwo
+    1: displayPlateSetup?.[1]?.teamOne,
+    2: displayPlateSetup?.[2]?.teamOne,
+    3: displayPlateSetup?.[2]?.teamTwo,
+    4: displayPlateSetup?.[1]?.teamTwo
   };
 
   return normalizeDisplayTeamReference(
@@ -1849,22 +1810,6 @@ function displayPlateConnectorClass(hasAdvanced) {
 }
 
 function renderDisplayPlateConnectors() {
-  const seedOneReady = Boolean(
-    getDisplayPlateSeedReference(1)
-  );
-
-  const seedTwoReady = Boolean(
-    getDisplayPlateSeedReference(2)
-  );
-
-  const seedThreeReady = Boolean(
-    getDisplayPlateSeedReference(3)
-  );
-
-  const quarterFinalWinner = Boolean(
-    getDisplayPlateWinner("quarterFinals", 1)
-  );
-
   const semiFinalOneWinner = Boolean(
     getDisplayPlateWinner("semiFinals", 1)
   );
@@ -1880,18 +1825,14 @@ function renderDisplayPlateConnectors() {
       preserveAspectRatio="none"
       aria-hidden="true"
     >
-      <path class="${displayPlateConnectorClass(seedOneReady)}"
-        d="M280 100 H320 V200 H360" />
-      <path class="${displayPlateConnectorClass(quarterFinalWinner)}"
-        d="M280 300 H320 V200 H360" />
-      <path class="${displayPlateConnectorClass(seedTwoReady)}"
-        d="M280 500 H320 V600 H360" />
-      <path class="${displayPlateConnectorClass(seedThreeReady)}"
-        d="M280 700 H320 V600 H360" />
-      <path class="${displayPlateConnectorClass(semiFinalOneWinner)}"
-        d="M640 200 H680 V400 H720" />
-      <path class="${displayPlateConnectorClass(semiFinalTwoWinner)}"
-        d="M640 600 H680 V400 H720" />
+      <path
+        class="${displayPlateConnectorClass(semiFinalOneWinner)}"
+        d="M440 200 H500 V400 H560"
+      />
+      <path
+        class="${displayPlateConnectorClass(semiFinalTwoWinner)}"
+        d="M440 600 H500 V400 H560"
+      />
     </svg>
   `;
 }
@@ -1901,26 +1842,17 @@ function renderDisplayPlateBracket() {
 
   if (!bracket) return;
 
+  /*
+    The NEST Plate now has four teams only, so the venue bracket
+    is intentionally two columns: two semi-finals feeding one final.
+  */
+  bracket.style.gridTemplateColumns =
+    "minmax(300px, 1fr) minmax(300px, 1fr)";
+  bracket.style.columnGap = "12%";
+  bracket.style.width = "min(100%, 1200px)";
+
   bracket.innerHTML = `
     ${renderDisplayPlateConnectors()}
-
-    <section class="display-plate-stage display-plate-quarter-finals">
-      <h2 class="display-bracket-column-title">Quarter-finals</h2>
-
-      <div class="display-plate-stage-matches">
-        ${renderDisplayPlateByeMatch(1, 1, 1, 1)}
-
-        ${renderDisplayPlateMatch(
-          "quarterFinals",
-          1,
-          2,
-          2
-        )}
-
-        ${renderDisplayPlateByeMatch(3, 2, 2, 3)}
-        ${renderDisplayPlateByeMatch(4, 3, 2, 4)}
-      </div>
-    </section>
 
     <section class="display-plate-stage display-plate-semi-finals">
       <h2 class="display-bracket-column-title">Semi-finals</h2>
