@@ -949,6 +949,40 @@ function renderDisplayBracketTeam(
   `;
 }
 
+
+const DISPLAY_KNOCKOUT_PITCHES = {
+  roundOf16: {
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 4,
+    5: 4,
+    6: 3,
+    7: 2,
+    8: 1
+  },
+
+  quarterFinals: {
+    1: 4,
+    2: 2,
+    3: 3,
+    4: 4
+  },
+
+  semiFinals: {
+    1: 2,
+    2: 1
+  },
+
+  final: {
+    1: 1
+  }
+};
+
+function getDisplayKnockoutPitch(roundKey, matchNumber) {
+  return DISPLAY_KNOCKOUT_PITCHES?.[roundKey]?.[matchNumber] || null;
+}
+
 function renderDisplayBracketMatch(
   roundKey,
   matchNumber,
@@ -966,6 +1000,9 @@ function renderDisplayBracketMatch(
     >
       <div class="display-bracket-match-label">
         ${escapeDisplayHtml(round.shortLabel)} ${matchNumber}
+        ${getDisplayKnockoutPitch(roundKey, matchNumber)
+          ? ` • Pitch ${getDisplayKnockoutPitch(roundKey, matchNumber)}`
+          : ""}
       </div>
 
       ${renderDisplayBracketTeam(
