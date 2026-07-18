@@ -494,6 +494,40 @@ const knockoutRoundConfig = {
   }
 };
 
+
+const KNOCKOUT_PITCHES = {
+  roundOf16: {
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 4,
+    5: 4,
+    6: 3,
+    7: 2,
+    8: 1
+  },
+
+  quarterFinals: {
+    1: 4,
+    2: 2,
+    3: 3,
+    4: 4
+  },
+
+  semiFinals: {
+    1: 2,
+    2: 1
+  },
+
+  final: {
+    1: 1
+  }
+};
+
+function getKnockoutPitch(roundKey, matchNumber) {
+  return KNOCKOUT_PITCHES?.[roundKey]?.[matchNumber] || null;
+}
+
 function createEmptyKnockoutMatchResult() {
   return {
     scoreOne: null,
@@ -5042,6 +5076,9 @@ function renderPublicKnockoutMatch(
     >
       <div class="knockout-match-number">
         ${escapeHtml(round.shortLabel)} ${matchNumber}
+        ${getKnockoutPitch(roundKey, matchNumber)
+          ? ` • Pitch ${getKnockoutPitch(roundKey, matchNumber)}`
+          : ""}
       </div>
 
       ${renderPublicKnockoutTeamRow(
