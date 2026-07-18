@@ -5198,7 +5198,8 @@ function renderPublicKnockoutTeamRow(
 
 function renderPublicKnockoutMatch(
   roundKey,
-  matchNumber
+  matchNumber,
+  slotNumber = 1
 ) {
   const round = knockoutRoundConfig[roundKey];
   const teams = getKnockoutMatchTeams(
@@ -5212,7 +5213,7 @@ function renderPublicKnockoutMatch(
 
   return `
     <article
-      class="knockout-match-card"
+      class="knockout-match-card knockout-grid-slot-${slotNumber}"
       data-round="${escapeHtml(roundKey)}"
       data-match="${matchNumber}"
     >
@@ -5259,10 +5260,11 @@ function renderPublicKnockoutRound(
       <h3>${escapeHtml(round.label)}</h3>
       <div class="knockout-column-matches">
         ${matchNumbers
-          .map((matchNumber) =>
+          .map((matchNumber, index) =>
             renderPublicKnockoutMatch(
               roundKey,
-              matchNumber
+              matchNumber,
+              index + 1
             )
           )
           .join("")}
@@ -5271,59 +5273,107 @@ function renderPublicKnockoutRound(
   `;
 }
 
+function publicKnockoutConnectorClass(
+  roundKey,
+  matchNumber
+) {
+  return getKnockoutWinner(roundKey, matchNumber)
+    ? "main-knockout-connector is-advanced"
+    : "main-knockout-connector";
+}
+
+function renderPublicKnockoutConnectors() {
+  return `
+    <svg
+      class="main-knockout-connectors"
+      viewBox="0 0 1400 800"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <path class="${publicKnockoutConnectorClass("roundOf16", 1)}"
+        d="M176 100 H190 V200 H204" />
+      <path class="${publicKnockoutConnectorClass("roundOf16", 2)}"
+        d="M176 300 H190 V200 H204" />
+      <path class="${publicKnockoutConnectorClass("roundOf16", 3)}"
+        d="M176 500 H190 V600 H204" />
+      <path class="${publicKnockoutConnectorClass("roundOf16", 4)}"
+        d="M176 700 H190 V600 H204" />
+
+      <path class="${publicKnockoutConnectorClass("quarterFinals", 1)}"
+        d="M380 200 H394 V400 H408" />
+      <path class="${publicKnockoutConnectorClass("quarterFinals", 2)}"
+        d="M380 600 H394 V400 H408" />
+      <path class="${publicKnockoutConnectorClass("semiFinals", 1)}"
+        d="M584 400 H612" />
+
+      <path class="${publicKnockoutConnectorClass("roundOf16", 5)}"
+        d="M1224 100 H1210 V200 H1196" />
+      <path class="${publicKnockoutConnectorClass("roundOf16", 6)}"
+        d="M1224 300 H1210 V200 H1196" />
+      <path class="${publicKnockoutConnectorClass("roundOf16", 7)}"
+        d="M1224 500 H1210 V600 H1196" />
+      <path class="${publicKnockoutConnectorClass("roundOf16", 8)}"
+        d="M1224 700 H1210 V600 H1196" />
+
+      <path class="${publicKnockoutConnectorClass("quarterFinals", 3)}"
+        d="M1020 200 H1006 V400 H992" />
+      <path class="${publicKnockoutConnectorClass("quarterFinals", 4)}"
+        d="M1020 600 H1006 V400 H992" />
+      <path class="${publicKnockoutConnectorClass("semiFinals", 2)}"
+        d="M816 400 H788" />
+    </svg>
+  `;
+}
+
 function renderPublicKnockoutBracket() {
   const container = byId("publicKnockoutBracket");
   if (!container) return;
 
   container.innerHTML = `
-    <div class="knockout-bracket">
-      <div class="knockout-side knockout-side-left">
-        ${renderPublicKnockoutRound(
-          "roundOf16",
-          [1, 2, 3, 4],
-          "knockout-round-of-16"
-        )}
+    <div class="knockout-bracket main-knockout-bracket-modern">
+      ${renderPublicKnockoutConnectors()}
 
-        ${renderPublicKnockoutRound(
-          "quarterFinals",
-          [1, 2],
-          "knockout-quarter-finals"
-        )}
+      ${renderPublicKnockoutRound(
+        "roundOf16",
+        [1, 2, 3, 4],
+        "main-round-roundOf16 main-side-left"
+      )}
 
-        ${renderPublicKnockoutRound(
-          "semiFinals",
-          [1],
-          "knockout-semi-finals"
-        )}
-      </div>
+      ${renderPublicKnockoutRound(
+        "quarterFinals",
+        [1, 2],
+        "main-round-quarterFinals main-side-left"
+      )}
 
-      <div class="knockout-centre">
-        ${renderPublicKnockoutRound(
-          "final",
-          [1],
-          "knockout-final"
-        )}
-      </div>
+      ${renderPublicKnockoutRound(
+        "semiFinals",
+        [1],
+        "main-round-semiFinals main-side-left"
+      )}
 
-      <div class="knockout-side knockout-side-right">
-        ${renderPublicKnockoutRound(
-          "semiFinals",
-          [2],
-          "knockout-semi-finals"
-        )}
+      ${renderPublicKnockoutRound(
+        "final",
+        [1],
+        "main-round-final knockout-final"
+      )}
 
-        ${renderPublicKnockoutRound(
-          "quarterFinals",
-          [3, 4],
-          "knockout-quarter-finals"
-        )}
+      ${renderPublicKnockoutRound(
+        "semiFinals",
+        [2],
+        "main-round-semiFinals main-side-right"
+      )}
 
-        ${renderPublicKnockoutRound(
-          "roundOf16",
-          [5, 6, 7, 8],
-          "knockout-round-of-16"
-        )}
-      </div>
+      ${renderPublicKnockoutRound(
+        "quarterFinals",
+        [3, 4],
+        "main-round-quarterFinals main-side-right"
+      )}
+
+      ${renderPublicKnockoutRound(
+        "roundOf16",
+        [5, 6, 7, 8],
+        "main-round-roundOf16 main-side-right"
+      )}
     </div>
 
     ${renderPublicTournamentLockup()}
