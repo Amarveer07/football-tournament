@@ -3557,9 +3557,9 @@ function renderPublicPlateConnectors() {
       aria-hidden="true"
     >
       <path class="${publicPlateConnectorClass(semiFinalOneWinner)}"
-        d="M300 220 H500 V400 H700" />
+        d="M440 220 H500 V400 H560" />
       <path class="${publicPlateConnectorClass(semiFinalTwoWinner)}"
-        d="M300 580 H500 V400 H700" />
+        d="M440 580 H500 V400 H560" />
     </svg>
   `;
 }
@@ -3569,10 +3569,10 @@ function renderPublicBottomEightBracket() {
   if (!container) return;
 
   container.innerHTML = `
-    <div class="plate-bracket-modern plate-bracket-four-team">
+    <div class="plate-bracket-modern plate-bracket-four-team" style="grid-template-columns:minmax(300px,1fr) minmax(300px,1fr);min-width:760px;">
       ${renderPublicPlateConnectors()}
 
-      <section class="plate-stage plate-quarter-finals">
+      <section class="plate-stage plate-semi-finals">
         <h3>Semi-finals</h3>
 
         <div class="plate-stage-matches">
@@ -3587,7 +3587,7 @@ function renderPublicBottomEightBracket() {
             "semiFinals",
             2,
             2,
-            "plate-grid-slot-3"
+            "plate-grid-slot-2"
           )}
         </div>
       </section>
