@@ -3559,9 +3559,25 @@ function renderPublicTournamentLockup() {
   `;
 }
 
+function getPublicPlateSeedReference(seedNumber) {
+  const seedSources = {
+    1: bottomEightSetup?.[2]?.teamOne,
+    2: bottomEightSetup?.[3]?.teamOne,
+    3: bottomEightSetup?.[4]?.teamOne,
+    4: bottomEightSetup?.[1]?.teamOne,
+    5: bottomEightSetup?.[1]?.teamTwo
+  };
+
+  return normalizeKnockoutTeamReference(
+    seedSources[seedNumber]
+  );
+}
+
 function renderPublicBottomEightMatch(
   roundKey,
-  matchNumber
+  matchNumber,
+  displayMatchNumber = matchNumber,
+  extraClass = ""
 ) {
   const round = bottomEightRoundConfig[roundKey];
 
@@ -3577,12 +3593,13 @@ function renderPublicBottomEightMatch(
 
   return `
     <article
-      class="knockout-match-card"
+      class="knockout-match-card ${escapeHtml(extraClass)}"
       data-round="bottomEight-${escapeHtml(roundKey)}"
       data-match="${matchNumber}"
     >
       <div class="knockout-match-number">
-        NEST Plate Championship ${escapeHtml(round.shortLabel)} ${matchNumber}
+        NEST Plate Championship ${escapeHtml(round.shortLabel)}
+        ${displayMatchNumber}
       </div>
 
       ${renderPublicKnockoutTeamRow(
@@ -3612,28 +3629,93 @@ function renderPublicBottomEightMatch(
   `;
 }
 
-function renderPublicBottomEightRound(
-  roundKey,
-  matchNumbers,
-  extraClass = ""
+function renderPublicPlateByeMatch(
+  displayMatchNumber,
+  seedNumber,
+  semiFinalNumber,
+  slotNumber
 ) {
-  const round = bottomEightRoundConfig[roundKey];
+  const reference = getPublicPlateSeedReference(
+    seedNumber
+  );
+
+  const team = getKnockoutDisplayTeam(
+    reference,
+    `Seed ${seedNumber}`
+  );
 
   return `
-    <section class="knockout-column ${extraClass}">
-      <h3>${escapeHtml(round.label)}</h3>
-
-      <div class="knockout-column-matches">
-        ${matchNumbers
-          .map((matchNumber) =>
-            renderPublicBottomEightMatch(
-              roundKey,
-              matchNumber
-            )
-          )
-          .join("")}
+    <article
+      class="knockout-match-card plate-bye-match plate-grid-slot-${slotNumber}"
+      data-plate-seed="${seedNumber}"
+    >
+      <div class="knockout-match-number">
+        NEST Plate Championship QF ${displayMatchNumber} · BYE
       </div>
-    </section>
+
+      <div class="knockout-team-row knockout-team-winner">
+        ${renderTeamName(team)}
+        <span class="plate-bye-chip">BYE</span>
+      </div>
+
+      <div class="plate-bye-message">
+        Automatic bye — advances to Semi-final ${semiFinalNumber}
+      </div>
+    </article>
+  `;
+}
+
+function publicPlateConnectorClass(hasAdvanced) {
+  return hasAdvanced
+    ? "plate-connector is-advanced"
+    : "plate-connector";
+}
+
+function renderPublicPlateConnectors() {
+  const seedOneReady = Boolean(
+    getPublicPlateSeedReference(1)
+  );
+
+  const seedTwoReady = Boolean(
+    getPublicPlateSeedReference(2)
+  );
+
+  const seedThreeReady = Boolean(
+    getPublicPlateSeedReference(3)
+  );
+
+  const quarterFinalWinner = Boolean(
+    getBottomEightWinner("quarterFinals", 1)
+  );
+
+  const semiFinalOneWinner = Boolean(
+    getBottomEightWinner("semiFinals", 1)
+  );
+
+  const semiFinalTwoWinner = Boolean(
+    getBottomEightWinner("semiFinals", 2)
+  );
+
+  return `
+    <svg
+      class="plate-bracket-connectors"
+      viewBox="0 0 1000 800"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <path class="${publicPlateConnectorClass(seedOneReady)}"
+        d="M280 100 H320 V200 H360" />
+      <path class="${publicPlateConnectorClass(quarterFinalWinner)}"
+        d="M280 300 H320 V200 H360" />
+      <path class="${publicPlateConnectorClass(seedTwoReady)}"
+        d="M280 500 H320 V600 H360" />
+      <path class="${publicPlateConnectorClass(seedThreeReady)}"
+        d="M280 700 H320 V600 H360" />
+      <path class="${publicPlateConnectorClass(semiFinalOneWinner)}"
+        d="M640 200 H680 V400 H720" />
+      <path class="${publicPlateConnectorClass(semiFinalTwoWinner)}"
+        d="M640 600 H680 V400 H720" />
+    </svg>
   `;
 }
 
@@ -3642,30 +3724,59 @@ function renderPublicBottomEightBracket() {
   if (!container) return;
 
   container.innerHTML = `
-    <div class="bottom-eight-bracket bottom-eight-bracket-five-team">
-      ${renderPublicBottomEightRound(
-        "quarterFinals",
-        [1],
-        "bottom-eight-quarter-finals"
-      )}
+    <div class="plate-bracket-modern">
+      ${renderPublicPlateConnectors()}
 
-      ${renderPublicBottomEightRound(
-        "semiFinals",
-        [1],
-        "bottom-eight-semi-finals"
-      )}
+      <section class="plate-stage plate-quarter-finals">
+        <h3>Quarter-finals</h3>
 
-      ${renderPublicBottomEightRound(
-        "final",
-        [1],
-        "bottom-eight-final"
-      )}
+        <div class="plate-stage-matches">
+          ${renderPublicPlateByeMatch(1, 1, 1, 1)}
 
-      ${renderPublicBottomEightRound(
-        "semiFinals",
-        [2],
-        "bottom-eight-semi-finals"
-      )}
+          ${renderPublicBottomEightMatch(
+            "quarterFinals",
+            1,
+            2,
+            "plate-grid-slot-2"
+          )}
+
+          ${renderPublicPlateByeMatch(3, 2, 2, 3)}
+          ${renderPublicPlateByeMatch(4, 3, 2, 4)}
+        </div>
+      </section>
+
+      <section class="plate-stage plate-semi-finals">
+        <h3>Semi-finals</h3>
+
+        <div class="plate-stage-matches">
+          ${renderPublicBottomEightMatch(
+            "semiFinals",
+            1,
+            1,
+            "plate-grid-slot-1"
+          )}
+
+          ${renderPublicBottomEightMatch(
+            "semiFinals",
+            2,
+            2,
+            "plate-grid-slot-2"
+          )}
+        </div>
+      </section>
+
+      <section class="plate-stage plate-final-stage">
+        <h3>Final</h3>
+
+        <div class="plate-stage-matches">
+          ${renderPublicBottomEightMatch(
+            "final",
+            1,
+            1,
+            "plate-grid-slot-1 plate-final-match"
+          )}
+        </div>
+      </section>
     </div>
 
     ${renderPublicTournamentLockup()}
@@ -3673,6 +3784,127 @@ function renderPublicBottomEightBracket() {
 }
 
 
+/* ==================================================
+   Public Live Pitch Map
+================================================== */
+
+const PUBLIC_PITCH_MAP_ORDER = [6, 3, 4, 5, 1, 2];
+
+function getPublicPitchMapMatch(pitchNumber) {
+  const assignment = pitchMapAssignments?.[pitchNumber];
+
+  if (!assignment?.groupKey || !assignment?.matchId) {
+    return null;
+  }
+
+  const match = matches?.[assignment.groupKey]?.[
+    assignment.matchId
+  ];
+
+  if (!match || typeof match !== "object") {
+    return null;
+  }
+
+  return {
+    ...match,
+    groupKey: assignment.groupKey,
+    matchId: assignment.matchId
+  };
+}
+
+function renderPublicPitchMapTeam(
+  groupKey,
+  teamName
+) {
+  const reference = {
+    groupKey,
+    teamName: String(teamName || "Team TBC").trim()
+  };
+
+  const team = getKnockoutDisplayTeam(
+    reference,
+    "Team TBC"
+  );
+
+  const logoPath = String(team.logo || "").trim();
+
+  return `
+    <div class="public-pitch-map-team">
+      ${
+        logoPath
+          ? `
+              <img
+                class="public-pitch-map-team-logo"
+                src="${escapeHtml(logoPath)}"
+                alt=""
+                loading="lazy"
+              >
+            `
+          : ""
+      }
+
+      <span>${escapeHtml(team.name)}</span>
+    </div>
+  `;
+}
+
+function renderPublicPitchMapCard(pitchNumber) {
+  const match = getPublicPitchMapMatch(
+    pitchNumber
+  );
+
+  if (!match) {
+    return `
+      <article class="public-pitch-map-card is-empty">
+        <div class="public-pitch-map-card-title">
+          Pitch ${pitchNumber}
+        </div>
+
+        <div class="public-pitch-map-empty-message">
+          No match currently
+        </div>
+      </article>
+    `;
+  }
+
+  return `
+    <article class="public-pitch-map-card">
+      <div class="public-pitch-map-card-title">
+        <span>Pitch ${pitchNumber}</span>
+        <span class="public-pitch-map-group-badge">
+          Group ${escapeHtml(match.groupKey)}
+        </span>
+      </div>
+
+      <div class="public-pitch-map-match">
+        ${renderPublicPitchMapTeam(
+          match.groupKey,
+          match.teamA
+        )}
+
+        <span class="public-pitch-map-versus">VS</span>
+
+        ${renderPublicPitchMapTeam(
+          match.groupKey,
+          match.teamB
+        )}
+      </div>
+    </article>
+  `;
+}
+
+function renderPublicPitchMap() {
+  const grid = byId("publicPitchMapGrid");
+  if (!grid) return;
+
+  grid.innerHTML = PUBLIC_PITCH_MAP_ORDER
+    .map(renderPublicPitchMapCard)
+    .join("");
+}
+
+
+/* ==================================================
+   Top Goalscorers
 
 /* ==================================================
    Top Goalscorers
@@ -5349,6 +5581,7 @@ function renderEverything() {
   renderBottomEightSetup();
   renderPublicKnockoutBracket();
   renderPublicBottomEightBracket();
+  renderPublicPitchMap();
 }
 
 function updateKnockoutTeamName(
