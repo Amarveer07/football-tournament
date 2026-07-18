@@ -3370,3 +3370,8 @@ tr.group-position-last td:first-child {
 .display-main-knockout-bracket {
   column-gap: clamp(28px, 2.2vw, 48px);
 }
+.display-knockout-bracket {
+  width: calc(100% - 40px);
+  margin-left: auto;
+  margin-right: auto;
+}
