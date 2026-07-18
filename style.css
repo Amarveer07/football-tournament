@@ -2972,3 +2972,6 @@ tbody tr:hover td {
     min-height: 720px;
   }
 }
+.public-pitch-map-group-badge {
+  display: none !important;
+}
