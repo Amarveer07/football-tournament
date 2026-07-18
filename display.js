@@ -966,7 +966,7 @@ const DISPLAY_KNOCKOUT_PITCHES = {
     1: 4,
     2: 2,
     3: 3,
-    4: 4
+    4: 1
   },
 
   semiFinals: {
