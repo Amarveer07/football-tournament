@@ -957,13 +957,21 @@ function renderDisplayBracketTeam(
   `;
 }
 
-function renderDisplayBracketMatch(roundKey, matchNumber) {
+function renderDisplayBracketMatch(
+  roundKey,
+  matchNumber,
+  slotNumber = 1
+) {
   const round = KNOCKOUT_ROUNDS[roundKey];
   const teams = getDisplayKnockoutMatchTeams(roundKey, matchNumber);
   const result = getDisplayKnockoutResult(roundKey, matchNumber);
 
   return `
-    <article class="display-bracket-match">
+    <article
+      class="display-bracket-match display-bracket-slot-${slotNumber}"
+      data-round="${escapeDisplayHtml(roundKey)}"
+      data-match="${matchNumber}"
+    >
       <div class="display-bracket-match-label">
         ${escapeDisplayHtml(round.shortLabel)} ${matchNumber}
       </div>
@@ -1003,17 +1011,80 @@ function renderDisplayBracketColumn(
   const round = KNOCKOUT_ROUNDS[roundKey];
 
   return `
-    <section class="display-bracket-column ${extraClass}">
+    <section
+      class="display-bracket-column display-round-${escapeDisplayHtml(roundKey)} ${extraClass}"
+    >
       <h2 class="display-bracket-column-title">
         ${escapeDisplayHtml(round.label)}
       </h2>
 
-      ${matchNumbers
-        .map((matchNumber) =>
-          renderDisplayBracketMatch(roundKey, matchNumber)
-        )
-        .join("")}
+      <div class="display-bracket-column-matches">
+        ${matchNumbers
+          .map((matchNumber, index) =>
+            renderDisplayBracketMatch(
+              roundKey,
+              matchNumber,
+              index + 1
+            )
+          )
+          .join("")}
+      </div>
     </section>
+  `;
+}
+
+function displayKnockoutConnectorClass(
+  roundKey,
+  matchNumber
+) {
+  return getDisplayKnockoutWinner(
+    roundKey,
+    matchNumber
+  )
+    ? "display-bracket-connector is-advanced"
+    : "display-bracket-connector";
+}
+
+function renderDisplayKnockoutConnectors() {
+  return `
+    <svg
+      class="display-knockout-connectors"
+      viewBox="0 0 1400 800"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <path class="${displayKnockoutConnectorClass("roundOf16", 1)}"
+        d="M180 100 H192 V200 H205" />
+      <path class="${displayKnockoutConnectorClass("roundOf16", 2)}"
+        d="M180 300 H192 V200 H205" />
+      <path class="${displayKnockoutConnectorClass("roundOf16", 3)}"
+        d="M180 500 H192 V600 H205" />
+      <path class="${displayKnockoutConnectorClass("roundOf16", 4)}"
+        d="M180 700 H192 V600 H205" />
+
+      <path class="${displayKnockoutConnectorClass("quarterFinals", 1)}"
+        d="M385 200 H397 V400 H410" />
+      <path class="${displayKnockoutConnectorClass("quarterFinals", 2)}"
+        d="M385 600 H397 V400 H410" />
+      <path class="${displayKnockoutConnectorClass("semiFinals", 1)}"
+        d="M590 400 H610" />
+
+      <path class="${displayKnockoutConnectorClass("roundOf16", 5)}"
+        d="M1220 100 H1207 V200 H1195" />
+      <path class="${displayKnockoutConnectorClass("roundOf16", 6)}"
+        d="M1220 300 H1207 V200 H1195" />
+      <path class="${displayKnockoutConnectorClass("roundOf16", 7)}"
+        d="M1220 500 H1207 V600 H1195" />
+      <path class="${displayKnockoutConnectorClass("roundOf16", 8)}"
+        d="M1220 700 H1207 V600 H1195" />
+
+      <path class="${displayKnockoutConnectorClass("quarterFinals", 3)}"
+        d="M1015 200 H1002 V400 H990" />
+      <path class="${displayKnockoutConnectorClass("quarterFinals", 4)}"
+        d="M1015 600 H1002 V400 H990" />
+      <path class="${displayKnockoutConnectorClass("semiFinals", 2)}"
+        d="M810 400 H790" />
+    </svg>
   `;
 }
 
@@ -1025,19 +1096,20 @@ function renderDisplayKnockoutBracket() {
   if (title) title.textContent = getDisplayKnockoutHeading();
 
   bracket.innerHTML = `
-    ${renderDisplayBracketColumn("roundOf16", [1, 2, 3, 4])}
-    ${renderDisplayBracketColumn("quarterFinals", [1, 2])}
-    ${renderDisplayBracketColumn("semiFinals", [1])}
-    ${renderDisplayBracketColumn(
-      "final",
-      [1],
-      "display-final-column"
-    )}
-    ${renderDisplayBracketColumn("semiFinals", [2])}
-    ${renderDisplayBracketColumn("quarterFinals", [3, 4])}
-    ${renderDisplayBracketColumn("roundOf16", [5, 6, 7, 8])}
+    ${renderDisplayKnockoutConnectors()}
+    ${renderDisplayBracketColumn("roundOf16", [1, 2, 3, 4], "display-side-left")}
+    ${renderDisplayBracketColumn("quarterFinals", [1, 2], "display-side-left")}
+    ${renderDisplayBracketColumn("semiFinals", [1], "display-side-left")}
+    ${renderDisplayBracketColumn("final", [1], "display-final-column")}
+    ${renderDisplayBracketColumn("semiFinals", [2], "display-side-right")}
+    ${renderDisplayBracketColumn("quarterFinals", [3, 4], "display-side-right")}
+    ${renderDisplayBracketColumn("roundOf16", [5, 6, 7, 8], "display-side-right")}
   `;
 }
+
+
+/* ==================================================
+   Group Fixture Schedule Display
 
 /* ==================================================
    Group Fixture Schedule Display
@@ -1653,9 +1725,26 @@ function getDisplayPlatePlaceholder(
   return "Team to be confirmed";
 }
 
+function getDisplayPlateSeedReference(seedNumber) {
+  const seedSources = {
+    1: displayPlateSetup?.[2]?.teamOne,
+    2: displayPlateSetup?.[3]?.teamOne,
+    3: displayPlateSetup?.[4]?.teamOne,
+    4: displayPlateSetup?.[1]?.teamOne,
+    5: displayPlateSetup?.[1]?.teamTwo
+  };
+
+  return normalizeDisplayTeamReference(
+    seedSources[seedNumber]
+  );
+}
+
 function renderDisplayPlateMatch(
   roundKey,
-  matchNumber
+  matchNumber,
+  displayMatchNumber = matchNumber,
+  slotNumber = 1,
+  extraClass = ""
 ) {
   const round = PLATE_ROUNDS[roundKey];
 
@@ -1670,10 +1759,14 @@ function renderDisplayPlateMatch(
   );
 
   return `
-    <article class="display-bracket-match">
+    <article
+      class="display-bracket-match display-plate-slot-${slotNumber} ${extraClass}"
+      data-round="plate-${escapeDisplayHtml(roundKey)}"
+      data-match="${matchNumber}"
+    >
       <div class="display-bracket-match-label">
         ${escapeDisplayHtml(round.shortLabel)}
-        ${matchNumber}
+        ${displayMatchNumber}
       </div>
 
       ${renderDisplayBracketTeam(
@@ -1703,70 +1796,171 @@ function renderDisplayPlateMatch(
   `;
 }
 
-function renderDisplayPlateColumn(
-  roundKey,
-  matchNumbers,
-  extraClass = ""
+function renderDisplayPlateByeMatch(
+  displayMatchNumber,
+  seedNumber,
+  semiFinalNumber,
+  slotNumber
 ) {
-  const round = PLATE_ROUNDS[roundKey];
+  const reference = getDisplayPlateSeedReference(
+    seedNumber
+  );
+
+  const team = findDisplayTeam(reference);
+  const displayTeam = team || {
+    name: `Seed ${seedNumber}`,
+    logo: ""
+  };
 
   return `
-    <section
-      class="
-        display-bracket-column
-        ${extraClass}
-      "
+    <article
+      class="display-bracket-match display-plate-bye-match display-plate-slot-${slotNumber}"
+      data-plate-seed="${seedNumber}"
     >
-      <h2 class="display-bracket-column-title">
-        ${escapeDisplayHtml(round.label)}
-      </h2>
+      <div class="display-bracket-match-label">
+        QF ${displayMatchNumber} · BYE
+      </div>
 
-      ${matchNumbers
-        .map((matchNumber) =>
-          renderDisplayPlateMatch(
-            roundKey,
-            matchNumber
-          )
-        )
-        .join("")}
-    </section>
+      <div class="display-bracket-team is-winner">
+        ${renderOptionalImage(
+          displayTeam.logo,
+          "display-bracket-team-logo",
+          `${displayTeam.name} logo`
+        )}
+
+        <span class="display-bracket-team-name">
+          ${escapeDisplayHtml(displayTeam.name)}
+        </span>
+
+        <span class="display-plate-bye-chip">BYE</span>
+      </div>
+
+      <div class="display-plate-bye-message">
+        Automatic bye — advances to SF ${semiFinalNumber}
+      </div>
+    </article>
+  `;
+}
+
+function displayPlateConnectorClass(hasAdvanced) {
+  return hasAdvanced
+    ? "display-bracket-connector is-advanced"
+    : "display-bracket-connector";
+}
+
+function renderDisplayPlateConnectors() {
+  const seedOneReady = Boolean(
+    getDisplayPlateSeedReference(1)
+  );
+
+  const seedTwoReady = Boolean(
+    getDisplayPlateSeedReference(2)
+  );
+
+  const seedThreeReady = Boolean(
+    getDisplayPlateSeedReference(3)
+  );
+
+  const quarterFinalWinner = Boolean(
+    getDisplayPlateWinner("quarterFinals", 1)
+  );
+
+  const semiFinalOneWinner = Boolean(
+    getDisplayPlateWinner("semiFinals", 1)
+  );
+
+  const semiFinalTwoWinner = Boolean(
+    getDisplayPlateWinner("semiFinals", 2)
+  );
+
+  return `
+    <svg
+      class="display-plate-connectors"
+      viewBox="0 0 1000 800"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <path class="${displayPlateConnectorClass(seedOneReady)}"
+        d="M280 100 H320 V200 H360" />
+      <path class="${displayPlateConnectorClass(quarterFinalWinner)}"
+        d="M280 300 H320 V200 H360" />
+      <path class="${displayPlateConnectorClass(seedTwoReady)}"
+        d="M280 500 H320 V600 H360" />
+      <path class="${displayPlateConnectorClass(seedThreeReady)}"
+        d="M280 700 H320 V600 H360" />
+      <path class="${displayPlateConnectorClass(semiFinalOneWinner)}"
+        d="M640 200 H680 V400 H720" />
+      <path class="${displayPlateConnectorClass(semiFinalTwoWinner)}"
+        d="M640 600 H680 V400 H720" />
+    </svg>
   `;
 }
 
 function renderDisplayPlateBracket() {
-  const bracket =
-    displayById("displayPlateBracket");
+  const bracket = displayById("displayPlateBracket");
 
   if (!bracket) return;
 
   bracket.innerHTML = `
-    ${renderDisplayPlateColumn(
-      "quarterFinals",
-      [1],
-      "plate-quarter-final-column"
-    )}
+    ${renderDisplayPlateConnectors()}
 
-    ${renderDisplayPlateColumn(
-      "semiFinals",
-      [1],
-      "plate-semi-final-column"
-    )}
+    <section class="display-plate-stage display-plate-quarter-finals">
+      <h2 class="display-bracket-column-title">Quarter-finals</h2>
 
-    ${renderDisplayPlateColumn(
-      "final",
-      [1],
-      "display-final-column plate-final-column"
-    )}
+      <div class="display-plate-stage-matches">
+        ${renderDisplayPlateByeMatch(1, 1, 1, 1)}
 
-    ${renderDisplayPlateColumn(
-      "semiFinals",
-      [2],
-      "plate-semi-final-column"
-    )}
+        ${renderDisplayPlateMatch(
+          "quarterFinals",
+          1,
+          2,
+          2
+        )}
+
+        ${renderDisplayPlateByeMatch(3, 2, 2, 3)}
+        ${renderDisplayPlateByeMatch(4, 3, 2, 4)}
+      </div>
+    </section>
+
+    <section class="display-plate-stage display-plate-semi-finals">
+      <h2 class="display-bracket-column-title">Semi-finals</h2>
+
+      <div class="display-plate-stage-matches">
+        ${renderDisplayPlateMatch(
+          "semiFinals",
+          1,
+          1,
+          1
+        )}
+
+        ${renderDisplayPlateMatch(
+          "semiFinals",
+          2,
+          2,
+          2
+        )}
+      </div>
+    </section>
+
+    <section class="display-plate-stage display-plate-final-stage">
+      <h2 class="display-bracket-column-title">Final</h2>
+
+      <div class="display-plate-stage-matches">
+        ${renderDisplayPlateMatch(
+          "final",
+          1,
+          1,
+          1,
+          "display-plate-final-match"
+        )}
+      </div>
+    </section>
   `;
 }
 
 
+/* ==================================================
+   Display Mode and Rotation
 
 /* ==================================================
    Display Mode and Rotation
