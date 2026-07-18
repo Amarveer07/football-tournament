@@ -3367,3 +3367,6 @@ tr.group-position-last td:first-child {
     height: 680px;
   }
 }
+.display-main-knockout-bracket {
+  column-gap: clamp(28px, 2.2vw, 48px);
+}
