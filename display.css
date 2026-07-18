@@ -3375,3 +3375,10 @@ tr.group-position-last td:first-child {
   margin-left: auto;
   margin-right: auto;
 }
+.display-main-knockout-bracket {
+  width: calc(100% - 70px) !important;
+  max-width: calc(100% - 70px) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+}
