@@ -1054,36 +1054,36 @@ function renderDisplayKnockoutConnectors() {
       aria-hidden="true"
     >
       <path class="${displayKnockoutConnectorClass("roundOf16", 1)}"
-        d="M180 100 H192 V200 H205" />
+        d="M176 100 H190 V200 H204" />
       <path class="${displayKnockoutConnectorClass("roundOf16", 2)}"
-        d="M180 300 H192 V200 H205" />
+        d="M176 300 H190 V200 H204" />
       <path class="${displayKnockoutConnectorClass("roundOf16", 3)}"
-        d="M180 500 H192 V600 H205" />
+        d="M176 500 H190 V600 H204" />
       <path class="${displayKnockoutConnectorClass("roundOf16", 4)}"
-        d="M180 700 H192 V600 H205" />
+        d="M176 700 H190 V600 H204" />
 
       <path class="${displayKnockoutConnectorClass("quarterFinals", 1)}"
-        d="M385 200 H397 V400 H410" />
+        d="M380 200 H394 V400 H408" />
       <path class="${displayKnockoutConnectorClass("quarterFinals", 2)}"
-        d="M385 600 H397 V400 H410" />
+        d="M380 600 H394 V400 H408" />
       <path class="${displayKnockoutConnectorClass("semiFinals", 1)}"
-        d="M590 400 H610" />
+        d="M584 400 H612" />
 
       <path class="${displayKnockoutConnectorClass("roundOf16", 5)}"
-        d="M1220 100 H1207 V200 H1195" />
+        d="M1224 100 H1210 V200 H1196" />
       <path class="${displayKnockoutConnectorClass("roundOf16", 6)}"
-        d="M1220 300 H1207 V200 H1195" />
+        d="M1224 300 H1210 V200 H1196" />
       <path class="${displayKnockoutConnectorClass("roundOf16", 7)}"
-        d="M1220 500 H1207 V600 H1195" />
+        d="M1224 500 H1210 V600 H1196" />
       <path class="${displayKnockoutConnectorClass("roundOf16", 8)}"
-        d="M1220 700 H1207 V600 H1195" />
+        d="M1224 700 H1210 V600 H1196" />
 
       <path class="${displayKnockoutConnectorClass("quarterFinals", 3)}"
-        d="M1015 200 H1002 V400 H990" />
+        d="M1020 200 H1006 V400 H992" />
       <path class="${displayKnockoutConnectorClass("quarterFinals", 4)}"
-        d="M1015 600 H1002 V400 H990" />
+        d="M1020 600 H1006 V400 H992" />
       <path class="${displayKnockoutConnectorClass("semiFinals", 2)}"
-        d="M810 400 H790" />
+        d="M816 400 H788" />
     </svg>
   `;
 }
@@ -1836,7 +1836,7 @@ function renderDisplayPlateByeMatch(
       </div>
 
       <div class="display-plate-bye-message">
-        Automatic bye — advances to SF ${semiFinalNumber}
+        Automatic bye — advances to Semi-final ${semiFinalNumber}
       </div>
     </article>
   `;
