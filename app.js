@@ -9,32 +9,30 @@
 ================================================== */
 
 const DEFAULT_TEAM_LOGOS = {
-  "Real Punjab FC": "logos/real-punjab-fc.png",
-  "Sunderland AFC": "logos/sunderland-afc.png",
-  "Manchester Youth FC": "logos/manchester-youth.png",
-
   "Kisan FC": "logos/kisan-fc.png",
   "Huddersfield FC": "logos/huddersfield-fc.png",
   "Akaal FC Paris": "logos/akaal-fc-paris.png",
   "Chardi Kala FC": "logos/chardi-kala-fc.png",
 
-  "Newcastle Panjab FC A": "logos/newcastle-punjab-fc-a.png",
-  "Glasgow Gurdwara FC": "logos/glasgow-gurdwara.png",
-  "We Start Now": "logos/we-start-now.png",
+  "NCL Punjab A": "logos/newcastle-punjab-fc-a.png",
+  "Glasgow Gurdwara": "logos/glasgow-gurdwara.png",
+  "We start now": "logos/we-start-now.png",
+  "Sunderland AFC": "logos/sunderland-afc.png",
 
   "Singh Brothers": "logos/singh-brothers.png",
   "Slow & Steady Leeds": "logos/slow-and-steady-leeds.png",
   "Soorma FC Paris": "logos/soorma-fc-paris.png",
-  "FC Italy": "logos/fc-italy.png",
+  "FC ITALY": "logos/fc-italy.png",
 
-  "FC Punjabi Lions Belgium": "logos/fc-punjabi-lions-belgium.png",
+  "FC Punjab Lions Belgium": "logos/fc-punjabi-lions-belgium.png",
   "Doncaster FC A": "logos/doncaster-fc-a.png",
   "GNG Thornaby": "logos/gng-thornaby.png",
-  "Newcastle Panjab FC C": "logos/newcastle-punjab-fc-c.png",
+  "NCL Punjab FC C": "logos/newcastle-punjab-fc-c.png",
 
   "Punjab United FC Gravesend": "logos/punjab-united-fc-gravesend.png",
-  "Newcastle Panjab FC B": "logos/newcastle-punjab-fc-b.png",
-  "Punjabi Mags": "logos/punjabi-mags.png"
+  "Real Punjab FC": "logos/real-punjab-fc.png",
+  "NCL Punjab B": "logos/newcastle-punjab-fc-b.png",
+  "Punjab Mags": "logos/punjabi-mags.png"
 };
 
 function getDefaultTeamLogo(teamName) {
@@ -66,12 +64,6 @@ function createTeam(name, logo = getDefaultTeamLogo(name)) {
 
 function defaultGroups() {
   return {
-    A: [
-      createTeam("Real Punjab FC"),
-      createTeam("Sunderland AFC"),
-      createTeam("Manchester Youth FC")
-    ],
-
     B: [
       createTeam("Kisan FC"),
       createTeam("Huddersfield FC"),
@@ -80,41 +72,53 @@ function defaultGroups() {
     ],
 
     C: [
-      createTeam("Newcastle Panjab FC A"),
-      createTeam("Glasgow Gurdwara FC"),
-      createTeam("We Start Now")
+      createTeam("NCL Punjab A"),
+      createTeam("Glasgow Gurdwara"),
+      createTeam("We start now"),
+      createTeam("Sunderland AFC")
     ],
 
     D: [
-      createTeam("FC Punjabi Lions Belgium"),
-      createTeam("Doncaster FC A"),
-      createTeam("GNG Thornaby"),
-      createTeam("Newcastle Panjab FC C")
-    ],
-
-    E: [
       createTeam("Singh Brothers"),
       createTeam("Slow & Steady Leeds"),
       createTeam("Soorma FC Paris"),
-      createTeam("FC Italy")
+      createTeam("FC ITALY")
+    ],
+
+    E: [
+      createTeam("FC Punjab Lions Belgium"),
+      createTeam("Doncaster FC A"),
+      createTeam("GNG Thornaby"),
+      createTeam("NCL Punjab FC C")
     ],
 
     F: [
       createTeam("Punjab United FC Gravesend"),
-      createTeam("Newcastle Panjab FC B"),
-      createTeam("Punjabi Mags")
+      createTeam("Real Punjab FC"),
+      createTeam("NCL Punjab B"),
+      createTeam("Punjab Mags")
     ]
   };
 }
 
 const OFFICIAL_TEAM_NAME_ALIASES = {
   "Manchester Youth": "Manchester Youth FC",
-  "Glasgow Gurdwara": "Glasgow Gurdwara FC",
+  "Newcastle Panjab FC A": "NCL Punjab A",
+  "Newcastle Punjab FC A": "NCL Punjab A",
+  "Glasgow Gurdwara FC": "Glasgow Gurdwara",
+  "We Start Now": "We start now",
+  "FC Italy": "FC ITALY",
+  "FC Punjabi Lions Belgium": "FC Punjab Lions Belgium",
+  "Newcastle Panjab FC C": "NCL Punjab FC C",
+  "Newcastle Punjab FC C": "NCL Punjab FC C",
+  "Newcastle Panjab FC B": "NCL Punjab B",
+  "Newcastle Punjab FC B": "NCL Punjab B",
+  "Punjabi Mags": "Punjab Mags",
   "Chardikala FC": "Chardi Kala FC"
 };
 
 const OFFICIAL_FIXTURE_VERSION =
-  "2026-07-18-final-pdf-v2";
+  "2026-07-18-20-team-five-groups-v1";
 
 const OFFICIAL_FIXTURE_DATE = {
   year: 2026,
@@ -123,58 +127,49 @@ const OFFICIAL_FIXTURE_DATE = {
 };
 
 const OFFICIAL_GROUP_FIXTURES = {
-  A: [
-    [10, 0, "3", "Real Punjab FC", "Sunderland AFC"],
-    [10, 30, "3", "Sunderland AFC", "Manchester Youth FC"],
-    [11, 0, "3", "Manchester Youth FC", "Real Punjab FC"],
-    [11, 30, "3", "Sunderland AFC", "Real Punjab FC"],
-    [12, 0, "3", "Manchester Youth FC", "Sunderland AFC"],
-    [12, 30, "3", "Real Punjab FC", "Manchester Youth FC"]
-  ],
-
   B: [
-    [10, 0, "4", "Kisan FC", "Chardi Kala FC"],
-    [10, 30, "4", "Huddersfield FC", "Akaal FC Paris"],
-    [11, 0, "4", "Huddersfield FC", "Chardi Kala FC"],
-    [11, 30, "4", "Chardi Kala FC", "Akaal FC Paris"],
-    [12, 0, "4", "Kisan FC", "Akaal FC Paris"],
-    [12, 30, "4", "Kisan FC", "Huddersfield FC"]
+    [10, 30, "1", "Kisan FC", "Huddersfield FC"],
+    [10, 30, "2", "Akaal FC Paris", "Chardi Kala FC"],
+    [11, 30, "1", "Kisan FC", "Akaal FC Paris"],
+    [11, 30, "2", "Huddersfield FC", "Chardi Kala FC"],
+    [12, 30, "1", "Kisan FC", "Chardi Kala FC"],
+    [12, 30, "2", "Huddersfield FC", "Akaal FC Paris"]
   ],
 
   C: [
-    [10, 0, "1", "Newcastle Panjab FC A", "Glasgow Gurdwara FC"],
-    [10, 30, "1", "Glasgow Gurdwara FC", "We Start Now"],
-    [11, 0, "1", "We Start Now", "Newcastle Panjab FC A"],
-    [11, 30, "1", "Glasgow Gurdwara FC", "Newcastle Panjab FC A"],
-    [12, 0, "1", "We Start Now", "Glasgow Gurdwara FC"],
-    [12, 30, "1", "Newcastle Panjab FC A", "We Start Now"]
+    [10, 0, "1", "NCL Punjab A", "Glasgow Gurdwara"],
+    [10, 0, "2", "We start now", "Sunderland AFC"],
+    [11, 0, "1", "NCL Punjab A", "We start now"],
+    [11, 0, "2", "Glasgow Gurdwara", "Sunderland AFC"],
+    [12, 0, "1", "NCL Punjab A", "Sunderland AFC"],
+    [12, 0, "2", "Glasgow Gurdwara", "We start now"]
   ],
 
   D: [
-    [10, 0, "5", "FC Punjabi Lions Belgium", "Newcastle Panjab FC C"],
-    [10, 30, "5", "Doncaster FC A", "GNG Thornaby"],
-    [11, 0, "5", "Doncaster FC A", "Newcastle Panjab FC C"],
-    [11, 30, "5", "Newcastle Panjab FC C", "GNG Thornaby"],
-    [12, 0, "5", "FC Punjabi Lions Belgium", "GNG Thornaby"],
-    [12, 30, "5", "FC Punjabi Lions Belgium", "Doncaster FC A"]
+    [10, 0, "3", "Singh Brothers", "Slow & Steady Leeds"],
+    [10, 0, "4", "Soorma FC Paris", "FC ITALY"],
+    [11, 0, "3", "Singh Brothers", "Soorma FC Paris"],
+    [11, 0, "4", "Slow & Steady Leeds", "FC ITALY"],
+    [12, 0, "3", "Singh Brothers", "FC ITALY"],
+    [12, 0, "4", "Slow & Steady Leeds", "Soorma FC Paris"]
   ],
 
   E: [
-    [10, 0, "6", "Singh Brothers", "FC Italy"],
-    [10, 30, "6", "Slow & Steady Leeds", "Soorma FC Paris"],
-    [11, 0, "6", "Slow & Steady Leeds", "FC Italy"],
-    [11, 30, "6", "FC Italy", "Soorma FC Paris"],
-    [12, 0, "6", "Singh Brothers", "Soorma FC Paris"],
-    [12, 30, "6", "Singh Brothers", "Slow & Steady Leeds"]
+    [10, 0, "5", "FC Punjab Lions Belgium", "Doncaster FC A"],
+    [10, 0, "6", "GNG Thornaby", "NCL Punjab FC C"],
+    [11, 0, "5", "FC Punjab Lions Belgium", "GNG Thornaby"],
+    [11, 0, "6", "Doncaster FC A", "NCL Punjab FC C"],
+    [12, 0, "5", "FC Punjab Lions Belgium", "NCL Punjab FC C"],
+    [12, 0, "6", "Doncaster FC A", "GNG Thornaby"]
   ],
 
   F: [
-    [10, 0, "2", "Punjab United FC Gravesend", "Newcastle Panjab FC B"],
-    [10, 30, "2", "Newcastle Panjab FC B", "Punjabi Mags"],
-    [11, 0, "2", "Punjabi Mags", "Punjab United FC Gravesend"],
-    [11, 30, "2", "Newcastle Panjab FC B", "Punjab United FC Gravesend"],
-    [12, 0, "2", "Punjabi Mags", "Newcastle Panjab FC B"],
-    [12, 30, "2", "Punjab United FC Gravesend", "Punjabi Mags"]
+    [10, 30, "3", "Punjab United FC Gravesend", "Real Punjab FC"],
+    [10, 30, "4", "NCL Punjab B", "Punjab Mags"],
+    [11, 30, "3", "Punjab United FC Gravesend", "NCL Punjab B"],
+    [11, 30, "4", "Real Punjab FC", "Punjab Mags"],
+    [12, 30, "3", "Punjab United FC Gravesend", "Punjab Mags"],
+    [12, 30, "4", "Real Punjab FC", "NCL Punjab B"]
   ]
 };
 
@@ -431,43 +426,43 @@ let undoStack = [];
 const roundOf16Plan = [
   {
     matchNumber: 1,
-    teamOneSource: "Winner of Group A",
-    teamTwoSource: "Third-place rank 4 or 3"
+    teamOneSource: "Winner of Group B",
+    teamTwoSource: "1st seed 4th / Group F 3rd"
   },
   {
     matchNumber: 2,
-    teamOneSource: "Winner of Group C",
-    teamTwoSource: "Third-place rank 3 or 4"
+    teamOneSource: "Runner-up of Group C",
+    teamTwoSource: "Runner-up of Group D"
   },
   {
     matchNumber: 3,
-    teamOneSource: "Winner of Group F",
-    teamTwoSource: "Runner-up of Group B"
+    teamOneSource: "Winner of Group E",
+    teamTwoSource: "3rd place of Group D"
   },
   {
     matchNumber: 4,
-    teamOneSource: "Runner-up of Group D",
-    teamTwoSource: "Runner-up of Group E"
+    teamOneSource: "Winner of Group F",
+    teamTwoSource: "3rd place of Group C"
   },
   {
     matchNumber: 5,
-    teamOneSource: "Winner of Group B",
-    teamTwoSource: "Third-place rank 2 or 1"
+    teamOneSource: "Winner of Group D",
+    teamTwoSource: "3rd place of Group E"
   },
   {
     matchNumber: 6,
-    teamOneSource: "Winner of Group D",
-    teamTwoSource: "Third-place rank 1 or 2"
+    teamOneSource: "3rd place of Group B",
+    teamTwoSource: "Runner-up of Group F"
   },
   {
     matchNumber: 7,
-    teamOneSource: "Winner of Group E",
-    teamTwoSource: "Runner-up of Group A"
+    teamOneSource: "Winner of Group C",
+    teamTwoSource: "Group F 3rd / 1st seed 4th"
   },
   {
     matchNumber: 8,
-    teamOneSource: "Runner-up of Group C",
-    teamTwoSource: "Runner-up of Group F"
+    teamOneSource: "Runner-up of Group B",
+    teamTwoSource: "Runner-up of Group E"
   }
 ];
 
@@ -598,38 +593,19 @@ let knockoutResults = normalizeKnockoutResults(
 const bottomEightPlan = [
   {
     matchNumber: 1,
-    teamOneSource: "Seed 4",
-    teamTwoSource: "Seed 5"
+    teamOneSource: "Seed 1",
+    teamTwoSource: "Seed 4"
+  },
+  {
+    matchNumber: 2,
+    teamOneSource: "Seed 2",
+    teamTwoSource: "Seed 3"
   }
 ];
 
-const bottomEightDirectSeedPlan = [
-  {
-    setupKey: 2,
-    matchNumber: 1,
-    slot: "one",
-    teamSource: "Seed 1"
-  },
-  {
-    setupKey: 3,
-    matchNumber: 2,
-    slot: "one",
-    teamSource: "Seed 2"
-  },
-  {
-    setupKey: 4,
-    matchNumber: 2,
-    slot: "two",
-    teamSource: "Seed 3"
-  }
-];
+const bottomEightDirectSeedPlan = [];
 
 const bottomEightRoundConfig = {
-  quarterFinals: {
-    label: "Quarter-final",
-    shortLabel: "QF",
-    matchCount: 1
-  },
   semiFinals: {
     label: "Semi-finals",
     shortLabel: "SF",
@@ -651,44 +627,31 @@ function normalizeBottomEightSetup(rawSetup) {
 
   if (
     Object.keys(rawSetup).length > 0 &&
-    rawSetup.formatVersion !== 3
+    rawSetup.formatVersion !== 4
   ) {
     plateSetupMigrationDetected = true;
     return {};
   }
 
   const normalized = {
-    formatVersion: 3
+    formatVersion: 4
   };
 
-  const rawQuarterFinal = rawSetup?.[1];
-  const teamOne = normalizeKnockoutTeamReference(
-    rawQuarterFinal?.teamOne
-  );
-  const teamTwo = normalizeKnockoutTeamReference(
-    rawQuarterFinal?.teamTwo
-  );
+  for (const matchNumber of [1, 2]) {
+    const rawMatch = rawSetup?.[matchNumber];
 
-  if (teamOne || teamTwo) {
-    normalized[1] = {
-      teamOne,
-      teamTwo
-    };
-  }
-
-  for (const setupKey of [2, 3, 4]) {
-    const rawSeed = rawSetup?.[setupKey];
-
-    if (rawSeed?.directSeed !== true) continue;
-
-    const seededTeam = normalizeKnockoutTeamReference(
-      rawSeed?.teamOne
+    const teamOne = normalizeKnockoutTeamReference(
+      rawMatch?.teamOne
     );
 
-    if (seededTeam) {
-      normalized[setupKey] = {
-        teamOne: seededTeam,
-        directSeed: true
+    const teamTwo = normalizeKnockoutTeamReference(
+      rawMatch?.teamTwo
+    );
+
+    if (teamOne || teamTwo) {
+      normalized[matchNumber] = {
+        teamOne,
+        teamTwo
       };
     }
   }
@@ -836,7 +799,9 @@ let topScorers = normalizeTopScorers(
 const REMOVED_TEAM_NAMES = new Set([
   "Sikh Gurdwara Darlington",
   "TBC",
-  "Singh Sabha Slough"
+  "Singh Sabha Slough",
+  "Manchester Youth",
+  "Manchester Youth FC"
 ]);
 
 let tournamentMigrationPending = false;
@@ -1036,12 +1001,12 @@ async function persistTournamentMigrationIfNeeded() {
     tournamentMigrationPending = false;
     await writeTournamentState();
     console.info(
-      "Saved the 21-team tournament structure to Firebase."
+      "Saved the 20-team tournament structure to Firebase."
     );
   } catch (error) {
     tournamentMigrationPending = true;
     console.error(
-      "The 21-team tournament update could not be saved.",
+      "The 20-team tournament update could not be saved.",
       error
     );
   } finally {
@@ -1662,6 +1627,52 @@ function getThirdPlacedTeams() {
     });
 }
 
+function getFourthPlacedTeams() {
+  return getGroupKeys()
+    .map((groupKey) => {
+      const sortedGroup = getSortedGroup(groupKey);
+      const fourthPlacedTeam = sortedGroup[3];
+
+      if (!fourthPlacedTeam) return null;
+
+      const played = Math.max(
+        0,
+        toNumber(fourthPlacedTeam.p)
+      );
+
+      const pointsPerGame =
+        played > 0
+          ? toNumber(fourthPlacedTeam.points) / played
+          : 0;
+
+      return {
+        ...fourthPlacedTeam,
+        groupKey,
+        ppg: pointsPerGame,
+        gf: getTeamGoalsFor(
+          groupKey,
+          fourthPlacedTeam.name
+        )
+      };
+    })
+    .filter(Boolean)
+    .sort((first, second) => {
+      if (second.ppg !== first.ppg) {
+        return second.ppg - first.ppg;
+      }
+
+      if (second.gd !== first.gd) {
+        return second.gd - first.gd;
+      }
+
+      if (second.gf !== first.gf) {
+        return second.gf - first.gf;
+      }
+
+      return first.name.localeCompare(second.name);
+    });
+}
+
 function renderThirdPlaceTable() {
   const table = byId("thirdPlaceTable");
   if (!table) return;
@@ -1679,10 +1690,7 @@ function renderThirdPlaceTable() {
 
   const rows = thirdPlacedTeams
     .map((team, index) => {
-      const rowClass =
-        index < 4
-          ? "third-place-qualified"
-          : "third-place-plate";
+      const rowClass = "third-place-qualified";
 
       return `
         <tr class="${rowClass}">
@@ -2306,78 +2314,84 @@ function autoFillKnockoutSetup() {
     return [priorityTeam, otherTeam];
   };
 
-  const thirdPlaced = getThirdPlacedTeams();
+  const fourthPlaced = getFourthPlacedTeams();
 
-  if (thirdPlaced.length < 4) {
-    alert("Four third-placed teams are required.");
+  if (fourthPlaced.length < 5) {
+    alert(
+      "All five groups need complete standings before the best fourth-placed team can be selected."
+    );
     return;
   }
 
-  const rank1 = makeTeam(
-    thirdPlaced[0].groupKey,
-    thirdPlaced[0]
-  );
-  const rank2 = makeTeam(
-    thirdPlaced[1].groupKey,
-    thirdPlaced[1]
-  );
-  const rank3 = makeTeam(
-    thirdPlaced[2].groupKey,
-    thirdPlaced[2]
-  );
-  const rank4 = makeTeam(
-    thirdPlaced[3].groupKey,
-    thirdPlaced[3]
+  const bestFourth = makeTeam(
+    fourthPlaced[0].groupKey,
+    fourthPlaced[0]
   );
 
-  const lowerPair = choosePair(
-    rank4,
-    rank3,
-    "A",
-    "C"
+  const groupFThird = makeTeam(
+    "F",
+    group("F")[2]
   );
 
-  const higherPair = choosePair(
-    rank2,
-    rank1,
+  if (!bestFourth || !groupFThird) {
+    alert(
+      "The best fourth-placed team and Group F third place must both be available."
+    );
+    return;
+  }
+
+  const flexiblePair = choosePair(
+    bestFourth,
+    groupFThird,
     "B",
-    "D"
+    "C"
   );
 
   const suggestedMatches = {
     1: [
-      makeTeam("A", group("A")[0]),
-      lowerPair[0]
+      makeTeam("B", group("B")[0]),
+      flexiblePair[0]
     ],
     2: [
-      makeTeam("C", group("C")[0]),
-      lowerPair[1]
+      makeTeam("C", group("C")[1]),
+      makeTeam("D", group("D")[1])
     ],
     3: [
-      makeTeam("F", group("F")[0]),
-      makeTeam("B", group("B")[1])
+      makeTeam("E", group("E")[0]),
+      makeTeam("D", group("D")[2])
     ],
     4: [
-      makeTeam("D", group("D")[1]),
-      makeTeam("E", group("E")[1])
+      makeTeam("F", group("F")[0]),
+      makeTeam("C", group("C")[2])
     ],
     5: [
-      makeTeam("B", group("B")[0]),
-      higherPair[0]
+      makeTeam("D", group("D")[0]),
+      makeTeam("E", group("E")[2])
     ],
     6: [
-      makeTeam("D", group("D")[0]),
-      higherPair[1]
+      makeTeam("B", group("B")[2]),
+      makeTeam("F", group("F")[1])
     ],
     7: [
-      makeTeam("E", group("E")[0]),
-      makeTeam("A", group("A")[1])
+      makeTeam("C", group("C")[0]),
+      flexiblePair[1]
     ],
     8: [
-      makeTeam("C", group("C")[1]),
-      makeTeam("F", group("F")[1])
+      makeTeam("B", group("B")[1]),
+      makeTeam("E", group("E")[1])
     ]
   };
+
+  const everyTeamAvailable = Object.values(
+    suggestedMatches
+  ).every((teams) => teams[0] && teams[1]);
+
+  if (!everyTeamAvailable) {
+    alert(
+      "The group standings are not complete enough to build the knockout bracket yet."
+    );
+    return;
+  }
 
   Object.entries(suggestedMatches).forEach(
     ([matchNumber, teams]) => {
@@ -2628,20 +2642,14 @@ async function clearKnockoutMatchResult(
 ================================================== */
 
 function bottomEightSetupIsComplete() {
-  const quarterFinal = bottomEightSetup?.[1];
+  return [1, 2].every((matchNumber) => {
+    const match = bottomEightSetup?.[matchNumber];
 
-  const quarterFinalReady = Boolean(
-    quarterFinal?.teamOne &&
-    quarterFinal?.teamTwo
-  );
-
-  const directSeedsReady = [2, 3, 4].every(
-    (setupKey) => Boolean(
-      bottomEightSetup?.[setupKey]?.teamOne
-    )
-  );
-
-  return quarterFinalReady && directSeedsReady;
+    return Boolean(
+      match?.teamOne &&
+      match?.teamTwo
+    );
+  });
 }
 
 function getBottomEightResult(roundKey, matchNumber) {
@@ -2658,8 +2666,8 @@ function getBottomEightWinner(roundKey, matchNumber) {
 }
 
 function getBottomEightMatchTeams(roundKey, matchNumber) {
-  if (roundKey === "quarterFinals") {
-    const savedMatch = bottomEightSetup?.[1];
+  if (roundKey === "semiFinals") {
+    const savedMatch = bottomEightSetup?.[matchNumber];
 
     return {
       teamOne: normalizeKnockoutTeamReference(
@@ -2667,29 +2675,6 @@ function getBottomEightMatchTeams(roundKey, matchNumber) {
       ),
       teamTwo: normalizeKnockoutTeamReference(
         savedMatch?.teamTwo
-      )
-    };
-  }
-
-  if (roundKey === "semiFinals") {
-    if (matchNumber === 1) {
-      return {
-        teamOne: normalizeKnockoutTeamReference(
-          bottomEightSetup?.[2]?.teamOne
-        ),
-        teamTwo: getBottomEightWinner(
-          "quarterFinals",
-          1
-        )
-      };
-    }
-
-    return {
-      teamOne: normalizeKnockoutTeamReference(
-        bottomEightSetup?.[3]?.teamOne
-      ),
-      teamTwo: normalizeKnockoutTeamReference(
-        bottomEightSetup?.[4]?.teamOne
       )
     };
   }
@@ -2708,13 +2693,6 @@ function getBottomEightMatchTeams(roundKey, matchNumber) {
 }
 
 function getNextBottomEightMatch(roundKey, matchNumber) {
-  if (roundKey === "quarterFinals") {
-    return {
-      roundKey: "semiFinals",
-      matchNumber: 1
-    };
-  }
-
   if (roundKey === "semiFinals") {
     return {
       roundKey: "final",
@@ -2785,17 +2763,11 @@ function getBottomEightSlotPlaceholder(
   matchNumber,
   slot
 ) {
-  if (roundKey === "quarterFinals") {
-    return slot === "one"
-      ? "Seed 4"
-      : "Seed 5";
-  }
-
   if (roundKey === "semiFinals") {
     if (matchNumber === 1) {
       return slot === "one"
         ? "Seed 1"
-        : "Winner of Seed 4 vs Seed 5";
+        : "Seed 4";
     }
 
     return slot === "one"
@@ -2830,98 +2802,54 @@ function renderBottomEightSetup() {
     })
     .join("");
 
-  const quarterFinalHtml = `
-    <div class="form-panel knockout-match-panel">
-      <h3>NEST Plate — Quarter-final</h3>
+  const semiFinalHtml = bottomEightPlan
+    .map((match) => `
+      <div class="form-panel knockout-match-panel">
+        <h3>NEST Plate — Semi-final ${match.matchNumber}</h3>
 
-      <p class="helper-text">
-        Seed 4 vs Seed 5
-      </p>
+        <p class="helper-text">
+          ${escapeHtml(match.teamOneSource)} vs ${escapeHtml(match.teamTwoSource)}
+        </p>
 
-      <div class="form-field">
-        <label for="bottomEightTeamOne_1">
-          Seed 4
-        </label>
+        <div class="form-field">
+          <label for="bottomEightTeamOne_${match.matchNumber}">
+            ${escapeHtml(match.teamOneSource)}
+          </label>
 
-        <select id="bottomEightTeamOne_1">
-          <option value="">Select team</option>
-          ${teamOptions}
-        </select>
-      </div>
-
-      <div class="form-field">
-        <label for="bottomEightTeamTwo_1">
-          Seed 5
-        </label>
-
-        <select id="bottomEightTeamTwo_1">
-          <option value="">Select team</option>
-          ${teamOptions}
-        </select>
-      </div>
-    </div>
-  `;
-
-  const directSeedHtml = bottomEightDirectSeedPlan
-    .map(
-      (seed) => `
-        <div class="form-panel knockout-match-panel">
-          <h3>
-            NEST Plate — ${escapeHtml(seed.teamSource)}
-          </h3>
-
-          <p class="helper-text">
-            ${
-              seed.setupKey === 2
-                ? "Enters Semi-final 1 against the quarter-final winner."
-                : seed.setupKey === 3
-                  ? "Plays Seed 3 in Semi-final 2."
-                  : "Plays Seed 2 in Semi-final 2."
-            }
-          </p>
-
-          <div class="form-field">
-            <label for="bottomEightSeed_${seed.setupKey}">
-              ${escapeHtml(seed.teamSource)}
-            </label>
-
-            <select id="bottomEightSeed_${seed.setupKey}">
-              <option value="">Select team</option>
-              ${teamOptions}
-            </select>
-          </div>
+          <select id="bottomEightTeamOne_${match.matchNumber}">
+            <option value="">Select team</option>
+            ${teamOptions}
+          </select>
         </div>
-      `
-    )
+
+        <div class="form-field">
+          <label for="bottomEightTeamTwo_${match.matchNumber}">
+            ${escapeHtml(match.teamTwoSource)}
+          </label>
+
+          <select id="bottomEightTeamTwo_${match.matchNumber}">
+            <option value="">Select team</option>
+            ${teamOptions}
+          </select>
+        </div>
+      </div>
+    `)
     .join("");
 
   container.innerHTML = `
     <div class="section-heading">
       <div>
-        <h3>Five-team seeded bracket</h3>
+        <h3>Four-team seeded bracket</h3>
         <p>
-          The five nonqualifiers are seeded by points per game,
-          then goal difference, then goals scored.
+          The four NEST Plate teams are the remaining fourth-placed teams,
+          seeded by points per game, then goal difference, then goals scored.
+          Seed 1 plays Seed 4 and Seed 2 plays Seed 3.
         </p>
       </div>
     </div>
 
     <div class="form-grid">
-      ${quarterFinalHtml}
-    </div>
-
-    <div class="section-heading plate-seed-heading">
-      <div>
-        <h3>Direct semi-final seeds</h3>
-        <p>
-          Seed 1 plays the quarter-final winner. Seeds 2 and 3
-          play each other in the other semi-final.
-        </p>
-      </div>
-    </div>
-
-    <div class="form-grid">
-      ${directSeedHtml}
+      ${semiFinalHtml}
     </div>
 
     <div class="subsection knockout-results-admin">
@@ -2929,8 +2857,8 @@ function renderBottomEightSetup() {
         <div>
           <h3>NEST Plate Results</h3>
           <p>
-            Enter scores for every round. If a match is tied,
-            choose the winner after penalties.
+            Enter the two semi-final results, then the final.
+            If a match is tied, choose the winner after penalties.
           </p>
         </div>
       </div>
@@ -2939,28 +2867,24 @@ function renderBottomEightSetup() {
     </div>
   `;
 
-  const savedQuarterFinal = bottomEightSetup?.[1];
+  bottomEightPlan.forEach((match) => {
+    const savedMatch =
+      bottomEightSetup?.[match.matchNumber];
 
-  if (savedQuarterFinal?.teamOne) {
-    byId("bottomEightTeamOne_1").value =
-      encodeTeamReference(savedQuarterFinal.teamOne);
-  }
+    if (savedMatch?.teamOne) {
+      byId(
+        `bottomEightTeamOne_${match.matchNumber}`
+      ).value = encodeTeamReference(
+        savedMatch.teamOne
+      );
+    }
 
-  if (savedQuarterFinal?.teamTwo) {
-    byId("bottomEightTeamTwo_1").value =
-      encodeTeamReference(savedQuarterFinal.teamTwo);
-  }
-
-  bottomEightDirectSeedPlan.forEach((seed) => {
-    const savedTeam =
-      bottomEightSetup?.[seed.setupKey]?.teamOne;
-
-    const select = byId(
-      `bottomEightSeed_${seed.setupKey}`
-    );
-
-    if (select && savedTeam) {
-      select.value = encodeTeamReference(savedTeam);
+    if (savedMatch?.teamTwo) {
+      byId(
+        `bottomEightTeamTwo_${match.matchNumber}`
+      ).value = encodeTeamReference(
+        savedMatch.teamTwo
+      );
     }
   });
 }
@@ -3196,58 +3120,15 @@ function createPlateSeedCandidate(groupKey, team) {
 }
 
 function getSeededPlateTeams() {
-  const candidates = [];
-  const selectedKeys = new Set();
-
-  const addCandidate = (candidate) => {
-    if (!candidate) return;
-
-    const key = `${candidate.groupKey}:${candidate.teamName}`;
-    if (selectedKeys.has(key)) return;
-
-    selectedKeys.add(key);
-    candidates.push(candidate);
-  };
-
-  getThirdPlacedTeams()
-    .slice(4)
-    .forEach((team) => {
-      addCandidate(
-        createPlateSeedCandidate(
-          team.groupKey,
-          team
-        )
-      );
-    });
-
-  getGroupKeys().forEach((groupKey) => {
-    const sortedGroup = getSortedGroup(groupKey);
-
-    if (sortedGroup.length < 4) return;
-
-    addCandidate(
+  return getFourthPlacedTeams()
+    .slice(1)
+    .map((team) =>
       createPlateSeedCandidate(
-        groupKey,
-        sortedGroup[sortedGroup.length - 1]
+        team.groupKey,
+        team
       )
-    );
-  });
-
-  return candidates.sort((first, second) => {
-    if (second.ppg !== first.ppg) {
-      return second.ppg - first.ppg;
-    }
-
-    if (second.gd !== first.gd) {
-      return second.gd - first.gd;
-    }
-
-    if (second.gf !== first.gf) {
-      return second.gf - first.gf;
-    }
-
-    return first.teamName.localeCompare(second.teamName);
-  });
+    )
+    .filter(Boolean);
 }
 
 function plateSeedCandidateToReference(candidate) {
@@ -3262,9 +3143,9 @@ function plateSeedCandidateToReference(candidate) {
 function autoFillBottomEightSetup() {
   const seededTeams = getSeededPlateTeams();
 
-  if (seededTeams.length !== 5) {
+  if (seededTeams.length !== 4) {
     alert(
-      "All six groups need valid standings before the five NEST Plate teams can be seeded."
+      "All five groups need valid standings before the four NEST Plate teams can be seeded."
     );
     return;
   }
@@ -3274,11 +3155,10 @@ function autoFillBottomEightSetup() {
   );
 
   const assignments = {
-    bottomEightTeamOne_1: references[3],
-    bottomEightTeamTwo_1: references[4],
-    bottomEightSeed_2: references[0],
-    bottomEightSeed_3: references[1],
-    bottomEightSeed_4: references[2]
+    bottomEightTeamOne_1: references[0],
+    bottomEightTeamTwo_1: references[3],
+    bottomEightTeamOne_2: references[1],
+    bottomEightTeamTwo_2: references[2]
   };
 
   Object.entries(assignments).forEach(
@@ -3313,7 +3193,7 @@ function autoFillBottomEightSetup() {
 
 async function saveBottomEightSetup() {
   const newSetup = {
-    formatVersion: 3
+    formatVersion: 4
   };
 
   const selectedTeams = new Set();
@@ -3337,45 +3217,35 @@ async function saveBottomEightSetup() {
     return true;
   };
 
-  const seed4 = decodeTeamReference(
-    byId("bottomEightTeamOne_1")?.value
-  );
-
-  const seed5 = decodeTeamReference(
-    byId("bottomEightTeamTwo_1")?.value
-  );
-
-  if (
-    !addUniqueTeam(seed4, "Seed 4") ||
-    !addUniqueTeam(seed5, "Seed 5")
-  ) {
-    return;
-  }
-
-  newSetup[1] = {
-    teamOne: seed4,
-    teamTwo: seed5
-  };
-
-  for (const seed of bottomEightDirectSeedPlan) {
-    const team = decodeTeamReference(
+  for (const match of bottomEightPlan) {
+    const teamOne = decodeTeamReference(
       byId(
-        `bottomEightSeed_${seed.setupKey}`
+        `bottomEightTeamOne_${match.matchNumber}`
+      )?.value
+    );
+
+    const teamTwo = decodeTeamReference(
+      byId(
+        `bottomEightTeamTwo_${match.matchNumber}`
       )?.value
     );
 
     if (
       !addUniqueTeam(
-        team,
-        seed.teamSource
+        teamOne,
+        `Semi-final ${match.matchNumber} ${match.teamOneSource}`
+      ) ||
+      !addUniqueTeam(
+        teamTwo,
+        `Semi-final ${match.matchNumber} ${match.teamTwoSource}`
       )
     ) {
       return;
     }
 
-    newSetup[seed.setupKey] = {
-      teamOne: team,
-      directSeed: true
+    newSetup[match.matchNumber] = {
+      teamOne,
+      teamTwo
     };
   }
 
@@ -3561,11 +3431,10 @@ function renderPublicTournamentLockup() {
 
 function getPublicPlateSeedReference(seedNumber) {
   const seedSources = {
-    1: bottomEightSetup?.[2]?.teamOne,
-    2: bottomEightSetup?.[3]?.teamOne,
-    3: bottomEightSetup?.[4]?.teamOne,
-    4: bottomEightSetup?.[1]?.teamOne,
-    5: bottomEightSetup?.[1]?.teamTwo
+    1: bottomEightSetup?.[1]?.teamOne,
+    2: bottomEightSetup?.[2]?.teamOne,
+    3: bottomEightSetup?.[2]?.teamTwo,
+    4: bottomEightSetup?.[1]?.teamTwo
   };
 
   return normalizeKnockoutTeamReference(
@@ -3672,22 +3541,6 @@ function publicPlateConnectorClass(hasAdvanced) {
 }
 
 function renderPublicPlateConnectors() {
-  const seedOneReady = Boolean(
-    getPublicPlateSeedReference(1)
-  );
-
-  const seedTwoReady = Boolean(
-    getPublicPlateSeedReference(2)
-  );
-
-  const seedThreeReady = Boolean(
-    getPublicPlateSeedReference(3)
-  );
-
-  const quarterFinalWinner = Boolean(
-    getBottomEightWinner("quarterFinals", 1)
-  );
-
   const semiFinalOneWinner = Boolean(
     getBottomEightWinner("semiFinals", 1)
   );
@@ -3703,18 +3556,10 @@ function renderPublicPlateConnectors() {
       preserveAspectRatio="none"
       aria-hidden="true"
     >
-      <path class="${publicPlateConnectorClass(seedOneReady)}"
-        d="M280 100 H320 V200 H360" />
-      <path class="${publicPlateConnectorClass(quarterFinalWinner)}"
-        d="M280 300 H320 V200 H360" />
-      <path class="${publicPlateConnectorClass(seedTwoReady)}"
-        d="M280 500 H320 V600 H360" />
-      <path class="${publicPlateConnectorClass(seedThreeReady)}"
-        d="M280 700 H320 V600 H360" />
       <path class="${publicPlateConnectorClass(semiFinalOneWinner)}"
-        d="M640 200 H680 V400 H720" />
+        d="M300 220 H500 V400 H700" />
       <path class="${publicPlateConnectorClass(semiFinalTwoWinner)}"
-        d="M640 600 H680 V400 H720" />
+        d="M300 580 H500 V400 H700" />
     </svg>
   `;
 }
@@ -3724,28 +3569,10 @@ function renderPublicBottomEightBracket() {
   if (!container) return;
 
   container.innerHTML = `
-    <div class="plate-bracket-modern">
+    <div class="plate-bracket-modern plate-bracket-four-team">
       ${renderPublicPlateConnectors()}
 
       <section class="plate-stage plate-quarter-finals">
-        <h3>Quarter-finals</h3>
-
-        <div class="plate-stage-matches">
-          ${renderPublicPlateByeMatch(1, 1, 1, 1)}
-
-          ${renderPublicBottomEightMatch(
-            "quarterFinals",
-            1,
-            2,
-            "plate-grid-slot-2"
-          )}
-
-          ${renderPublicPlateByeMatch(3, 2, 2, 3)}
-          ${renderPublicPlateByeMatch(4, 3, 2, 4)}
-        </div>
-      </section>
-
-      <section class="plate-stage plate-semi-finals">
         <h3>Semi-finals</h3>
 
         <div class="plate-stage-matches">
@@ -3760,7 +3587,7 @@ function renderPublicBottomEightBracket() {
             "semiFinals",
             2,
             2,
-            "plate-grid-slot-2"
+            "plate-grid-slot-3"
           )}
         </div>
       </section>
@@ -4801,8 +4628,8 @@ function renderOfficialFixtureLoader() {
 
   if (status) {
     status.textContent = officialFixturesLoaded
-      ? "All 36 official fixtures are loaded. Every match can still be edited below."
-      : "Loads the revised 36-match, 21-team group schedule for Saturday 18 July 2026.";
+      ? "All 30 official fixtures are loaded. Every match can still be edited below."
+      : "Loads the new 30-match, 20-team group schedule for Saturday 18 July 2026.";
   }
 }
 
@@ -4846,25 +4673,16 @@ function resetTeamTableAdjustments() {
 async function loadOfficialFixtures() {
   if (!requireAdmin()) return;
 
-  standardizeOfficialTeamNamesInState();
-
-  const missingTeams = getMissingOfficialFixtureTeams();
-
-  if (missingTeams.length > 0) {
-    alert(
-      `These official teams are missing from their groups:\n\n${missingTeams.join("\n")}\n\nRestore the teams before loading the fixture pack.`
-    );
-    return;
-  }
-
   const confirmed = confirm(
-    "Load the revised 36-match official group schedule?\n\nThis replaces existing group matches and scores, clears test standings adjustments, goalscorers, pitch assignments and both knockout setups. Team names, logos and sponsor information are kept."
+    "Load the new 30-match official group schedule?\n\nThis changes the tournament to 20 teams in Groups B-F, removes Group A and Manchester Youth, moves Sunderland into Group C and Real Punjab into Group F, replaces all group fixtures and scores, and clears standings adjustments, goalscorers, pitch assignments and both knockout setups."
   );
 
   if (!confirmed) return;
 
   const saved = await commitStateChange(() => {
-    standardizeOfficialTeamNamesInState();
+    groups = defaultGroups();
+    groupKeys = Object.keys(groups);
+
     matches = normalizeMatches(
       createOfficialMatches(),
       groupKeys
@@ -4877,18 +4695,23 @@ async function loadOfficialFixtures() {
 
     knockoutSetup = {};
     knockoutResults = createEmptyKnockoutResults();
+
     bottomEightSetup = {};
-    bottomEightResults = createEmptyBottomEightResults();
+    bottomEightResults =
+      createEmptyBottomEightResults();
+
     topScorers = {};
+
     officialFixturesLoaded = true;
     officialFixturesVersion =
       OFFICIAL_FIXTURE_VERSION;
-    currentGroup = "A";
+
+    currentGroup = "B";
   });
 
   if (saved) {
     alert(
-      "The revised 36-match official schedule has been loaded. Every fixture remains fully editable in Group Matches."
+      "The new 20-team, 30-match official schedule has been loaded. Every fixture remains fully editable in Group Matches."
     );
   }
 }
