@@ -11,7 +11,7 @@
   <title>Sikh Football Tournament – Live Updates</title>
 
   <!-- Public styling -->
-  <link rel="stylesheet" href="style.css?v=22">
+  <link rel="stylesheet" href="style.css?v=23">
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
@@ -19,7 +19,7 @@
   <script src="firebase-init.js" defer></script>
 
   <!-- Tournament application -->
-  <script src="app.js?v=43" defer></script>
+  <script src="app.js?v=44" defer></script>
 </head>
 
 <body>
@@ -112,32 +112,11 @@
       <a href="#bottom-eight">
         NEST Plate Championship
       </a>
+
+      <a href="#pitch-map">
+        Pitch Map
+      </a>
     </nav>
-
-
-    <!-- ==========================================
-         MAIN SPONSOR AREA
-    =========================================== -->
-
-    <section class="featured-sponsor-section">
-      <div class="featured-sponsor-copy">
-        <p class="sponsor-eyebrow">
-          Main Sponsor
-        </p>
-
-        <h2>
-          Tournament Partner
-        </h2>
-
-        <p>
-          Main sponsor branding will appear here.
-        </p>
-      </div>
-
-      <div class="featured-sponsor-placeholder">
-        Sponsor logo coming soon
-      </div>
-    </section>
 
 
     <!-- ==========================================
@@ -413,40 +392,116 @@
         </div>
       </section>
 
-
       <!-- ========================================
-           SUPPORTING SPONSORS
+           LIVE PITCH MAP
       ========================================= -->
 
-      <section class="supporting-sponsors-section">
-        <div class="supporting-sponsors-heading">
-          <p class="section-eyebrow">
-            Supported By
-          </p>
+      <section
+        id="pitch-map"
+        class="public-section public-pitch-map-section"
+      >
+        <div class="public-section-heading">
+          <div>
+            <p class="section-eyebrow">
+              Around the Venue
+            </p>
 
-          <h2>
-            Tournament Sponsors
-          </h2>
+            <h2>
+              Live Pitch Map
+            </h2>
+
+            <p>
+              See which match is currently assigned to every pitch.
+              Swipe sideways on smaller screens to view the full map.
+            </p>
+          </div>
         </div>
 
-        <div class="supporting-sponsor-grid">
-          <div class="supporting-sponsor-slot">
-            Sponsor logo
-          </div>
+        <div class="public-panel public-pitch-map-panel">
+          <div
+            class="public-pitch-map-scroll"
+            tabindex="0"
+            aria-label="Scrollable live tournament pitch map"
+          >
+            <div class="public-pitch-map-board">
+              <div class="public-pitch-map-title-row">
+                <h3>NEST26 Tournament Site Map</h3>
+              </div>
 
-          <div class="supporting-sponsor-slot">
-            Sponsor logo
-          </div>
+              <div class="public-pitch-map-layout">
+                <aside class="public-pitch-map-sidebar">
+                  <img
+                    class="public-pitch-map-tournament-logo"
+                    src="logos/tournament-logo-full.png"
+                    alt="Ladhar Investments North East Sikh Tournament 2026"
+                  >
 
-          <div class="supporting-sponsor-slot">
-            Sponsor logo
-          </div>
+                  <div class="public-pitch-map-rule">
+                    <span aria-hidden="true">🐕</span>
+                    <strong>No dogs</strong>
+                  </div>
 
-          <div class="supporting-sponsor-slot">
-            Sponsor logo
+                  <div class="public-pitch-map-rule">
+                    <span aria-hidden="true">🍷</span>
+                    <strong>No alcohol</strong>
+                  </div>
+
+                  <div class="public-pitch-map-rule">
+                    <span aria-hidden="true">🚭</span>
+                    <strong>No smoking<br>No vaping</strong>
+                  </div>
+                </aside>
+
+                <div class="public-pitch-map-main">
+                  <div
+                    id="publicPitchMapGrid"
+                    class="public-pitch-map-grid"
+                    aria-live="polite"
+                  >
+                    <p class="public-pitch-map-loading">
+                      Loading live pitch assignments…
+                    </p>
+                  </div>
+
+                  <div class="public-pitch-map-facilities">
+                    <div class="public-pitch-map-facility public-pitch-map-kids">
+                      <span aria-hidden="true">🛝</span>
+                      <strong>Kids Play Area</strong>
+                    </div>
+
+                    <div class="public-pitch-map-facility public-pitch-map-food">
+                      <span aria-hidden="true">🍔</span>
+                      <strong>Food Stalls</strong>
+                    </div>
+
+                    <div class="public-pitch-map-facility public-pitch-map-information">
+                      <span aria-hidden="true">ⓘ</span>
+                      <strong>Information Centre</strong>
+                    </div>
+
+                    <div class="public-pitch-map-facility public-pitch-map-registration">
+                      <span aria-hidden="true">📋</span>
+                      <strong>Registration</strong>
+                    </div>
+
+                    <div class="public-pitch-map-location">
+                      <span aria-hidden="true">●</span>
+                      <strong>You are here!</strong>
+                      <span aria-hidden="true">↙</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <p class="public-pitch-map-footer-message">
+                Thank you for being part of NEST26 — play fair,
+                respect all and enjoy the game!
+              </p>
+            </div>
           </div>
         </div>
       </section>
+
 
     </div>
 
